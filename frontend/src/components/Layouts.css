@@ -1,0 +1,506 @@
+/* ==========================================
+   LAYOUT PRINCIPAL
+========================================== */
+
+.app-layout {
+    display: flex;
+    min-height: 100vh;
+    background: #f5f7fb;
+}
+
+
+/* ==========================================
+   SIDEBAR
+========================================== */
+
+.sidebar {
+    width: 270px;
+    min-height: 100vh;
+
+    background: #123b5d;
+    color: white;
+
+    display: flex;
+    flex-direction: column;
+
+    position: fixed;
+    left: 0;
+    top: 0;
+
+    overflow-y: auto;
+
+    box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1);
+}
+
+
+/* ==========================================
+   LOGO
+========================================== */
+
+.logo {
+    padding: 30px 25px;
+
+    border-bottom: 1px solid rgba(255, 255, 255, 0.15);
+
+    text-align: center;
+}
+
+
+.logo h2 {
+    margin: 0;
+
+    font-size: 24px;
+
+    letter-spacing: 2px;
+}
+
+
+.logo span {
+    display: block;
+
+    margin-top: 5px;
+
+    font-size: 12px;
+
+    letter-spacing: 4px;
+
+    opacity: 0.8;
+}
+
+
+/* ==========================================
+   NAVIGATION
+========================================== */
+
+.sidebar-nav {
+    display: flex;
+    flex-direction: column;
+
+    padding: 15px 12px;
+
+    gap: 5px;
+
+    flex: 1;
+}
+
+
+/* ==========================================
+   LIENS PRINCIPAUX
+========================================== */
+
+.sidebar-nav > a {
+    display: flex;
+
+    align-items: center;
+
+    padding: 13px 15px;
+
+    text-decoration: none;
+
+    color: #dbeafe;
+
+    border-radius: 8px;
+
+    transition: 0.3s;
+
+    font-size: 15px;
+
+    border-left: 3px solid transparent;
+}
+
+
+/* ==========================================
+   SURVOL LIENS PRINCIPAUX
+========================================== */
+
+.sidebar-nav > a:hover {
+    background: rgba(255, 255, 255, 0.12);
+
+    color: white;
+}
+
+
+/* ==========================================
+   LIEN PRINCIPAL ACTIF
+========================================== */
+
+.sidebar-nav > a.active {
+    background: rgba(255, 255, 255, 0.12);
+
+    color: white;
+
+    font-weight: 600;
+
+    border-left: 3px solid white;
+}
+
+
+/* ==========================================
+   SECTIONS MENU
+========================================== */
+
+.menu-section {
+    width: 100%;
+
+    margin-bottom: 5px;
+}
+
+
+/* ==========================================
+   BOUTON MENU PRINCIPAL
+========================================== */
+
+.menu-parent {
+    width: 100%;
+
+    display: flex;
+
+    justify-content: space-between;
+
+    align-items: center;
+
+    padding: 13px 15px;
+
+    border: none;
+
+    background: transparent;
+
+    color: #dbeafe;
+
+    cursor: pointer;
+
+    border-radius: 8px;
+
+    font-size: 15px;
+
+    text-align: left;
+
+    transition: 0.3s;
+
+    font-family: inherit;
+}
+
+
+/* ==========================================
+   SURVOL MENU PRINCIPAL
+========================================== */
+
+.menu-parent:hover {
+    background: rgba(255, 255, 255, 0.12);
+
+    color: white;
+}
+
+
+/* ==========================================
+   SOUS MENU
+========================================== */
+
+.submenu {
+    display: flex;
+
+    flex-direction: column;
+
+    margin-left: 15px;
+
+    margin-top: 5px;
+
+    padding-left: 10px;
+
+    border-left: 1px solid rgba(255, 255, 255, 0.2);
+
+    gap: 3px;
+}
+
+
+/* ==========================================
+   LIENS SOUS MENU
+========================================== */
+
+.submenu a {
+    display: block;
+
+    padding: 10px 12px;
+
+    color: #cbd5e1;
+
+    text-decoration: none;
+
+    border-radius: 6px;
+
+    font-size: 14px;
+
+    transition: 0.3s;
+
+    border-left: 3px solid transparent;
+}
+
+
+/* ==========================================
+   SURVOL SOUS MENU
+========================================== */
+
+.submenu a:hover {
+    background: rgba(255, 255, 255, 0.1);
+
+    color: white;
+}
+
+
+/* ==========================================
+   SOUS MENU ACTIF
+========================================== */
+
+.submenu a.active {
+    background: rgba(255, 255, 255, 0.12);
+
+    color: white;
+
+    font-weight: 600;
+
+    border-left: 3px solid white;
+}
+
+
+/* ==========================================
+   BAS SIDEBAR
+========================================== */
+
+.sidebar-bottom {
+    padding: 20px;
+
+    border-top: 1px solid rgba(255, 255, 255, 0.15);
+}
+
+
+.sidebar-bottom button {
+    width: 100%;
+
+    padding: 12px;
+
+    border: none;
+
+    border-radius: 8px;
+
+    cursor: pointer;
+
+    background: rgba(255, 255, 255, 0.1);
+
+    color: white;
+
+    font-size: 14px;
+
+    transition: 0.3s;
+}
+
+
+.sidebar-bottom button:hover {
+    background: rgba(255, 255, 255, 0.2);
+}
+
+
+/* ==========================================
+   CONTENU PRINCIPAL
+========================================== */
+
+.main-content {
+    margin-left: 270px;
+
+    width: calc(100% - 270px);
+
+    min-height: 100vh;
+}
+
+
+/* ==========================================
+   TOPBAR
+========================================== */
+
+.topbar {
+    height: 70px;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: space-between;
+
+    padding: 0 35px;
+
+    background: white;
+
+    border-bottom: 1px solid #e5e7eb;
+
+    position: sticky;
+
+    top: 0;
+
+    z-index: 10;
+}
+
+
+.topbar h3 {
+    margin: 0;
+
+    color: #123b5d;
+
+    font-size: 18px;
+}
+
+
+/* ==========================================
+   UTILISATEUR
+========================================== */
+
+.user-info {
+    display: flex;
+
+    flex-direction: column;
+
+    align-items: flex-end;
+}
+
+
+.user-info span {
+    font-size: 14px;
+
+    font-weight: 600;
+
+    color: #1e293b;
+}
+
+
+.user-info small {
+    margin-top: 3px;
+
+    color: #64748b;
+}
+
+
+/* ==========================================
+   CONTENU PAGE
+========================================== */
+
+.page-content {
+    padding: 30px;
+}
+
+
+/* ==========================================
+   SCROLLBAR SIDEBAR
+========================================== */
+
+.sidebar::-webkit-scrollbar {
+    width: 6px;
+}
+
+
+.sidebar::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+
+.sidebar::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.2);
+
+    border-radius: 10px;
+}
+
+
+/* ==========================================
+   RESPONSIVE - TABLETTE
+========================================== */
+
+@media (max-width: 900px) {
+
+    .sidebar {
+        width: 230px;
+    }
+
+
+    .main-content {
+        margin-left: 230px;
+
+        width: calc(100% - 230px);
+    }
+
+}
+
+
+/* ==========================================
+   RESPONSIVE - MOBILE
+========================================== */
+
+@media (max-width: 700px) {
+
+    .sidebar {
+        width: 70px;
+    }
+
+
+    .logo {
+        padding: 20px 5px;
+    }
+
+
+    .logo h2,
+    .logo span {
+        display: none;
+    }
+
+
+    .menu-parent span:first-child {
+        font-size: 0;
+    }
+
+
+    .submenu {
+        display: none;
+    }
+
+
+    .sidebar-nav > a {
+        justify-content: center;
+
+        padding: 15px 5px;
+
+        font-size: 0;
+    }
+
+
+    .sidebar-nav > a.active {
+        border-left: none;
+
+        border-bottom: 3px solid white;
+    }
+
+
+    .sidebar-bottom {
+        padding: 10px;
+    }
+
+
+    .sidebar-bottom button {
+        font-size: 0;
+
+        padding: 15px 5px;
+    }
+
+
+    .main-content {
+        margin-left: 70px;
+
+        width: calc(100% - 70px);
+    }
+
+
+    .topbar {
+        padding: 0 15px;
+    }
+
+
+    .page-content {
+        padding: 15px;
+    }
+
+}

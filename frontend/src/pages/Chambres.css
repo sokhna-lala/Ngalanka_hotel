@@ -1,0 +1,234 @@
+/* ==========================================
+   ACTIONS
+========================================== */
+
+.actions-cell {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.btn-action {
+    width: 36px;
+    height: 36px;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: 0.2s;
+}
+
+.btn-view {
+    background: #e8f4ff;
+}
+
+.btn-view:hover {
+    transform: translateY(-1px);
+}
+
+.btn-edit {
+    background: #fff4df;
+}
+
+.btn-edit:hover {
+    transform: translateY(-1px);
+}
+
+
+/* ==========================================
+   FENÊTRE DÉTAILS
+========================================== */
+
+.details-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.45);
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    z-index: 1000;
+    padding: 20px;
+}
+
+
+/* ==========================================
+   MODAL
+========================================== */
+
+.details-modal {
+    width: 100%;
+    max-width: 720px;
+
+    background: white;
+    border-radius: 16px;
+
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.2);
+
+    overflow: hidden;
+
+    animation: modalAppear 0.2s ease-out;
+}
+
+@keyframes modalAppear {
+
+    from {
+        opacity: 0;
+        transform: translateY(-15px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+
+/* ==========================================
+   HEADER
+========================================== */
+
+.details-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    padding: 22px 26px;
+
+    border-bottom: 1px solid #eee;
+}
+
+.details-header h2 {
+    margin: 0;
+    font-size: 22px;
+}
+
+.details-header p {
+    margin: 5px 0 0;
+    color: #777;
+    font-size: 14px;
+}
+
+.details-close {
+    width: 36px;
+    height: 36px;
+
+    border: none;
+    border-radius: 8px;
+
+    background: #f5f5f5;
+
+    cursor: pointer;
+
+    font-size: 16px;
+}
+
+.details-close:hover {
+    background: #eaeaea;
+}
+
+
+/* ==========================================
+   CONTENU
+========================================== */
+
+.details-content {
+    padding: 25px 26px;
+
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+
+    gap: 18px;
+}
+
+.detail-item {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+
+    padding: 14px;
+
+    background: #f8fafc;
+
+    border-radius: 10px;
+}
+
+.detail-item span:first-child {
+    font-size: 13px;
+    color: #777;
+}
+
+.detail-item strong {
+    font-size: 15px;
+    color: #222;
+}
+
+.detail-full {
+    grid-column: 1 / -1;
+}
+
+.detail-full p {
+    margin: 0;
+
+    color: #444;
+
+    line-height: 1.5;
+}
+
+
+/* ==========================================
+   FOOTER
+========================================== */
+
+.details-footer {
+    padding: 18px 26px;
+
+    border-top: 1px solid #eee;
+
+    display: flex;
+    justify-content: flex-end;
+
+    gap: 10px;
+}
+
+.btn-secondary {
+    padding: 10px 18px;
+
+    border: 1px solid #ddd;
+
+    background: white;
+
+    border-radius: 8px;
+
+    cursor: pointer;
+}
+
+.btn-secondary:hover {
+    background: #f5f5f5;
+}
+
+
+/* ==========================================
+   RESPONSIVE
+========================================== */
+
+@media (max-width: 650px) {
+
+    .details-content {
+        grid-template-columns: 1fr;
+    }
+
+    .detail-full {
+        grid-column: auto;
+    }
+
+    .details-modal {
+        max-height: 90vh;
+        overflow-y: auto;
+    }
+
+}

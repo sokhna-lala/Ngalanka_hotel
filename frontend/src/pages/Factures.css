@@ -1,0 +1,527 @@
+/* =====================================================
+   PAGE FACTURES
+===================================================== */
+
+.factures-page {
+    padding: 24px;
+    background: #f5f7fa;
+    min-height: 100vh;
+    color: #1f2937;
+}
+
+/* =====================================================
+   EN-TÊTE
+===================================================== */
+
+.page-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 24px;
+}
+
+.page-header h1 {
+    margin: 0;
+    font-size: 28px;
+    font-weight: 700;
+    color: #1f2937;
+}
+
+.page-header p {
+    margin: 6px 0 0;
+    color: #6b7280;
+    font-size: 14px;
+}
+
+/* =====================================================
+   BOUTONS
+===================================================== */
+
+.btn-primary {
+    border: none;
+    background: #2563eb;
+    color: white;
+    padding: 11px 18px;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: 0.2s;
+}
+
+.btn-primary:hover {
+    background: #1d4ed8;
+}
+
+.btn-secondary {
+    border: 1px solid #d1d5db;
+    background: white;
+    color: #374151;
+    padding: 9px 14px;
+    border-radius: 7px;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+}
+
+.btn-secondary:hover {
+    background: #f3f4f6;
+}
+
+.btn-close {
+    border: none;
+    background: transparent;
+    color: #6b7280;
+    font-size: 22px;
+    cursor: pointer;
+    width: 38px;
+    height: 38px;
+    border-radius: 50%;
+}
+
+.btn-close:hover {
+    background: #f3f4f6;
+    color: #111827;
+}
+
+.btn-delete {
+    border: none;
+    background: #fee2e2;
+    color: #dc2626;
+    width: 38px;
+    height: 38px;
+    border-radius: 7px;
+    cursor: pointer;
+    margin-top: 24px;
+}
+
+.btn-delete:hover {
+    background: #fecaca;
+}
+
+/* =====================================================
+   FORMULAIRE FACTURE
+===================================================== */
+
+.facture-form {
+    background: white;
+    border-radius: 12px;
+    border: 1px solid #e5e7eb;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.06);
+    overflow: hidden;
+}
+
+/* =====================================================
+   HEADER FORMULAIRE
+===================================================== */
+
+.form-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px 24px;
+    border-bottom: 1px solid #e5e7eb;
+    background: #f8fafc;
+}
+
+.form-header h2 {
+    margin: 0;
+    font-size: 20px;
+    color: #111827;
+}
+
+.form-header p {
+    margin: 5px 0 0;
+    color: #6b7280;
+    font-size: 13px;
+}
+
+/* =====================================================
+   FORMULAIRE
+===================================================== */
+
+.facture-form form {
+    padding: 24px;
+}
+
+.form-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+    margin-bottom: 28px;
+}
+
+.facture-form label {
+    display: block;
+    margin-bottom: 7px;
+    font-size: 13px;
+    font-weight: 600;
+    color: #374151;
+}
+
+.facture-form input,
+.facture-form select,
+.facture-form textarea {
+    width: 100%;
+    box-sizing: border-box;
+    border: 1px solid #d1d5db;
+    border-radius: 7px;
+    padding: 10px 12px;
+    background: white;
+    color: #111827;
+    font-size: 14px;
+    outline: none;
+    transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.facture-form input:focus,
+.facture-form select:focus,
+.facture-form textarea:focus {
+    border-color: #2563eb;
+    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+}
+
+.facture-form textarea {
+    resize: vertical;
+}
+
+/* =====================================================
+   LIGNES DE FACTURE
+===================================================== */
+
+.lignes-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 14px;
+}
+
+.lignes-header h3 {
+    margin: 0;
+    font-size: 17px;
+    color: #111827;
+}
+
+.lignes-container {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.ligne-facture {
+    display: grid;
+    grid-template-columns:
+        130px
+        minmax(180px, 1.8fr)
+        100px
+        140px
+        120px
+        150px
+        45px;
+
+    gap: 12px;
+    align-items: end;
+
+    padding: 16px;
+    border: 1px solid #e5e7eb;
+    border-radius: 9px;
+    background: #fafafa;
+}
+
+.ligne-facture input,
+.ligne-facture select {
+    background: white;
+}
+
+.ligne-montant {
+    min-width: 120px;
+}
+
+.ligne-montant strong {
+    display: block;
+    padding: 10px 0;
+    color: #111827;
+    font-size: 14px;
+}
+
+/* =====================================================
+   TOTAUX
+===================================================== */
+
+.totaux-facture {
+    margin-top: 24px;
+    margin-left: auto;
+    width: 420px;
+    max-width: 100%;
+
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+
+    padding: 18px;
+    border-radius: 10px;
+    background: #f8fafc;
+    border: 1px solid #e5e7eb;
+}
+
+.totaux-facture > div {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 20px;
+}
+
+.totaux-facture span {
+    font-size: 14px;
+    color: #4b5563;
+}
+
+.totaux-facture strong {
+    font-size: 15px;
+    color: #111827;
+}
+
+.totaux-facture input {
+    width: 150px;
+}
+
+.net-a-payer {
+    margin-top: 8px;
+    padding-top: 14px;
+    border-top: 1px solid #d1d5db;
+}
+
+.net-a-payer span {
+    font-size: 16px;
+    font-weight: 700;
+    color: #111827;
+}
+
+.net-a-payer strong {
+    font-size: 20px;
+    color: #2563eb;
+}
+
+/* =====================================================
+   OBSERVATION
+===================================================== */
+
+.full-width {
+    margin-top: 24px;
+}
+
+.full-width textarea {
+    min-height: 90px;
+}
+
+/* =====================================================
+   ACTIONS FORMULAIRE
+===================================================== */
+
+.form-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 12px;
+    margin-top: 24px;
+    padding-top: 20px;
+    border-top: 1px solid #e5e7eb;
+}
+
+.form-actions button {
+    border: 1px solid #d1d5db;
+    background: white;
+    color: #374151;
+    padding: 10px 18px;
+    border-radius: 7px;
+    font-size: 14px;
+    cursor: pointer;
+}
+
+.form-actions button:hover {
+    background: #f3f4f6;
+}
+
+.form-actions .btn-primary {
+    border: none;
+    background: #2563eb;
+    color: white;
+}
+
+.form-actions .btn-primary:hover {
+    background: #1d4ed8;
+}
+
+/* =====================================================
+   TABLEAU
+===================================================== */
+
+.table-container {
+    width: 100%;
+    overflow-x: auto;
+    background: white;
+    border: 1px solid #e5e7eb;
+    border-radius: 10px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+}
+
+.table-container table {
+    width: 100%;
+    border-collapse: collapse;
+    min-width: 1100px;
+}
+
+.table-container th {
+    padding: 13px 14px;
+    text-align: left;
+    background: #f8fafc;
+    color: #4b5563;
+    font-size: 12px;
+    font-weight: 700;
+    border-bottom: 1px solid #e5e7eb;
+}
+
+.table-container td {
+    padding: 14px;
+    border-bottom: 1px solid #f1f5f9;
+    font-size: 13px;
+    color: #374151;
+}
+
+.table-container tbody tr:hover {
+    background: #f9fafb;
+}
+
+.table-container tbody tr:last-child td {
+    border-bottom: none;
+}
+
+.empty {
+    text-align: center;
+    padding: 45px !important;
+    color: #6b7280 !important;
+}
+
+/* =====================================================
+   STATUTS
+===================================================== */
+
+.statut {
+    display: inline-flex;
+    align-items: center;
+    padding: 5px 9px;
+    border-radius: 20px;
+    font-size: 11px;
+    font-weight: 700;
+}
+
+.statut-brouillon {
+    background: #f3f4f6;
+    color: #4b5563;
+}
+
+.statut-partielle {
+    background: #fef3c7;
+    color: #92400e;
+}
+
+.statut-payee {
+    background: #dcfce7;
+    color: #166534;
+}
+
+.statut-annulee {
+    background: #fee2e2;
+    color: #991b1b;
+}
+
+/* =====================================================
+   ACTIONS TABLEAU
+===================================================== */
+
+.actions {
+    display: flex;
+    gap: 6px;
+}
+
+.btn-action {
+    width: 34px;
+    height: 34px;
+    border: 1px solid #e5e7eb;
+    background: white;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 15px;
+}
+
+.btn-action:hover {
+    background: #f3f4f6;
+}
+
+/* =====================================================
+   ERREUR
+===================================================== */
+
+.error-message {
+    padding: 14px 16px;
+    border-radius: 8px;
+    background: #fee2e2;
+    color: #991b1b;
+    border: 1px solid #fecaca;
+}
+
+/* =====================================================
+   RESPONSIVE
+===================================================== */
+
+@media (max-width: 1200px) {
+    .ligne-facture {
+        grid-template-columns:
+            repeat(3, 1fr);
+    }
+
+    .ligne-facture .btn-delete {
+        margin-top: 0;
+    }
+}
+
+@media (max-width: 768px) {
+    .factures-page {
+        padding: 15px;
+    }
+
+    .page-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 15px;
+    }
+
+    .page-header .btn-primary {
+        width: 100%;
+    }
+
+    .form-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .ligne-facture {
+        grid-template-columns: 1fr;
+    }
+
+    .ligne-facture .btn-delete {
+        width: 100%;
+        margin-top: 5px;
+    }
+
+    .totaux-facture {
+        width: 100%;
+        box-sizing: border-box;
+    }
+
+    .form-actions {
+        flex-direction: column-reverse;
+    }
+
+    .form-actions button {
+        width: 100%;
+    }
+}

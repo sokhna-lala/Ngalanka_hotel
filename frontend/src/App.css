@@ -1,0 +1,164 @@
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+#root {
+  min-height: 100vh;
+}
+
+.login-page {
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: #f3f6f9;
+  padding: 20px;
+}
+
+.login-card {
+  width: 100%;
+  max-width: 450px;
+  background: white;
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow: 0 10px 35px rgba(0, 0, 0, 0.12);
+}
+
+.hotel-header {
+  text-align: center;
+  padding: 35px 25px 30px;
+  background: #0b5d7a;
+  color: white;
+}
+
+.hotel-icon {
+  font-size: 55px;
+  margin-bottom: 10px;
+}
+
+.hotel-header h1 {
+  margin: 0;
+  font-size: 28px;
+  letter-spacing: 1px;
+}
+
+.hotel-header p {
+  margin: 8px 0 0;
+  opacity: 0.9;
+  font-size: 14px;
+}
+
+.login-content {
+  padding: 35px;
+}
+
+.login-content h2 {
+  margin: 0;
+  text-align: center;
+  font-size: 25px;
+  color: #222;
+}
+
+.welcome {
+  text-align: center;
+  color: #777;
+  font-size: 14px;
+  margin-bottom: 30px;
+}
+
+.form-group {
+  margin-bottom: 20px;
+}
+
+.form-group label {
+  display: block;
+  margin-bottom: 8px;
+  font-weight: 600;
+  color: #333;
+  font-size: 14px;
+}
+
+.form-group input {
+  width: 100%;
+  padding: 13px 14px;
+  border: 1px solid #d5dce1;
+  border-radius: 8px;
+  font-size: 15px;
+  outline: none;
+  transition: 0.2s;
+}
+
+.form-group input:focus {
+  border-color: #0b5d7a;
+  box-shadow: 0 0 0 3px rgba(11, 93, 122, 0.1);
+}
+
+.login-button {
+  width: 100%;
+  padding: 14px;
+  border: none;
+  border-radius: 8px;
+  background: #0b5d7a;
+  color: white;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+.login-button:hover {
+  background: #084a61;
+}
+
+.login-button:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
+.message {
+  padding: 12px;
+  margin-bottom: 18px;
+  border-radius: 7px;
+  background: #eef6f9;
+  color: #0b5d7a;
+  font-size: 14px;
+  text-align: center;
+}
+
+.login-footer {
+  text-align: center;
+  padding: 18px;
+  background: #f8f9fa;
+  border-top: 1px solid #eee;
+}
+
+.login-footer p {
+  margin: 0 0 5px;
+  font-size: 13px;
+  font-weight: 600;
+  color: #555;
+}
+
+.login-footer span {
+  font-size: 12px;
+  color: #999;
+}
+
+@media (max-width: 500px) {
+  .login-card {
+    max-width: 100%;
+  }
+
+  .login-content {
+    padding: 25px;
+  }
+
+  .hotel-header h1 {
+    font-size: 24px;
+  }
+}

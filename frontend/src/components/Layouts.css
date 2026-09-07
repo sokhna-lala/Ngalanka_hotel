@@ -1,3 +1,31 @@
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;600;700&family=Poppins:wght@400;500;600;700&display=swap');
+
+/* ==========================================
+   VARIABLES
+========================================== */
+
+:root {
+    --navy-deep: #0a1f30;
+    --navy: #123049;
+    --navy-light: #16395a;
+
+    --brass: #c9a15c;
+    --brass-soft: rgba(201, 161, 92, 0.16);
+    --brass-hover: #d9b876;
+
+    --ivory: #f8f5ef;
+    --white: #ffffff;
+
+    --ink: #1f2a33;
+    --slate: #64748b;
+    --line: #e7e2d7;
+
+    --radius-sm: 6px;
+    --radius-md: 10px;
+    --shadow-soft: 0 4px 16px rgba(10, 31, 48, 0.06);
+}
+
+
 /* ==========================================
    LAYOUT PRINCIPAL
 ========================================== */
@@ -5,7 +33,9 @@
 .app-layout {
     display: flex;
     min-height: 100vh;
-    background: #f5f7fb;
+    background: var(--ivory);
+    font-family: "Poppins", sans-serif;
+    color: var(--ink);
 }
 
 
@@ -17,7 +47,7 @@
     width: 270px;
     min-height: 100vh;
 
-    background: #123b5d;
+    background: linear-gradient(180deg, var(--navy) 0%, var(--navy-deep) 100%);
     color: white;
 
     display: flex;
@@ -29,7 +59,7 @@
 
     overflow-y: auto;
 
-    box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1);
+    box-shadow: 4px 0 24px rgba(10, 31, 48, 0.18);
 }
 
 
@@ -38,33 +68,44 @@
 ========================================== */
 
 .logo {
-    padding: 30px 25px;
-
-    border-bottom: 1px solid rgba(255, 255, 255, 0.15);
+    padding: 34px 25px 26px;
 
     text-align: center;
+    position: relative;
 }
 
+.logo::after {
+    content: "";
+    position: absolute;
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 46px;
+    height: 2px;
+    background: var(--brass);
+}
 
 .logo h2 {
     margin: 0;
 
-    font-size: 24px;
-
-    letter-spacing: 2px;
+    font-family: "Playfair Display", serif;
+    font-weight: 600;
+    font-size: 25px;
+    letter-spacing: 1.5px;
+    color: white;
 }
 
 
 .logo span {
     display: block;
 
-    margin-top: 5px;
+    margin-top: 6px;
 
-    font-size: 12px;
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 5px;
 
-    letter-spacing: 4px;
-
-    opacity: 0.8;
+    color: var(--brass);
 }
 
 
@@ -76,9 +117,9 @@
     display: flex;
     flex-direction: column;
 
-    padding: 15px 12px;
+    padding: 20px 12px;
 
-    gap: 5px;
+    gap: 4px;
 
     flex: 1;
 }
@@ -93,19 +134,20 @@
 
     align-items: center;
 
-    padding: 13px 15px;
+    padding: 12px 15px;
 
     text-decoration: none;
 
-    color: #dbeafe;
+    color: #c3d2de;
 
-    border-radius: 8px;
+    border-radius: var(--radius-sm);
 
-    transition: 0.3s;
+    transition: background 0.2s ease, color 0.2s ease, border-color 0.2s ease;
 
-    font-size: 15px;
+    font-size: 14.5px;
+    font-weight: 500;
 
-    border-left: 3px solid transparent;
+    border-left: 2px solid transparent;
 }
 
 
@@ -114,7 +156,7 @@
 ========================================== */
 
 .sidebar-nav > a:hover {
-    background: rgba(255, 255, 255, 0.12);
+    background: rgba(255, 255, 255, 0.06);
 
     color: white;
 }
@@ -125,13 +167,13 @@
 ========================================== */
 
 .sidebar-nav > a.active {
-    background: rgba(255, 255, 255, 0.12);
+    background: var(--brass-soft);
 
     color: white;
 
     font-weight: 600;
 
-    border-left: 3px solid white;
+    border-left: 2px solid var(--brass);
 }
 
 
@@ -142,7 +184,7 @@
 .menu-section {
     width: 100%;
 
-    margin-bottom: 5px;
+    margin-bottom: 4px;
 }
 
 
@@ -159,25 +201,32 @@
 
     align-items: center;
 
-    padding: 13px 15px;
+    padding: 12px 15px;
 
     border: none;
 
     background: transparent;
 
-    color: #dbeafe;
+    color: #c3d2de;
 
     cursor: pointer;
 
-    border-radius: 8px;
+    border-radius: var(--radius-sm);
 
-    font-size: 15px;
+    font-size: 14.5px;
+    font-weight: 500;
 
     text-align: left;
 
-    transition: 0.3s;
+    transition: background 0.2s ease, color 0.2s ease;
 
     font-family: inherit;
+}
+
+.menu-parent span:last-child {
+    color: var(--brass);
+    font-size: 13px;
+    transition: transform 0.2s ease;
 }
 
 
@@ -186,7 +235,7 @@
 ========================================== */
 
 .menu-parent:hover {
-    background: rgba(255, 255, 255, 0.12);
+    background: rgba(255, 255, 255, 0.06);
 
     color: white;
 }
@@ -203,13 +252,14 @@
 
     margin-left: 15px;
 
-    margin-top: 5px;
+    margin-top: 4px;
+    margin-bottom: 6px;
 
-    padding-left: 10px;
+    padding-left: 12px;
 
-    border-left: 1px solid rgba(255, 255, 255, 0.2);
+    border-left: 1px solid rgba(201, 161, 92, 0.25);
 
-    gap: 3px;
+    gap: 2px;
 }
 
 
@@ -220,19 +270,20 @@
 .submenu a {
     display: block;
 
-    padding: 10px 12px;
+    padding: 9px 12px;
 
-    color: #cbd5e1;
+    color: #9fb1c0;
 
     text-decoration: none;
 
-    border-radius: 6px;
+    border-radius: var(--radius-sm);
 
-    font-size: 14px;
+    font-size: 13.5px;
+    font-weight: 400;
 
-    transition: 0.3s;
+    transition: background 0.2s ease, color 0.2s ease;
 
-    border-left: 3px solid transparent;
+    border-left: 2px solid transparent;
 }
 
 
@@ -241,7 +292,7 @@
 ========================================== */
 
 .submenu a:hover {
-    background: rgba(255, 255, 255, 0.1);
+    background: rgba(255, 255, 255, 0.06);
 
     color: white;
 }
@@ -252,13 +303,13 @@
 ========================================== */
 
 .submenu a.active {
-    background: rgba(255, 255, 255, 0.12);
+    background: var(--brass-soft);
 
     color: white;
 
     font-weight: 600;
 
-    border-left: 3px solid white;
+    border-left: 2px solid var(--brass);
 }
 
 
@@ -267,9 +318,9 @@
 ========================================== */
 
 .sidebar-bottom {
-    padding: 20px;
+    padding: 22px;
 
-    border-top: 1px solid rgba(255, 255, 255, 0.15);
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
 }
 
 
@@ -278,24 +329,27 @@
 
     padding: 12px;
 
-    border: none;
+    border: 1px solid rgba(201, 161, 92, 0.4);
 
-    border-radius: 8px;
+    border-radius: var(--radius-sm);
 
     cursor: pointer;
 
-    background: rgba(255, 255, 255, 0.1);
+    background: transparent;
 
-    color: white;
+    color: var(--brass);
 
-    font-size: 14px;
+    font-family: "Poppins", sans-serif;
+    font-size: 13.5px;
+    font-weight: 600;
 
-    transition: 0.3s;
+    transition: background 0.2s ease, color 0.2s ease;
 }
 
 
 .sidebar-bottom button:hover {
-    background: rgba(255, 255, 255, 0.2);
+    background: var(--brass);
+    color: var(--navy-deep);
 }
 
 
@@ -317,7 +371,7 @@
 ========================================== */
 
 .topbar {
-    height: 70px;
+    height: 72px;
 
     display: flex;
 
@@ -325,11 +379,11 @@
 
     justify-content: space-between;
 
-    padding: 0 35px;
+    padding: 0 36px;
 
-    background: white;
+    background: var(--white);
 
-    border-bottom: 1px solid #e5e7eb;
+    border-bottom: 1px solid var(--line);
 
     position: sticky;
 
@@ -342,9 +396,11 @@
 .topbar h3 {
     margin: 0;
 
-    color: #123b5d;
-
-    font-size: 18px;
+    font-family: "Playfair Display", serif;
+    color: var(--navy-deep);
+    font-size: 19px;
+    font-weight: 600;
+    letter-spacing: 0.3px;
 }
 
 
@@ -363,17 +419,15 @@
 
 .user-info span {
     font-size: 14px;
-
     font-weight: 600;
-
-    color: #1e293b;
+    color: var(--ink);
 }
 
 
 .user-info small {
     margin-top: 3px;
-
-    color: #64748b;
+    font-size: 12px;
+    color: var(--slate);
 }
 
 
@@ -382,7 +436,7 @@
 ========================================== */
 
 .page-content {
-    padding: 30px;
+    padding: 32px 36px;
 }
 
 
@@ -401,9 +455,21 @@
 
 
 .sidebar::-webkit-scrollbar-thumb {
-    background: rgba(255, 255, 255, 0.2);
+    background: rgba(201, 161, 92, 0.3);
 
     border-radius: 10px;
+}
+
+
+/* ==========================================
+   ACCESSIBILITÉ - FOCUS CLAVIER
+========================================== */
+
+.sidebar-nav a:focus-visible,
+.menu-parent:focus-visible,
+.sidebar-bottom button:focus-visible {
+    outline: 2px solid var(--brass);
+    outline-offset: 2px;
 }
 
 
@@ -439,7 +505,11 @@
 
 
     .logo {
-        padding: 20px 5px;
+        padding: 22px 5px;
+    }
+
+    .logo::after {
+        display: none;
     }
 
 
@@ -471,7 +541,7 @@
     .sidebar-nav > a.active {
         border-left: none;
 
-        border-bottom: 3px solid white;
+        border-bottom: 2px solid var(--brass);
     }
 
 
@@ -500,7 +570,7 @@
 
 
     .page-content {
-        padding: 15px;
+        padding: 18px;
     }
 
 }

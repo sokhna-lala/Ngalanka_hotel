@@ -1,0 +1,290 @@
+/* =====================================================
+   PAGE PAIEMENTS
+===================================================== */
+
+.paiements-page {
+    padding: 24px;
+    background: #f5f7fa;
+    min-height: 100vh;
+    color: #1f2937;
+}
+
+.page-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 24px;
+}
+
+.page-header h1 {
+    margin: 0;
+    font-size: 28px;
+    font-weight: 700;
+    color: #1f2937;
+}
+
+.page-header p {
+    margin: 6px 0 0;
+    color: #6b7280;
+    font-size: 14px;
+}
+
+/* =====================================================
+   STATISTIQUES
+===================================================== */
+
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 16px;
+    margin-bottom: 24px;
+}
+
+.stat-card {
+    background: white;
+    border: 1px solid #e5e7eb;
+    border-radius: 10px;
+    padding: 18px;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+}
+
+.stat-card span {
+    font-size: 13px;
+    color: #6b7280;
+    font-weight: 600;
+}
+
+.stat-card strong {
+    font-size: 20px;
+    color: #111827;
+}
+
+.stat-card small {
+    font-size: 12px;
+    color: #9ca3af;
+}
+
+.stat-total {
+    background: #eff6ff;
+    border-color: #bfdbfe;
+}
+
+.stat-total strong {
+    color: #1d4ed8;
+}
+
+/* =====================================================
+   BARRE DE FILTRES
+===================================================== */
+
+.filtres-bar {
+    display: flex;
+    align-items: end;
+    gap: 16px;
+    flex-wrap: wrap;
+    background: white;
+    border: 1px solid #e5e7eb;
+    border-radius: 10px;
+    padding: 18px;
+    margin-bottom: 20px;
+}
+
+.filtres-bar label {
+    display: block;
+    margin-bottom: 7px;
+    font-size: 13px;
+    font-weight: 600;
+    color: #374151;
+}
+
+.filtres-bar input,
+.filtres-bar select {
+    border: 1px solid #d1d5db;
+    border-radius: 7px;
+    padding: 9px 12px;
+    font-size: 14px;
+    outline: none;
+}
+
+.filtres-bar input:focus,
+.filtres-bar select:focus {
+    border-color: #2563eb;
+    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+}
+
+.filtres-actions {
+    display: flex;
+    gap: 10px;
+    margin-left: auto;
+}
+
+/* =====================================================
+   BOUTONS
+===================================================== */
+
+.btn-primary {
+    border: none;
+    background: #2563eb;
+    color: white;
+    padding: 10px 18px;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.btn-primary:hover {
+    background: #1d4ed8;
+}
+
+.btn-secondary {
+    border: 1px solid #d1d5db;
+    background: white;
+    color: #374151;
+    padding: 9px 14px;
+    border-radius: 7px;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+}
+
+.btn-secondary:hover {
+    background: #f3f4f6;
+}
+
+/* =====================================================
+   TABLEAU
+===================================================== */
+
+.table-container {
+    width: 100%;
+    overflow-x: auto;
+    background: white;
+    border: 1px solid #e5e7eb;
+    border-radius: 10px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+}
+
+.table-container table {
+    width: 100%;
+    border-collapse: collapse;
+    min-width: 1000px;
+}
+
+.table-container th {
+    padding: 13px 14px;
+    text-align: left;
+    background: #f8fafc;
+    color: #4b5563;
+    font-size: 12px;
+    font-weight: 700;
+    border-bottom: 1px solid #e5e7eb;
+}
+
+.table-container td {
+    padding: 14px;
+    border-bottom: 1px solid #f1f5f9;
+    font-size: 13px;
+    color: #374151;
+}
+
+.table-container tbody tr:hover {
+    background: #f9fafb;
+}
+
+.table-container tbody tr:last-child td {
+    border-bottom: none;
+}
+
+.empty {
+    text-align: center;
+    padding: 45px !important;
+    color: #6b7280 !important;
+}
+
+/* =====================================================
+   BADGES
+===================================================== */
+
+.badge-mode {
+    display: inline-flex;
+    padding: 4px 9px;
+    border-radius: 20px;
+    font-size: 11px;
+    font-weight: 700;
+    background: #eef2ff;
+    color: #4338ca;
+}
+
+.statut {
+    display: inline-flex;
+    align-items: center;
+    padding: 5px 9px;
+    border-radius: 20px;
+    font-size: 11px;
+    font-weight: 700;
+}
+
+.statut-brouillon {
+    background: #f3f4f6;
+    color: #4b5563;
+}
+
+.statut-partielle {
+    background: #fef3c7;
+    color: #92400e;
+}
+
+.statut-payee {
+    background: #dcfce7;
+    color: #166534;
+}
+
+.statut-annulee {
+    background: #fee2e2;
+    color: #991b1b;
+}
+
+/* =====================================================
+   ERREUR
+===================================================== */
+
+.error-message {
+    padding: 14px 16px;
+    border-radius: 8px;
+    background: #fee2e2;
+    color: #991b1b;
+    border: 1px solid #fecaca;
+}
+
+/* =====================================================
+   RESPONSIVE
+===================================================== */
+
+@media (max-width: 1100px) {
+    .stats-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (max-width: 768px) {
+    .paiements-page {
+        padding: 15px;
+    }
+
+    .stats-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .filtres-bar {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .filtres-actions {
+        margin-left: 0;
+    }
+}

@@ -11,6 +11,8 @@ import Reservations from "./pages/Reservations";
 import Chambres from "./pages/Chambres";
 import Sejours from "./pages/Sejours";
 import Factures from "./pages/Factures";
+import Paiements from "./pages/Paiements";
+import Caisse from "./pages/Caisse";
 
 function ProtectedRoute({ children }) {
 const { estConnecte } = useAuth();
@@ -94,12 +96,12 @@ return ( <Routes>
 
     <Route
       path="/paiements"
-      element={<h1>Paiements</h1>}
+      element={<Paiements />}
     />
 
     <Route
-      path="/caisse"
-      element={<h1>Caisse</h1>}
+        path="/caisse"
+        element={<Caisse />}
     />
 
 

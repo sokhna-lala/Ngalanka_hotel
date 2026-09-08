@@ -5,14 +5,24 @@ const pool = require("../config/database");
 // ==========================================
 // GET - Liste des réservations
 // ==========================================
+
 router.get("/", async (req, res) => {
+
     try {
+
         const [reservations] = await pool.execute(`
+
             SELECT
                 r.id_reservation,
                 r.numero_reservation,
                 r.id_client,
-                CONCAT(c.nom, ' ', COALESCE(c.prenom, '')) AS client,
+
+                CONCAT(
+                    c.nom,
+                    ' ',
+                    COALESCE(c.prenom, '')
+                ) AS client,
+
                 r.date_reservation,
                 r.date_arrivee,
                 r.date_depart,
@@ -21,27 +31,45 @@ router.get("/", async (req, res) => {
                 r.statut,
                 r.montant_prevu,
                 r.avance,
-                r.observation
+                r.observation,
+
+                ch.numero AS numero_chambre,
+                tc.libelle AS type_chambre
+
             FROM reservations r
+
             INNER JOIN clients c
                 ON c.id_client = r.id_client
+
+            LEFT JOIN reservation_chambres rc
+                ON rc.id_reservation = r.id_reservation
+
+            LEFT JOIN chambres ch
+                ON ch.id_chambre = rc.id_chambre
+
+            LEFT JOIN types_chambre tc
+                ON tc.id_type = ch.id_type
+
             ORDER BY r.date_creation DESC
+
         `);
 
         res.json(reservations);
 
     } catch (error) {
+
         console.error(
             "Erreur récupération réservations :",
             error
         );
 
         res.status(500).json({
-            message: "Impossible de récupérer les réservations"
+            message:
+                "Impossible de récupérer les réservations"
         });
     }
-});
 
+});
 
 // ==========================================
 // GET - Clients pour formulaire réservation
@@ -844,5 +872,669 @@ router.put("/:id", async (req, res) => {
     }
 });
 
+// ==========================================
+// POST - ANNULER UNE RÉSERVATION
+// ==========================================
+
+router.post("/:id/annuler", async (req, res) => {
+
+    const connection = await pool.getConnection();
+
+    try {
+
+        await connection.beginTransaction();
+
+        const idReservation = req.params.id;
+
+
+        // ==========================================
+        // RÉCUPÉRER LA RÉSERVATION
+        // ==========================================
+
+        const [reservations] =
+            await connection.execute(
+                `
+                SELECT
+                    id_reservation,
+                    numero_reservation,
+                    statut
+                FROM reservations
+                WHERE id_reservation = ?
+                FOR UPDATE
+                `,
+                [idReservation]
+            );
+
+
+        if (reservations.length === 0) {
+
+            await connection.rollback();
+
+            return res.status(404).json({
+                message: "Réservation introuvable"
+            });
+        }
+
+
+        const reservation =
+            reservations[0];
+
+
+        // ==========================================
+        // VÉRIFIER SI DÉJÀ ANNULÉE
+        // ==========================================
+
+        if (
+            reservation.statut === "ANNULEE"
+        ) {
+
+            await connection.rollback();
+
+            return res.status(400).json({
+                message:
+                    "Cette réservation est déjà annulée."
+            });
+        }
+
+
+        // ==========================================
+        // RÉCUPÉRER LA CHAMBRE
+        // ==========================================
+
+        const [chambresReservation] =
+            await connection.execute(
+                `
+                SELECT
+                    id_chambre
+                FROM reservation_chambres
+                WHERE id_reservation = ?
+                `,
+                [idReservation]
+            );
+
+
+        // ==========================================
+        // ANNULER LA RÉSERVATION
+        // ==========================================
+
+        await connection.execute(
+            `
+            UPDATE reservations
+            SET statut = 'ANNULEE'
+            WHERE id_reservation = ?
+            `,
+            [idReservation]
+        );
+
+
+        // ==========================================
+        // LIBÉRER LES CHAMBRES
+        // ==========================================
+
+        for (
+            const chambreReservation
+            of chambresReservation
+        ) {
+
+            await connection.execute(
+                `
+                UPDATE chambres
+                SET statut = 'DISPONIBLE'
+                WHERE id_chambre = ?
+                `,
+                [
+                    chambreReservation.id_chambre
+                ]
+            );
+        }
+
+
+        // ==========================================
+        // VALIDER TRANSACTION
+        // ==========================================
+
+        await connection.commit();
+
+
+        res.json({
+
+            message:
+                "Réservation annulée avec succès",
+
+            id_reservation:
+                reservation.id_reservation,
+
+            numero_reservation:
+                reservation.numero_reservation,
+
+            statut:
+                "ANNULEE"
+        });
+
+    } catch (error) {
+
+        await connection.rollback();
+
+        console.error(
+            "Erreur annulation réservation :",
+            error
+        );
+
+        res.status(500).json({
+
+            message:
+                "Impossible d'annuler la réservation"
+        });
+
+    } finally {
+
+        connection.release();
+    }
+
+});// ==========================================
+// POST - ANNULER UNE RÉSERVATION
+// ==========================================
+
+router.post("/:id/annuler", async (req, res) => {
+
+    const connection = await pool.getConnection();
+
+    try {
+
+        await connection.beginTransaction();
+
+        const idReservation = req.params.id;
+
+
+        // ==========================================
+        // RÉCUPÉRER LA RÉSERVATION
+        // ==========================================
+
+        const [reservations] =
+            await connection.execute(
+                `
+                SELECT
+                    id_reservation,
+                    numero_reservation,
+                    statut
+                FROM reservations
+                WHERE id_reservation = ?
+                FOR UPDATE
+                `,
+                [idReservation]
+            );
+
+
+        if (reservations.length === 0) {
+
+            await connection.rollback();
+
+            return res.status(404).json({
+                message: "Réservation introuvable"
+            });
+        }
+
+
+        const reservation =
+            reservations[0];
+
+
+        // ==========================================
+        // VÉRIFIER SI DÉJÀ ANNULÉE
+        // ==========================================
+
+        if (
+            reservation.statut === "ANNULEE"
+        ) {
+
+            await connection.rollback();
+
+            return res.status(400).json({
+                message:
+                    "Cette réservation est déjà annulée."
+            });
+        }
+
+
+        // ==========================================
+        // RÉCUPÉRER LA CHAMBRE
+        // ==========================================
+
+        const [chambresReservation] =
+            await connection.execute(
+                `
+                SELECT
+                    id_chambre
+                FROM reservation_chambres
+                WHERE id_reservation = ?
+                `,
+                [idReservation]
+            );
+
+
+        // ==========================================
+        // ANNULER LA RÉSERVATION
+        // ==========================================
+
+        await connection.execute(
+            `
+            UPDATE reservations
+            SET statut = 'ANNULEE'
+            WHERE id_reservation = ?
+            `,
+            [idReservation]
+        );
+
+
+        // ==========================================
+        // LIBÉRER LES CHAMBRES
+        // ==========================================
+
+        for (
+            const chambreReservation
+            of chambresReservation
+        ) {
+
+            await connection.execute(
+                `
+                UPDATE chambres
+                SET statut = 'DISPONIBLE'
+                WHERE id_chambre = ?
+                `,
+                [
+                    chambreReservation.id_chambre
+                ]
+            );
+        }
+
+
+        // ==========================================
+        // VALIDER TRANSACTION
+        // ==========================================
+
+        await connection.commit();
+
+
+        res.json({
+
+            message:
+                "Réservation annulée avec succès",
+
+            id_reservation:
+                reservation.id_reservation,
+
+            numero_reservation:
+                reservation.numero_reservation,
+
+            statut:
+                "ANNULEE"
+        });
+
+    } catch (error) {
+
+        await connection.rollback();
+
+        console.error(
+            "Erreur annulation réservation :",
+            error
+        );
+
+        res.status(500).json({
+
+            message:
+                "Impossible d'annuler la réservation"
+        });
+
+    } finally {
+
+        connection.release();
+    }
+
+});// ==========================================
+// POST - ANNULER UNE RÉSERVATION
+// ==========================================
+
+router.post("/:id/annuler", async (req, res) => {
+
+    const connection = await pool.getConnection();
+
+    try {
+
+        await connection.beginTransaction();
+
+        const idReservation = req.params.id;
+
+
+        // ==========================================
+        // RÉCUPÉRER LA RÉSERVATION
+        // ==========================================
+
+        const [reservations] =
+            await connection.execute(
+                `
+                SELECT
+                    id_reservation,
+                    numero_reservation,
+                    statut
+                FROM reservations
+                WHERE id_reservation = ?
+                FOR UPDATE
+                `,
+                [idReservation]
+            );
+
+
+        if (reservations.length === 0) {
+
+            await connection.rollback();
+
+            return res.status(404).json({
+                message: "Réservation introuvable"
+            });
+        }
+
+
+        const reservation =
+            reservations[0];
+
+
+        // ==========================================
+        // VÉRIFIER SI DÉJÀ ANNULÉE
+        // ==========================================
+
+        if (
+            reservation.statut === "ANNULEE"
+        ) {
+
+            await connection.rollback();
+
+            return res.status(400).json({
+                message:
+                    "Cette réservation est déjà annulée."
+            });
+        }
+
+
+        // ==========================================
+        // RÉCUPÉRER LA CHAMBRE
+        // ==========================================
+
+        const [chambresReservation] =
+            await connection.execute(
+                `
+                SELECT
+                    id_chambre
+                FROM reservation_chambres
+                WHERE id_reservation = ?
+                `,
+                [idReservation]
+            );
+
+
+        // ==========================================
+        // ANNULER LA RÉSERVATION
+        // ==========================================
+
+        await connection.execute(
+            `
+            UPDATE reservations
+            SET statut = 'ANNULEE'
+            WHERE id_reservation = ?
+            `,
+            [idReservation]
+        );
+
+
+        // ==========================================
+        // LIBÉRER LES CHAMBRES
+        // ==========================================
+
+        for (
+            const chambreReservation
+            of chambresReservation
+        ) {
+
+            await connection.execute(
+                `
+                UPDATE chambres
+                SET statut = 'DISPONIBLE'
+                WHERE id_chambre = ?
+                `,
+                [
+                    chambreReservation.id_chambre
+                ]
+            );
+        }
+
+
+        // ==========================================
+        // VALIDER TRANSACTION
+        // ==========================================
+
+        await connection.commit();
+
+
+        res.json({
+
+            message:
+                "Réservation annulée avec succès",
+
+            id_reservation:
+                reservation.id_reservation,
+
+            numero_reservation:
+                reservation.numero_reservation,
+
+            statut:
+                "ANNULEE"
+        });
+
+    } catch (error) {
+
+        await connection.rollback();
+
+        console.error(
+            "Erreur annulation réservation :",
+            error
+        );
+
+        res.status(500).json({
+
+            message:
+                "Impossible d'annuler la réservation"
+        });
+
+    } finally {
+
+        connection.release();
+    }
+
+});
+
+// ==========================================
+// PUT - ANNULER UNE RÉSERVATION
+// ==========================================
+
+router.put("/:id/annuler", async (req, res) => {
+
+    const connection =
+        await pool.getConnection();
+
+    try {
+
+        await connection.beginTransaction();
+
+        const idReservation =
+            req.params.id;
+
+
+        // ======================================
+        // RÉCUPÉRER LA RÉSERVATION
+        // ======================================
+
+        const [reservations] =
+            await connection.execute(
+                `
+                SELECT
+                    id_reservation,
+                    statut
+                FROM reservations
+                WHERE id_reservation = ?
+                FOR UPDATE
+                `,
+                [idReservation]
+            );
+
+
+        if (
+            reservations.length === 0
+        ) {
+
+            await connection.rollback();
+
+            return res.status(404).json({
+                message:
+                    "Réservation introuvable"
+            });
+        }
+
+
+        const reservation =
+            reservations[0];
+
+
+        // ======================================
+        // DÉJÀ ANNULÉE
+        // ======================================
+
+        if (
+            reservation.statut === "ANNULEE"
+        ) {
+
+            await connection.rollback();
+
+            return res.status(400).json({
+                message:
+                    "Cette réservation est déjà annulée"
+            });
+        }
+
+
+        // ======================================
+        // EMPÊCHER ANNULATION SI CHECK-IN
+        // ======================================
+
+        const [sejours] =
+            await connection.execute(
+                `
+                SELECT
+                    id_sejour,
+                    statut
+                FROM sejours
+                WHERE id_reservation = ?
+                AND statut = 'EN_COURS'
+                `,
+                [idReservation]
+            );
+
+
+        if (
+            sejours.length > 0
+        ) {
+
+            await connection.rollback();
+
+            return res.status(400).json({
+                message:
+                    "Impossible d'annuler cette réservation car le client est déjà en séjour."
+            });
+        }
+
+
+        // ======================================
+        // RÉCUPÉRER LES CHAMBRES
+        // ======================================
+
+        const [chambres] =
+            await connection.execute(
+                `
+                SELECT
+                    id_chambre
+                FROM reservation_chambres
+                WHERE id_reservation = ?
+                `,
+                [idReservation]
+            );
+
+
+        // ======================================
+        // ANNULER LA RÉSERVATION
+        // ======================================
+
+        await connection.execute(
+            `
+            UPDATE reservations
+            SET statut = 'ANNULEE'
+            WHERE id_reservation = ?
+            `,
+            [idReservation]
+        );
+
+
+        // ======================================
+        // LIBÉRER LES CHAMBRES
+        // ======================================
+
+        for (
+            const chambre of chambres
+        ) {
+
+            await connection.execute(
+                `
+                UPDATE chambres
+                SET statut = 'DISPONIBLE'
+                WHERE id_chambre = ?
+                `,
+                [
+                    chambre.id_chambre
+                ]
+            );
+        }
+
+
+        await connection.commit();
+
+
+        res.json({
+
+            message:
+                "Réservation annulée avec succès"
+
+        });
+
+
+    } catch (error) {
+
+        await connection.rollback();
+
+        console.error(
+            "Erreur annulation réservation :",
+            error
+        );
+
+        res.status(500).json({
+
+            message:
+                "Impossible d'annuler la réservation"
+
+        });
+
+    } finally {
+
+        connection.release();
+
+    }
+
+});
 
 module.exports = router;

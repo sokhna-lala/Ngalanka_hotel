@@ -41,6 +41,74 @@ router.get("/", async (req, res) => {
     }
 });
 
+
+// ==========================================
+// GET - Rechercher un client par téléphone
+// ==========================================
+router.get("/telephone/:telephone", async (req, res) => {
+    try {
+
+        const telephone = req.params.telephone.trim();
+
+        if (!telephone) {
+            return res.status(400).json({
+                message: "Le numéro de téléphone est obligatoire"
+            });
+        }
+
+        const [clients] = await pool.execute(
+            `
+            SELECT
+                id_client,
+                code_client,
+                nom,
+                prenom,
+                sexe,
+                date_naissance,
+                telephone,
+                email,
+                adresse,
+                ville,
+                pays,
+                nationalite,
+                type_piece,
+                numero_piece,
+                entreprise,
+                observation
+            FROM clients
+            WHERE telephone = ?
+            LIMIT 1
+            `,
+            [telephone]
+        );
+
+        // Client introuvable
+        if (clients.length === 0) {
+            return res.status(404).json({
+                message: "Aucun client trouvé avec ce numéro"
+            });
+        }
+
+        // Client trouvé
+        res.json(clients[0]);
+
+    } catch (error) {
+
+        console.error(
+            "Erreur recherche client par téléphone :",
+            error
+        );
+
+        res.status(500).json({
+            message:
+                "Impossible de rechercher le client"
+        });
+    }
+});
+
+
+
+
 // ==========================================
 // GET - Un client
 // ==========================================

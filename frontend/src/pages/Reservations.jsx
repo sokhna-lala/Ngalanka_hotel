@@ -1,40 +1,110 @@
-
 import { useEffect, useState } from "react";
 import axios from "axios";
 import "./Reservations.css";
 
-const API_URL = "http://localhost:5000/api/reservations";
+const API_URL = "http://localhost:5000/api";
 
-const formulaireInitial = {
-    id_client: "",
-    id_chambre: "",
+
+// ==========================================
+// DONNÉES INITIALES RÉSERVATION
+// ==========================================
+
+const reservationInitiale = {
     date_arrivee: "",
     date_depart: "",
     nb_adultes: 1,
     nb_enfants: 0,
-    statut: "EN_ATTENTE",
+    id_chambre: "",
+    tarif_nuit: 0,
+    nombre_nuits: 0,
+    montant_prevu: 0,
     avance: 0,
     observation: ""
 };
 
+
+// ==========================================
+// DONNÉES INITIALES NOUVEAU CLIENT
+// ==========================================
+
+const nouveauClientInitial = {
+    nom: "",
+    prenom: "",
+    telephone: "",
+    email: "",
+    sexe: "",
+    date_naissance: "",
+    adresse: "",
+    ville: "",
+    pays: "Sénégal",
+    nationalite: "Sénégalaise",
+    type_piece: "",
+    numero_piece: "",
+    entreprise: "",
+    observation: ""
+};
+
+
 function Reservations() {
 
-    const [reservations, setReservations] = useState([]);
-    const [clients, setClients] = useState([]);
-    const [chambres, setChambres] = useState([]);
+    // ==========================================
+    // DONNÉES
+    // ==========================================
 
-    const [loading, setLoading] = useState(true);
-    const [loadingFormulaire, setLoadingFormulaire] = useState(false);
-    const [error, setError] = useState("");
+    const [reservations, setReservations] =
+        useState([]);
 
-    const [afficherFormulaire, setAfficherFormulaire] = useState(false);
-    const [reservationEnModification, setReservationEnModification] =
-        useState(null);
+    const [chambres, setChambres] =
+        useState([]);
 
-    const [formulaire, setFormulaire] = useState(formulaireInitial);
+    const [loading, setLoading] =
+        useState(true);
+
+    const [error, setError] =
+        useState("");
+
 
     // ==========================================
-    // CHARGER LES RÉSERVATIONS
+    // FORMULAIRE
+    // ==========================================
+
+    const [afficherFormulaire, setAfficherFormulaire] =
+        useState(false);
+
+    const [telephoneRecherche, setTelephoneRecherche] =
+        useState("");
+
+    const [rechercheEffectuee, setRechercheEffectuee] =
+        useState(false);
+
+    const [rechercheLoading, setRechercheLoading] =
+        useState(false);
+
+    const [clientTrouve, setClientTrouve] =
+        useState(null);
+
+    const [nouveauClient, setNouveauClient] =
+        useState(nouveauClientInitial);
+
+    const [reservation, setReservation] =
+        useState(reservationInitiale);
+
+
+    // ==========================================
+    // MODE MODIFICATION
+    // ==========================================
+
+    const [modeModification, setModeModification] =
+        useState(false);
+
+    const [
+        idReservationModification,
+        setIdReservationModification
+    ] = useState(null);
+
+
+    // ==========================================
+    // CHARGER RÉSERVATIONS
     // ==========================================
 
     const chargerReservations = async () => {
@@ -43,12 +113,13 @@ function Reservations() {
 
             setLoading(true);
 
-            const response = await axios.get(API_URL);
+            const response =
+                await axios.get(
+                    `${API_URL}/reservations`
+                );
 
             setReservations(
-                Array.isArray(response.data)
-                    ? response.data
-                    : []
+                response.data
             );
 
             setError("");
@@ -56,70 +127,48 @@ function Reservations() {
         } catch (err) {
 
             console.error(
-                "Erreur chargement réservations :",
+                "Erreur réservations :",
                 err
             );
 
             setError(
                 err.response?.data?.message ||
-                "Impossible de charger les réservations."
+                "Impossible de charger les réservations"
             );
 
         } finally {
 
             setLoading(false);
-
         }
     };
 
+
     // ==========================================
-    // CHARGER CLIENTS ET CHAMBRES
+    // CHARGER CHAMBRES
     // ==========================================
 
-    const chargerDonneesFormulaire = async () => {
+    const chargerChambres = async () => {
 
         try {
 
-            setLoadingFormulaire(true);
-
-            const [
-                clientsResponse,
-                chambresResponse
-            ] = await Promise.all([
-                axios.get(`${API_URL}/data/clients`),
-                axios.get(`${API_URL}/data/chambres`)
-            ]);
-
-            setClients(
-                Array.isArray(clientsResponse.data)
-                    ? clientsResponse.data
-                    : []
-            );
+            const response =
+                await axios.get(
+                    `${API_URL}/reservations/data/chambres`
+                );
 
             setChambres(
-                Array.isArray(chambresResponse.data)
-                    ? chambresResponse.data
-                    : []
+                response.data
             );
 
         } catch (err) {
 
             console.error(
-                "Erreur chargement données formulaire :",
+                "Erreur chambres :",
                 err
             );
-
-            setError(
-                err.response?.data?.message ||
-                "Impossible de charger les clients ou les chambres."
-            );
-
-        } finally {
-
-            setLoadingFormulaire(false);
-
         }
     };
+
 
     // ==========================================
     // CHARGEMENT INITIAL
@@ -128,344 +177,41 @@ function Reservations() {
     useEffect(() => {
 
         chargerReservations();
-        chargerDonneesFormulaire();
+
+        chargerChambres();
 
     }, []);
 
-    // ==========================================
-    // MODIFICATION DES CHAMPS
-    // ==========================================
-
-    const handleChange = (e) => {
-
-        const { name, value } = e.target;
-
-        setFormulaire((ancien) => ({
-            ...ancien,
-            [name]: value
-        }));
-    };
 
     // ==========================================
-    // OUVRIR NOUVELLE RÉSERVATION
+    // OUVRIR FORMULAIRE
     // ==========================================
 
-    const nouvelleReservation = async () => {
+    const ouvrirFormulaire = () => {
 
-        setReservationEnModification(null);
+        setModeModification(false);
 
-        setFormulaire({
-            ...formulaireInitial
-        });
+        setIdReservationModification(null);
+
+        setTelephoneRecherche("");
+
+        setRechercheEffectuee(false);
+
+        setClientTrouve(null);
+
+        setNouveauClient(
+            nouveauClientInitial
+        );
+
+        setReservation(
+            reservationInitiale
+        );
 
         setAfficherFormulaire(true);
 
-        await chargerDonneesFormulaire();
+        chargerChambres();
     };
 
-    // ==========================================
-    // MODIFIER UNE RÉSERVATION
-    // ==========================================
-
-    const modifierReservation = (reservation) => {
-
-        setReservationEnModification(reservation);
-
-        setFormulaire({
-
-            id_client:
-                reservation.id_client || "",
-
-            id_chambre: "",
-
-            date_arrivee:
-                reservation.date_arrivee
-                    ? String(reservation.date_arrivee).substring(0, 10)
-                    : "",
-
-            date_depart:
-                reservation.date_depart
-                    ? String(reservation.date_depart).substring(0, 10)
-                    : "",
-
-            nb_adultes:
-                reservation.nb_adultes || 1,
-
-            nb_enfants:
-                reservation.nb_enfants || 0,
-
-            statut:
-                reservation.statut || "EN_ATTENTE",
-
-            avance:
-                reservation.avance || 0,
-
-            observation:
-                reservation.observation || ""
-        });
-
-        setAfficherFormulaire(true);
-    };
-
-    // ==========================================
-    // CALCUL DU NOMBRE DE NUITS
-    // ==========================================
-
-    const calculerNombreNuits = () => {
-
-        if (
-            !formulaire.date_arrivee ||
-            !formulaire.date_depart
-        ) {
-            return 0;
-        }
-
-        const arrivee = new Date(
-            `${formulaire.date_arrivee}T00:00:00`
-        );
-
-        const depart = new Date(
-            `${formulaire.date_depart}T00:00:00`
-        );
-
-        const difference =
-            depart.getTime() - arrivee.getTime();
-
-        const nuits = Math.ceil(
-            difference / (1000 * 60 * 60 * 24)
-        );
-
-        return nuits > 0 ? nuits : 0;
-    };
-
-    // ==========================================
-    // CHAMBRE SÉLECTIONNÉE
-    // ==========================================
-
-    const chambreSelectionnee = chambres.find(
-        (chambre) =>
-            String(chambre.id_chambre) ===
-            String(formulaire.id_chambre)
-    );
-
-    // ==========================================
-    // CALCULS
-    // ==========================================
-
-    const nombreNuits = calculerNombreNuits();
-
-    const tarifNuit = chambreSelectionnee
-        ? Number(chambreSelectionnee.tarif) || 0
-        : 0;
-
-    const montantPrevu =
-        nombreNuits > 0
-            ? tarifNuit * nombreNuits
-            : 0;
-
-    // ==========================================
-    // ENREGISTRER UNE RÉSERVATION
-    // ==========================================
-
-    const enregistrerReservation = async (e) => {
-
-        e.preventDefault();
-
-        try {
-
-            setError("");
-
-            // --------------------------------------
-            // VALIDATIONS COMMUNES
-            // --------------------------------------
-
-            if (!formulaire.id_client) {
-
-                alert("Veuillez sélectionner un client.");
-
-                return;
-            }
-
-            if (!formulaire.date_arrivee) {
-
-                alert(
-                    "Veuillez sélectionner la date d'arrivée."
-                );
-
-                return;
-            }
-
-            if (!formulaire.date_depart) {
-
-                alert(
-                    "Veuillez sélectionner la date de départ."
-                );
-
-                return;
-            }
-
-            if (nombreNuits <= 0) {
-
-                alert(
-                    "La date de départ doit être après la date d'arrivée."
-                );
-
-                return;
-            }
-
-            // ======================================
-            // MODIFICATION
-            // ======================================
-
-            if (reservationEnModification) {
-
-                await axios.put(
-                    `${API_URL}/${reservationEnModification.id_reservation}`,
-                    {
-                        id_client:
-                            Number(formulaire.id_client),
-
-                        date_arrivee:
-                            formulaire.date_arrivee,
-
-                        date_depart:
-                            formulaire.date_depart,
-
-                        nb_adultes:
-                            Number(formulaire.nb_adultes) || 1,
-
-                        nb_enfants:
-                            Number(formulaire.nb_enfants) || 0,
-
-                        statut:
-                            formulaire.statut,
-
-                        montant_prevu:
-                            Number(
-                                reservationEnModification.montant_prevu
-                            ) || 0,
-
-                        avance:
-                            Number(formulaire.avance) || 0,
-
-                        observation:
-                            formulaire.observation || null
-                    }
-                );
-
-                alert(
-                    "Réservation modifiée avec succès !"
-                );
-
-            } else {
-
-                // ==================================
-                // CRÉATION
-                // ==================================
-
-                if (!formulaire.id_chambre) {
-
-                    alert(
-                        "Veuillez sélectionner une chambre."
-                    );
-
-                    return;
-                }
-
-                if (!chambreSelectionnee) {
-
-                    alert(
-                        "La chambre sélectionnée est introuvable."
-                    );
-
-                    return;
-                }
-
-                const numeroReservation =
-                    `RES-${Date.now()}`;
-
-                await axios.post(
-                    API_URL,
-                    {
-                        numero_reservation:
-                            numeroReservation,
-
-                        id_client:
-                            Number(formulaire.id_client),
-
-                        date_arrivee:
-                            formulaire.date_arrivee,
-
-                        date_depart:
-                            formulaire.date_depart,
-
-                        nb_adultes:
-                            Number(formulaire.nb_adultes) || 1,
-
-                        nb_enfants:
-                            Number(formulaire.nb_enfants) || 0,
-
-                        statut:
-                            formulaire.statut,
-
-                        montant_prevu:
-                            montantPrevu,
-
-                        avance:
-                            Number(formulaire.avance) || 0,
-
-                        observation:
-                            formulaire.observation || null,
-
-                        id_utilisateur:
-                            null,
-
-                        id_chambre:
-                            Number(formulaire.id_chambre),
-
-                        tarif_nuit:
-                            tarifNuit,
-
-                        nombre_nuits:
-                            nombreNuits
-                    }
-                );
-
-                alert(
-                    "Réservation créée avec succès !"
-                );
-            }
-
-            // ======================================
-            // NETTOYAGE
-            // ======================================
-
-            setAfficherFormulaire(false);
-
-            setReservationEnModification(null);
-
-            setFormulaire({
-                ...formulaireInitial
-            });
-
-            await chargerReservations();
-
-            // Actualiser les chambres disponibles
-            await chargerDonneesFormulaire();
-
-        } catch (err) {
-
-            console.error(
-                "Erreur réservation :",
-                err
-            );
-
-            alert(
-                err.response?.data?.message ||
-                "Impossible d'enregistrer la réservation."
-            );
-        }
-    };
 
     // ==========================================
     // FERMER FORMULAIRE
@@ -475,58 +221,755 @@ function Reservations() {
 
         setAfficherFormulaire(false);
 
-        setReservationEnModification(null);
+        setModeModification(false);
 
-        setFormulaire({
-            ...formulaireInitial
-        });
+        setIdReservationModification(null);
 
-        setError("");
+        setTelephoneRecherche("");
+
+        setRechercheEffectuee(false);
+
+        setClientTrouve(null);
+
+        setNouveauClient(
+            nouveauClientInitial
+        );
+
+        setReservation(
+            reservationInitiale
+        );
     };
 
+
     // ==========================================
-    // FORMATAGE DATE
+    // RECHERCHER CLIENT
+    // ==========================================
+
+    const rechercherClient = async () => {
+
+        if (!telephoneRecherche.trim()) {
+
+            alert(
+                "Veuillez saisir un numéro de téléphone."
+            );
+
+            return;
+        }
+
+        try {
+
+            setRechercheLoading(true);
+
+            setClientTrouve(null);
+
+            const response =
+                await axios.get(
+                    `${API_URL}/clients/telephone/${encodeURIComponent(
+                        telephoneRecherche.trim()
+                    )}`
+                );
+
+            setClientTrouve(
+                response.data
+            );
+
+            setRechercheEffectuee(true);
+
+        } catch (err) {
+
+            if (
+                err.response?.status === 404
+            ) {
+
+                setClientTrouve(null);
+
+                setNouveauClient({
+                    ...nouveauClientInitial,
+
+                    telephone:
+                        telephoneRecherche.trim()
+                });
+
+                setRechercheEffectuee(true);
+
+            } else {
+
+                console.error(
+                    "Erreur recherche client :",
+                    err
+                );
+
+                alert(
+                    err.response?.data?.message ||
+                    "Erreur lors de la recherche du client."
+                );
+            }
+
+        } finally {
+
+            setRechercheLoading(false);
+        }
+    };
+
+
+    // ==========================================
+    // MODIFICATION CLIENT
+    // ==========================================
+
+    const handleClientChange = (e) => {
+
+        const {
+            name,
+            value
+        } = e.target;
+
+        setNouveauClient(
+            (ancien) => ({
+                ...ancien,
+                [name]: value
+            })
+        );
+    };
+
+
+    // ==========================================
+    // MODIFICATION RÉSERVATION
+    // ==========================================
+
+    const handleReservationChange = (e) => {
+
+        const {
+            name,
+            value
+        } = e.target;
+
+        setReservation(
+            (ancien) => ({
+                ...ancien,
+                [name]: value
+            })
+        );
+    };
+
+
+    // ==========================================
+    // CHOISIR CHAMBRE
+    // ==========================================
+
+    const choisirChambre = (e) => {
+
+        const idChambre =
+            e.target.value;
+
+        const chambre =
+            chambres.find(
+                (item) =>
+                    String(
+                        item.id_chambre
+                    ) ===
+                    String(
+                        idChambre
+                    )
+            );
+
+        setReservation(
+            (ancien) => ({
+                ...ancien,
+
+                id_chambre:
+                    idChambre,
+
+                tarif_nuit:
+                    chambre
+                        ? Number(
+                            chambre.tarif
+                        )
+                        : 0
+            })
+        );
+    };
+
+
+    // ==========================================
+    // CALCUL AUTOMATIQUE
+    // ==========================================
+
+    useEffect(() => {
+
+        if (
+            !reservation.date_arrivee ||
+            !reservation.date_depart
+        ) {
+
+            return;
+        }
+
+        const arrivee =
+            new Date(
+                reservation.date_arrivee
+            );
+
+        const depart =
+            new Date(
+                reservation.date_depart
+            );
+
+        const difference =
+            depart.getTime() -
+            arrivee.getTime();
+
+        const nuits =
+            Math.ceil(
+                difference /
+                (1000 * 60 * 60 * 24)
+            );
+
+        if (nuits > 0) {
+
+            const montant =
+                nuits *
+                Number(
+                    reservation.tarif_nuit || 0
+                );
+
+            setReservation(
+                (ancien) => ({
+                    ...ancien,
+
+                    nombre_nuits:
+                        nuits,
+
+                    montant_prevu:
+                        montant
+                })
+            );
+        }
+
+    }, [
+        reservation.date_arrivee,
+        reservation.date_depart,
+        reservation.tarif_nuit
+    ]);
+
+
+    // ==========================================
+    // GÉNÉRER CODE CLIENT
+    // ==========================================
+
+    const genererCodeClient = () => {
+
+        const annee =
+            new Date()
+                .getFullYear();
+
+        const timestamp =
+            Date.now()
+                .toString()
+                .slice(-6);
+
+        return `CLI-${annee}-${timestamp}`;
+    };
+
+
+    // ==========================================
+    // GÉNÉRER NUMÉRO RÉSERVATION
+    // ==========================================
+
+    const genererNumeroReservation = () => {
+
+        const annee =
+            new Date()
+                .getFullYear();
+
+        const numero =
+            String(
+                reservations.length + 1
+            ).padStart(4, "0");
+
+        return `RES-${annee}-${numero}`;
+    };
+
+
+    // ==========================================
+    // ENREGISTRER RÉSERVATION
+    // ==========================================
+
+    const enregistrerReservation = async (e) => {
+
+        e.preventDefault();
+
+
+        // ======================================
+        // MODE MODIFICATION
+        // ======================================
+
+        if (modeModification) {
+
+            try {
+
+                await axios.put(
+                    `${API_URL}/reservations/${idReservationModification}`,
+                    {
+
+                        id_client:
+                            clientTrouve.id_client,
+
+                        date_arrivee:
+                            reservation.date_arrivee,
+
+                        date_depart:
+                            reservation.date_depart,
+
+                        nb_adultes:
+                            Number(
+                                reservation.nb_adultes
+                            ),
+
+                        nb_enfants:
+                            Number(
+                                reservation.nb_enfants
+                            ),
+
+                        statut:
+                            "EN_ATTENTE",
+
+                        montant_prevu:
+                            Number(
+                                reservation.montant_prevu
+                            ),
+
+                        avance:
+                            Number(
+                                reservation.avance
+                            ),
+
+                        observation:
+                            reservation.observation
+                    }
+                );
+
+
+                alert(
+                    "Réservation modifiée avec succès !"
+                );
+
+
+                fermerFormulaire();
+
+                await chargerReservations();
+
+                await chargerChambres();
+
+
+                return;
+
+            } catch (err) {
+
+                console.error(
+                    "Erreur modification réservation :",
+                    err
+                );
+
+                alert(
+                    err.response?.data?.message ||
+                    "Impossible de modifier la réservation."
+                );
+
+                return;
+            }
+        }
+
+
+        // ======================================
+        // CRÉATION NOUVELLE RÉSERVATION
+        // ======================================
+
+        try {
+
+            let idClient;
+
+
+            // CLIENT EXISTANT
+
+            if (clientTrouve) {
+
+                idClient =
+                    clientTrouve.id_client;
+            }
+
+
+            // NOUVEAU CLIENT
+
+            else {
+
+                if (
+                    !nouveauClient.nom ||
+                    !nouveauClient.telephone
+                ) {
+
+                    alert(
+                        "Le nom et le téléphone du nouveau client sont obligatoires."
+                    );
+
+                    return;
+                }
+
+
+                const clientResponse =
+                    await axios.post(
+                        `${API_URL}/clients`,
+                        {
+                            ...nouveauClient,
+
+                            code_client:
+                                genererCodeClient()
+                        }
+                    );
+
+
+                idClient =
+                    clientResponse
+                        .data
+                        .id_client;
+            }
+
+
+            // VALIDATION CHAMBRE
+
+            if (
+                !reservation.id_chambre
+            ) {
+
+                alert(
+                    "Veuillez sélectionner une chambre."
+                );
+
+                return;
+            }
+
+
+            // CRÉATION
+
+            await axios.post(
+                `${API_URL}/reservations`,
+                {
+
+                    numero_reservation:
+                        genererNumeroReservation(),
+
+                    id_client:
+                        idClient,
+
+                    date_arrivee:
+                        reservation.date_arrivee,
+
+                    date_depart:
+                        reservation.date_depart,
+
+                    nb_adultes:
+                        Number(
+                            reservation.nb_adultes
+                        ),
+
+                    nb_enfants:
+                        Number(
+                            reservation.nb_enfants
+                        ),
+
+                    statut:
+                        "EN_ATTENTE",
+
+                    montant_prevu:
+                        Number(
+                            reservation.montant_prevu
+                        ),
+
+                    avance:
+                        Number(
+                            reservation.avance
+                        ),
+
+                    observation:
+                        reservation.observation,
+
+                    id_chambre:
+                        Number(
+                            reservation.id_chambre
+                        ),
+
+                    tarif_nuit:
+                        Number(
+                            reservation.tarif_nuit
+                        ),
+
+                    nombre_nuits:
+                        Number(
+                            reservation.nombre_nuits
+                        )
+                }
+            );
+
+
+            alert(
+                "Réservation créée avec succès !"
+            );
+
+
+            fermerFormulaire();
+
+            await chargerReservations();
+
+            await chargerChambres();
+
+
+        } catch (err) {
+
+            console.error(
+                "Erreur création réservation :",
+                err
+            );
+
+            alert(
+                err.response?.data?.message ||
+                "Impossible de créer la réservation."
+            );
+        }
+    };
+
+
+    // ==========================================
+    // ANNULER RÉSERVATION
+    // ==========================================
+
+    const annulerReservation = async (
+        idReservation
+    ) => {
+
+        const confirmation =
+            window.confirm(
+                "Voulez-vous vraiment annuler cette réservation ?"
+            );
+
+        if (!confirmation) {
+
+            return;
+        }
+
+        try {
+
+            await axios.put(
+                `${API_URL}/reservations/${idReservation}/annuler`
+            );
+
+
+            alert(
+                "La réservation a été annulée avec succès."
+            );
+
+
+            await chargerReservations();
+
+            await chargerChambres();
+
+
+        } catch (err) {
+
+            console.error(
+                "Erreur annulation réservation :",
+                err
+            );
+
+            alert(
+                err.response?.data?.message ||
+                "Impossible d'annuler la réservation."
+            );
+        }
+    };
+
+
+    // ==========================================
+    // MODIFIER RÉSERVATION
+    // ==========================================
+
+    const modifierReservation = async (
+        item
+    ) => {
+
+        try {
+
+            setModeModification(true);
+
+            setIdReservationModification(
+                item.id_reservation
+            );
+
+
+            // ==================================
+            // CLIENT
+            // ==================================
+
+            setClientTrouve({
+                id_client:
+                    item.id_client,
+
+                nom:
+                    item.client || "",
+
+                prenom:
+                    "",
+
+                telephone:
+                    item.telephone || "",
+
+                email:
+                    item.email || ""
+            });
+
+
+            setRechercheEffectuee(true);
+
+
+            // ==================================
+            // RECHARGER CHAMBRES
+            // ==================================
+
+            await chargerChambres();
+
+
+            // ==================================
+            // CHAMBRE
+            // ==================================
+
+            const chambre =
+                chambres.find(
+                    (c) =>
+                        String(
+                            c.numero
+                        ) ===
+                        String(
+                            item.numero_chambre
+                        )
+                );
+
+
+            // ==================================
+            // DONNÉES FORMULAIRE
+            // ==================================
+
+            setReservation({
+
+                date_arrivee:
+                    item.date_arrivee
+                        ? item.date_arrivee
+                            .substring(0, 10)
+                        : "",
+
+                date_depart:
+                    item.date_depart
+                        ? item.date_depart
+                            .substring(0, 10)
+                        : "",
+
+                nb_adultes:
+                    item.nb_adultes || 1,
+
+                nb_enfants:
+                    item.nb_enfants || 0,
+
+                id_chambre:
+                    chambre
+                        ? String(
+                            chambre.id_chambre
+                        )
+                        : "",
+
+                tarif_nuit:
+                    chambre
+                        ? Number(
+                            chambre.tarif
+                        )
+                        : 0,
+
+                nombre_nuits:
+                    0,
+
+                montant_prevu:
+                    Number(
+                        item.montant_prevu || 0
+                    ),
+
+                avance:
+                    Number(
+                        item.avance || 0
+                    ),
+
+                observation:
+                    item.observation || ""
+            });
+
+
+            setAfficherFormulaire(true);
+
+
+        } catch (err) {
+
+            console.error(
+                "Erreur modification :",
+                err
+            );
+
+            alert(
+                "Impossible de charger la réservation."
+            );
+        }
+    };
+
+
+    // ==========================================
+    // FORMAT DATE
     // ==========================================
 
     const formatDate = (date) => {
 
         if (!date) {
+
             return "-";
         }
 
-        const dateTexte =
-            String(date).substring(0, 10);
-
-        const morceaux =
-            dateTexte.split("-");
-
-        if (morceaux.length !== 3) {
-            return dateTexte;
-        }
-
-        return `${morceaux[2]}/${morceaux[1]}/${morceaux[0]}`;
+        return new Date(
+            date
+        ).toLocaleDateString(
+            "fr-FR"
+        );
     };
 
+
     // ==========================================
-    // FORMATAGE MONTANT
+    // FORMAT MONTANT
     // ==========================================
 
     const formatMontant = (montant) => {
 
-        return Number(montant || 0)
-            .toLocaleString("fr-FR");
+        return Number(
+            montant || 0
+        ).toLocaleString(
+            "fr-FR"
+        );
     };
+
 
     // ==========================================
     // RENDU
     // ==========================================
 
     return (
+
         <div className="reservations-page">
 
-            {/* =====================================
-                EN-TÊTE
-            ====================================== */}
+
+            {/* ==================================
+                HEADER
+            ================================== */}
 
             <div className="page-header">
 
@@ -537,631 +980,970 @@ function Reservations() {
                     </h1>
 
                     <p>
-                        Gestion des réservations de l'hôtel
+                        Gestion des réservations de chambres
                     </p>
 
                 </div>
 
+
                 <button
                     type="button"
                     className="btn-primary"
-                    onClick={nouvelleReservation}
+                    onClick={
+                        ouvrirFormulaire
+                    }
                 >
                     + Nouvelle réservation
                 </button>
 
             </div>
 
-            {/* =====================================
-                ERREUR
-            ====================================== */}
 
-            {error && (
-                <p className="error-message">
-                    {error}
-                </p>
-            )}
-
-            {/* =====================================
+            {/* ==================================
                 FORMULAIRE
-            ====================================== */}
+            ================================== */}
 
-            {afficherFormulaire && (
+            {
+                afficherFormulaire && (
 
-                <div className="reservation-form">
+                    <div className="reservation-form">
 
-                    <div className="form-header">
 
-                        <div>
+                        <div className="form-header">
 
-                            <h2>
-                                {reservationEnModification
-                                    ? "Modifier la réservation"
-                                    : "Nouvelle réservation"}
-                            </h2>
+                            <div>
 
-                            {reservationEnModification && (
-                                <p>
+                                <h2>
+
                                     {
-                                        reservationEnModification
-                                            .numero_reservation
+                                        modeModification
+                                            ? "Modifier la réservation"
+                                            : "Nouvelle réservation"
                                     }
+
+                                </h2>
+
+                                <p>
+
+                                    {
+                                        modeModification
+                                            ? "Modifiez les informations de la réservation"
+                                            : "Recherchez d'abord le client"
+                                    }
+
                                 </p>
-                            )}
+
+                            </div>
+
+
+                            <button
+                                type="button"
+                                className="btn-close"
+                                onClick={
+                                    fermerFormulaire
+                                }
+                            >
+                                ✕
+                            </button>
 
                         </div>
 
-                        <button
-                            type="button"
-                            onClick={fermerFormulaire}
-                            className="btn-close"
-                        >
-                            ✕
-                        </button>
-
-                    </div>
-
-                    {loadingFormulaire ? (
-
-                        <p>
-                            Chargement des données...
-                        </p>
-
-                    ) : (
 
                         <form
-                            onSubmit={enregistrerReservation}
+                            onSubmit={
+                                enregistrerReservation
+                            }
                         >
 
-                            <div className="form-grid">
 
-                                {/* CLIENT */}
+                            {/* ======================
+                                CLIENT
+                            ====================== */}
 
-                                <div>
+                            <div className="form-section">
 
-                                    <label>
-                                        Client *
-                                    </label>
+                                <h3>
+                                    1. Identification du client
+                                </h3>
 
-                                    <select
-                                        name="id_client"
-                                        value={
-                                            formulaire.id_client
-                                        }
-                                        onChange={handleChange}
-                                        required
-                                    >
 
-                                        <option value="">
-                                            Sélectionner un client
-                                        </option>
+                                {
+                                    !modeModification && (
 
-                                        {clients.map(
-                                            (client) => (
+                                        <div className="telephone-search">
 
-                                                <option
-                                                    key={
-                                                        client.id_client
+                                            <input
+                                                type="tel"
+                                                value={
+                                                    telephoneRecherche
+                                                }
+                                                onChange={
+                                                    (e) =>
+                                                        setTelephoneRecherche(
+                                                            e.target.value
+                                                        )
+                                                }
+                                                placeholder="Numéro de téléphone"
+                                            />
+
+
+                                            <button
+                                                type="button"
+                                                className="btn-primary"
+                                                onClick={
+                                                    rechercherClient
+                                                }
+                                                disabled={
+                                                    rechercheLoading
+                                                }
+                                            >
+
+                                                {
+                                                    rechercheLoading
+                                                        ? "Recherche..."
+                                                        : "Rechercher"
+                                                }
+
+                                            </button>
+
+                                        </div>
+                                    )
+                                }
+
+
+                                {
+                                    rechercheEffectuee &&
+                                    clientTrouve && (
+
+                                        <div className="client-found">
+
+                                            <h4>
+                                                ✓ Client sélectionné
+                                            </h4>
+
+                                            <p>
+
+                                                <strong>
+
+                                                    {
+                                                        clientTrouve.nom
+                                                    }{" "}
+
+                                                    {
+                                                        clientTrouve.prenom
                                                     }
+
+                                                </strong>
+
+                                            </p>
+
+
+                                            {
+                                                clientTrouve.telephone && (
+
+                                                    <p>
+                                                        📱 {
+                                                            clientTrouve.telephone
+                                                        }
+                                                    </p>
+
+                                                )
+                                            }
+
+
+                                            {
+                                                clientTrouve.email && (
+
+                                                    <p>
+                                                        ✉️ {
+                                                            clientTrouve.email
+                                                        }
+                                                    </p>
+
+                                                )
+                                            }
+
+                                        </div>
+                                    )
+                                }
+
+
+                                {
+                                    rechercheEffectuee &&
+                                    !clientTrouve &&
+                                    !modeModification && (
+
+                                        <div className="new-client-section">
+
+                                            <h4>
+                                                Nouveau client
+                                            </h4>
+
+
+                                            <div className="form-grid">
+
+                                                <div>
+
+                                                    <label>
+                                                        Nom *
+                                                    </label>
+
+                                                    <input
+                                                        type="text"
+                                                        name="nom"
+                                                        value={
+                                                            nouveauClient.nom
+                                                        }
+                                                        onChange={
+                                                            handleClientChange
+                                                        }
+                                                        required
+                                                    />
+
+                                                </div>
+
+
+                                                <div>
+
+                                                    <label>
+                                                        Prénom
+                                                    </label>
+
+                                                    <input
+                                                        type="text"
+                                                        name="prenom"
+                                                        value={
+                                                            nouveauClient.prenom
+                                                        }
+                                                        onChange={
+                                                            handleClientChange
+                                                        }
+                                                    />
+
+                                                </div>
+
+
+                                                <div>
+
+                                                    <label>
+                                                        Téléphone *
+                                                    </label>
+
+                                                    <input
+                                                        type="tel"
+                                                        name="telephone"
+                                                        value={
+                                                            nouveauClient.telephone
+                                                        }
+                                                        onChange={
+                                                            handleClientChange
+                                                        }
+                                                        required
+                                                    />
+
+                                                </div>
+
+
+                                                <div>
+
+                                                    <label>
+                                                        Email
+                                                    </label>
+
+                                                    <input
+                                                        type="email"
+                                                        name="email"
+                                                        value={
+                                                            nouveauClient.email
+                                                        }
+                                                        onChange={
+                                                            handleClientChange
+                                                        }
+                                                    />
+
+                                                </div>
+
+                                            </div>
+
+                                        </div>
+                                    )
+                                }
+
+                            </div>
+
+
+                            {/* ======================
+                                SÉJOUR
+                            ====================== */}
+
+                            {
+                                rechercheEffectuee && (
+
+                                    <div className="form-section">
+
+                                        <h3>
+                                            2. Informations du séjour
+                                        </h3>
+
+
+                                        <div className="form-grid">
+
+                                            <div>
+
+                                                <label>
+                                                    Date d'arrivée *
+                                                </label>
+
+                                                <input
+                                                    type="date"
+                                                    name="date_arrivee"
                                                     value={
-                                                        client.id_client
+                                                        reservation.date_arrivee
+                                                    }
+                                                    onChange={
+                                                        handleReservationChange
+                                                    }
+                                                    required
+                                                />
+
+                                            </div>
+
+
+                                            <div>
+
+                                                <label>
+                                                    Date de départ *
+                                                </label>
+
+                                                <input
+                                                    type="date"
+                                                    name="date_depart"
+                                                    value={
+                                                        reservation.date_depart
+                                                    }
+                                                    onChange={
+                                                        handleReservationChange
+                                                    }
+                                                    required
+                                                />
+
+                                            </div>
+
+
+                                            <div>
+
+                                                <label>
+                                                    Adultes
+                                                </label>
+
+                                                <input
+                                                    type="number"
+                                                    min="1"
+                                                    name="nb_adultes"
+                                                    value={
+                                                        reservation.nb_adultes
+                                                    }
+                                                    onChange={
+                                                        handleReservationChange
+                                                    }
+                                                />
+
+                                            </div>
+
+
+                                            <div>
+
+                                                <label>
+                                                    Enfants
+                                                </label>
+
+                                                <input
+                                                    type="number"
+                                                    min="0"
+                                                    name="nb_enfants"
+                                                    value={
+                                                        reservation.nb_enfants
+                                                    }
+                                                    onChange={
+                                                        handleReservationChange
+                                                    }
+                                                />
+
+                                            </div>
+
+                                        </div>
+
+                                    </div>
+                                )
+                            }
+
+
+                            {/* ======================
+                                CHAMBRE
+                            ====================== */}
+
+                            {
+                                rechercheEffectuee && (
+
+                                    <div className="form-section">
+
+                                        <h3>
+                                            3. Chambre
+                                        </h3>
+
+
+                                        <div className="form-grid">
+
+                                            <div className="full-width">
+
+                                                <label>
+                                                    Chambre *
+                                                </label>
+
+                                                <select
+                                                    value={
+                                                        reservation.id_chambre
+                                                    }
+                                                    onChange={
+                                                        choisirChambre
+                                                    }
+                                                    required
+                                                    disabled={
+                                                        modeModification
                                                     }
                                                 >
+
+                                                    <option value="">
+                                                        Sélectionner une chambre
+                                                    </option>
+
+
                                                     {
-                                                        client.code_client
+                                                        chambres.map(
+                                                            (chambre) => (
+
+                                                                <option
+                                                                    key={
+                                                                        chambre.id_chambre
+                                                                    }
+                                                                    value={
+                                                                        chambre.id_chambre
+                                                                    }
+                                                                >
+
+                                                                    Chambre {
+                                                                        chambre.numero
+                                                                    }
+
+                                                                    {" - "}
+
+                                                                    {
+                                                                        chambre.type_chambre
+                                                                    }
+
+                                                                    {" - "}
+
+                                                                    {
+                                                                        formatMontant(
+                                                                            chambre.tarif
+                                                                        )
+                                                                    }
+
+                                                                    {" FCFA / nuit"}
+
+                                                                </option>
+
+                                                            )
+                                                        )
                                                     }
-                                                    {" - "}
-                                                    {client.nom}
-                                                    {" "}
-                                                    {client.prenom || ""}
-                                                </option>
-                                            )
-                                        )}
 
-                                    </select>
+                                                </select>
 
-                                </div>
+                                            </div>
 
-                                {/* CHAMBRE */}
 
-                                {!reservationEnModification && (
+                                            <div>
 
-                                    <div>
+                                                <label>
+                                                    Tarif / nuit
+                                                </label>
 
-                                        <label>
-                                            Chambre *
-                                        </label>
+                                                <input
+                                                    type="number"
+                                                    value={
+                                                        reservation.tarif_nuit
+                                                    }
+                                                    readOnly
+                                                />
 
-                                        <select
-                                            name="id_chambre"
-                                            value={
-                                                formulaire.id_chambre
+                                            </div>
+
+
+                                            <div>
+
+                                                <label>
+                                                    Nombre de nuits
+                                                </label>
+
+                                                <input
+                                                    type="number"
+                                                    value={
+                                                        reservation.nombre_nuits
+                                                    }
+                                                    readOnly
+                                                />
+
+                                            </div>
+
+
+                                            <div>
+
+                                                <label>
+                                                    Montant prévu
+                                                </label>
+
+                                                <input
+                                                    type="number"
+                                                    value={
+                                                        reservation.montant_prevu
+                                                    }
+                                                    readOnly
+                                                />
+
+                                            </div>
+
+
+                                            <div>
+
+                                                <label>
+                                                    Avance
+                                                </label>
+
+                                                <input
+                                                    type="number"
+                                                    min="0"
+                                                    name="avance"
+                                                    value={
+                                                        reservation.avance
+                                                    }
+                                                    onChange={
+                                                        handleReservationChange
+                                                    }
+                                                />
+
+                                            </div>
+
+
+                                            <div className="full-width">
+
+                                                <label>
+                                                    Observation
+                                                </label>
+
+                                                <textarea
+                                                    name="observation"
+                                                    value={
+                                                        reservation.observation
+                                                    }
+                                                    onChange={
+                                                        handleReservationChange
+                                                    }
+                                                    rows="3"
+                                                />
+
+                                            </div>
+
+                                        </div>
+
+                                    </div>
+                                )
+                            }
+
+
+                            {/* ======================
+                                ACTIONS FORMULAIRE
+                            ====================== */}
+
+                            {
+                                rechercheEffectuee && (
+
+                                    <div className="form-actions">
+
+                                        <button
+                                            type="button"
+                                            onClick={
+                                                fermerFormulaire
                                             }
-                                            onChange={
-                                                handleChange
-                                            }
-                                            required
+                                        >
+                                            Annuler
+                                        </button>
+
+
+                                        <button
+                                            type="submit"
+                                            className="btn-primary"
                                         >
 
-                                            <option value="">
-                                                Sélectionner une chambre
-                                            </option>
+                                            {
+                                                modeModification
+                                                    ? "Enregistrer les modifications"
+                                                    : "Enregistrer la réservation"
+                                            }
 
-                                            {chambres.map(
-                                                (chambre) => (
-
-                                                    <option
-                                                        key={
-                                                            chambre.id_chambre
-                                                        }
-                                                        value={
-                                                            chambre.id_chambre
-                                                        }
-                                                    >
-                                                        Chambre{" "}
-                                                        {chambre.numero}
-                                                        {" - "}
-                                                        {
-                                                            chambre.type_chambre
-                                                        }
-                                                        {" - "}
-                                                        {
-                                                            formatMontant(
-                                                                chambre.tarif
-                                                            )
-                                                        }
-                                                        {" FCFA/nuit"}
-                                                    </option>
-                                                )
-                                            )}
-
-                                        </select>
-
-                                        {chambres.length === 0 && (
-                                            <small>
-                                                Aucune chambre disponible.
-                                            </small>
-                                        )}
+                                        </button>
 
                                     </div>
-
-                                )}
-
-                                {/* DATE ARRIVÉE */}
-
-                                <div>
-
-                                    <label>
-                                        Date d'arrivée *
-                                    </label>
-
-                                    <input
-                                        type="date"
-                                        name="date_arrivee"
-                                        value={
-                                            formulaire.date_arrivee
-                                        }
-                                        onChange={handleChange}
-                                        required
-                                    />
-
-                                </div>
-
-                                {/* DATE DÉPART */}
-
-                                <div>
-
-                                    <label>
-                                        Date de départ *
-                                    </label>
-
-                                    <input
-                                        type="date"
-                                        name="date_depart"
-                                        value={
-                                            formulaire.date_depart
-                                        }
-                                        onChange={handleChange}
-                                        required
-                                    />
-
-                                </div>
-
-                                {/* ADULTES */}
-
-                                <div>
-
-                                    <label>
-                                        Adultes
-                                    </label>
-
-                                    <input
-                                        type="number"
-                                        name="nb_adultes"
-                                        min="1"
-                                        value={
-                                            formulaire.nb_adultes
-                                        }
-                                        onChange={handleChange}
-                                    />
-
-                                </div>
-
-                                {/* ENFANTS */}
-
-                                <div>
-
-                                    <label>
-                                        Enfants
-                                    </label>
-
-                                    <input
-                                        type="number"
-                                        name="nb_enfants"
-                                        min="0"
-                                        value={
-                                            formulaire.nb_enfants
-                                        }
-                                        onChange={handleChange}
-                                    />
-
-                                </div>
-
-                                {/* STATUT */}
-
-                                <div>
-
-                                    <label>
-                                        Statut
-                                    </label>
-
-                                    <select
-                                        name="statut"
-                                        value={
-                                            formulaire.statut
-                                        }
-                                        onChange={handleChange}
-                                    >
-
-                                        <option value="EN_ATTENTE">
-                                            En attente
-                                        </option>
-
-                                        <option value="CONFIRMEE">
-                                            Confirmée
-                                        </option>
-
-                                        <option value="ANNULEE">
-                                            Annulée
-                                        </option>
-
-                                        <option value="NO_SHOW">
-                                            No-show
-                                        </option>
-
-                                        <option value="TERMINEE">
-                                            Terminée
-                                        </option>
-
-                                    </select>
-
-                                </div>
-
-                                {/* AVANCE */}
-
-                                <div>
-
-                                    <label>
-                                        Avance
-                                    </label>
-
-                                    <input
-                                        type="number"
-                                        name="avance"
-                                        min="0"
-                                        step="0.01"
-                                        value={
-                                            formulaire.avance
-                                        }
-                                        onChange={handleChange}
-                                    />
-
-                                </div>
-
-                                {/* MONTANT */}
-
-                                {!reservationEnModification && (
-
-                                    <div>
-
-                                        <label>
-                                            Montant prévu
-                                        </label>
-
-                                        <input
-                                            type="text"
-                                            value={`${formatMontant(
-                                                montantPrevu
-                                            )} FCFA`}
-                                            readOnly
-                                        />
-
-                                    </div>
-
-                                )}
-
-                                {/* NUITS */}
-
-                                {!reservationEnModification && (
-
-                                    <div>
-
-                                        <label>
-                                            Nombre de nuits
-                                        </label>
-
-                                        <input
-                                            type="text"
-                                            value={nombreNuits}
-                                            readOnly
-                                        />
-
-                                    </div>
-
-                                )}
-
-                                {/* OBSERVATION */}
-
-                                <div className="full-width">
-
-                                    <label>
-                                        Observation
-                                    </label>
-
-                                    <textarea
-                                        name="observation"
-                                        value={
-                                            formulaire.observation
-                                        }
-                                        onChange={handleChange}
-                                        rows="3"
-                                        placeholder="Observation éventuelle..."
-                                    />
-
-                                </div>
-
-                            </div>
-
-                            {/* =================================
-                                ACTIONS
-                            ================================== */}
-
-                            <div className="form-actions">
-
-                                <button
-                                    type="button"
-                                    onClick={fermerFormulaire}
-                                >
-                                    Annuler
-                                </button>
-
-                                <button
-                                    type="submit"
-                                    className="btn-primary"
-                                >
-                                    {reservationEnModification
-                                        ? "Enregistrer les modifications"
-                                        : "Créer la réservation"}
-                                </button>
-
-                            </div>
+                                )
+                            }
 
                         </form>
-                    )}
 
-                </div>
-            )}
+                    </div>
+                )
+            }
 
-            {/* =====================================
-                TABLEAU
-            ====================================== */}
 
-            {!afficherFormulaire && (
+            {/* ==================================
+                LISTE DES RÉSERVATIONS
+            ================================== */}
 
-                <>
+            {
+                !afficherFormulaire && (
 
-                    {loading && (
-                        <p>
-                            Chargement des réservations...
-                        </p>
-                    )}
+                    <>
 
-                    {!loading && !error && (
+                        {
+                            loading && (
 
-                        <div className="table-container">
+                                <p>
+                                    Chargement des réservations...
+                                </p>
 
-                            <table>
+                            )
+                        }
 
-                                <thead>
 
-                                    <tr>
+                        {
+                            error && (
 
-                                        <th>
-                                            Réservation
-                                        </th>
+                                <p className="error-message">
+                                    {error}
+                                </p>
 
-                                        <th>
-                                            Client
-                                        </th>
+                            )
+                        }
 
-                                        <th>
-                                            Arrivée
-                                        </th>
 
-                                        <th>
-                                            Départ
-                                        </th>
+                        {
+                            !loading &&
+                            !error && (
 
-                                        <th>
-                                            Adultes
-                                        </th>
+                                <div className="table-container">
 
-                                        <th>
-                                            Enfants
-                                        </th>
+                                    <table>
 
-                                        <th>
-                                            Montant
-                                        </th>
+                                        <thead>
 
-                                        <th>
-                                            Avance
-                                        </th>
+                                            <tr>
 
-                                        <th>
-                                            Statut
-                                        </th>
+                                                <th>
+                                                    Réservation
+                                                </th>
 
-                                        <th>
-                                            Actions
-                                        </th>
+                                                <th>
+                                                    Client
+                                                </th>
 
-                                    </tr>
+                                                <th>
+                                                    Arrivée
+                                                </th>
 
-                                </thead>
+                                                <th>
+                                                    Départ
+                                                </th>
 
-                                <tbody>
+                                                <th>
+                                                    Adultes
+                                                </th>
 
-                                    {reservations.length === 0 ? (
+                                                <th>
+                                                    Chambre
+                                                </th>
 
-                                        <tr>
+                                                <th>
+                                                    Montant
+                                                </th>
 
-                                            <td
-                                                colSpan="10"
-                                                className="empty"
-                                            >
-                                                Aucune réservation enregistrée
-                                            </td>
+                                                <th>
+                                                    Avance
+                                                </th>
 
-                                        </tr>
+                                                <th>
+                                                    Statut
+                                                </th>
 
-                                    ) : (
+                                                <th>
+                                                    Actions
+                                                </th>
 
-                                        reservations.map(
-                                            (reservation) => (
+                                            </tr>
 
-                                                <tr
-                                                    key={
-                                                        reservation.id_reservation
-                                                    }
-                                                >
+                                        </thead>
 
-                                                    <td>
 
-                                                        <strong>
-                                                            {
-                                                                reservation.numero_reservation
-                                                            }
-                                                        </strong>
+                                        <tbody>
 
-                                                    </td>
+                                            {
+                                                reservations.length === 0
 
-                                                    <td>
-                                                        {
-                                                            reservation.client
-                                                        }
-                                                    </td>
+                                                    ? (
 
-                                                    <td>
-                                                        {formatDate(
-                                                            reservation.date_arrivee
-                                                        )}
-                                                    </td>
+                                                        <tr>
 
-                                                    <td>
-                                                        {formatDate(
-                                                            reservation.date_depart
-                                                        )}
-                                                    </td>
+                                                            <td
+                                                                colSpan="10"
+                                                                className="empty"
+                                                            >
+                                                                Aucune réservation enregistrée
+                                                            </td>
 
-                                                    <td>
-                                                        {
-                                                            reservation.nb_adultes
-                                                        }
-                                                    </td>
+                                                        </tr>
 
-                                                    <td>
-                                                        {
-                                                            reservation.nb_enfants
-                                                        }
-                                                    </td>
+                                                    )
 
-                                                    <td>
-                                                        {formatMontant(
-                                                            reservation.montant_prevu
-                                                        )}{" "}
-                                                        FCFA
-                                                    </td>
+                                                    : (
 
-                                                    <td>
-                                                        {formatMontant(
-                                                            reservation.avance
-                                                        )}{" "}
-                                                        FCFA
-                                                    </td>
+                                                        reservations.map(
+                                                            (item) => (
 
-                                                    <td>
+                                                                <tr
+                                                                    key={
+                                                                        item.id_reservation
+                                                                    }
+                                                                >
 
-                                                        <span
-                                                            className={`status status-${String(
-                                                                reservation.statut ||
-                                                                ""
-                                                            ).toLowerCase()}`}
-                                                        >
-                                                            {
-                                                                reservation.statut
-                                                            }
-                                                        </span>
+                                                                    <td>
 
-                                                    </td>
+                                                                        <strong>
 
-                                                    <td>
+                                                                            {
+                                                                                item.numero_reservation
+                                                                            }
 
-                                                        <button
-                                                            type="button"
-                                                            className="btn-action"
-                                                            title="Modifier"
-                                                            onClick={() =>
-                                                                modifierReservation(
-                                                                    reservation
-                                                                )
-                                                            }
-                                                        >
-                                                            ✏️
-                                                        </button>
+                                                                        </strong>
 
-                                                    </td>
+                                                                    </td>
 
-                                                </tr>
-                                            )
-                                        )
 
-                                    )}
+                                                                    <td>
 
-                                </tbody>
+                                                                        {
+                                                                            item.client
+                                                                        }
 
-                            </table>
+                                                                    </td>
 
-                        </div>
 
-                    )}
+                                                                    <td>
 
-                </>
-            )}
+                                                                        {
+                                                                            formatDate(
+                                                                                item.date_arrivee
+                                                                            )
+                                                                        }
+
+                                                                    </td>
+
+
+                                                                    <td>
+
+                                                                        {
+                                                                            formatDate(
+                                                                                item.date_depart
+                                                                            )
+                                                                        }
+
+                                                                    </td>
+
+
+                                                                    <td>
+
+                                                                        {
+                                                                            item.nb_adultes
+                                                                        }
+
+                                                                    </td>
+
+
+                                                                    <td>
+
+                                                                        {
+                                                                            item.numero_chambre
+
+                                                                                ? (
+
+                                                                                    <>
+
+                                                                                        <strong>
+
+                                                                                            Chambre {
+                                                                                                item.numero_chambre
+                                                                                            }
+
+                                                                                        </strong>
+
+
+                                                                                        {
+                                                                                            item.type_chambre && (
+
+                                                                                                <div
+                                                                                                    className="room-type"
+                                                                                                >
+
+                                                                                                    {
+                                                                                                        item.type_chambre
+                                                                                                    }
+
+                                                                                                </div>
+
+                                                                                            )
+                                                                                        }
+
+                                                                                    </>
+
+                                                                                )
+
+                                                                                : (
+
+                                                                                    "—"
+
+                                                                                )
+                                                                        }
+
+                                                                    </td>
+
+
+                                                                    <td>
+
+                                                                        {
+                                                                            formatMontant(
+                                                                                item.montant_prevu
+                                                                            )
+                                                                        }
+
+                                                                        {" FCFA"}
+
+                                                                    </td>
+
+
+                                                                    <td>
+
+                                                                        {
+                                                                            formatMontant(
+                                                                                item.avance
+                                                                            )
+                                                                        }
+
+                                                                        {" FCFA"}
+
+                                                                    </td>
+
+
+                                                                    <td>
+
+                                                                        <span
+                                                                            className={`status status-${String(
+                                                                                item.statut
+                                                                            ).toLowerCase()}`}
+                                                                        >
+
+                                                                            {
+                                                                                item.statut
+                                                                            }
+
+                                                                        </span>
+
+                                                                    </td>
+
+
+                                                                    {/* ACTIONS */}
+
+                                                                    <td
+                                                                        className="actions-cell"
+                                                                    >
+
+                                                                        {
+                                                                            item.statut !== "ANNULEE" && (
+
+                                                                                <>
+
+                                                                                    <button
+                                                                                        type="button"
+                                                                                        className="btn-edit"
+                                                                                        onClick={() =>
+                                                                                            modifierReservation(
+                                                                                                item
+                                                                                            )
+                                                                                        }
+                                                                                    >
+                                                                                        Modifier
+                                                                                    </button>
+
+
+                                                                                    <button
+                                                                                        type="button"
+                                                                                        className="btn-cancel"
+                                                                                        onClick={() =>
+                                                                                            annulerReservation(
+                                                                                                item.id_reservation
+                                                                                            )
+                                                                                        }
+                                                                                    >
+                                                                                        Annuler
+                                                                                    </button>
+
+                                                                                </>
+
+                                                                            )
+                                                                        }
+
+
+                                                                        {
+                                                                            item.statut === "ANNULEE" && (
+
+                                                                                <span
+                                                                                    className="cancelled-text"
+                                                                                >
+                                                                                    Annulée
+                                                                                </span>
+
+                                                                            )
+                                                                        }
+
+                                                                    </td>
+
+                                                                </tr>
+
+                                                            )
+                                                        )
+                                                    )
+                                            }
+
+                                        </tbody>
+
+                                    </table>
+
+                                </div>
+                            )
+                        }
+
+                    </>
+                )
+            }
 
         </div>
     );
 }
 
-export default Reservations;
 
+export default Reservations;

@@ -34,45 +34,6 @@ router.get("/", async (req, res) => {
 });
 
 
-// =====================================================
-// GET - Une caisse
-// =====================================================
-router.get("/:id", async (req, res) => {
-    try {
-        const id = req.params.id;
-
-        const [caisses] = await pool.execute(`
-            SELECT
-                id_caisse,
-                nom_caisse,
-                solde_initial,
-                solde_actuel,
-                statut,
-                utilisateur_ouverture,
-                date_ouverture,
-                date_fermeture,
-                observation
-            FROM caisses
-            WHERE id_caisse = ?
-        `, [id]);
-
-        if (caisses.length === 0) {
-            return res.status(404).json({
-                message: "Caisse introuvable"
-            });
-        }
-
-        res.json(caisses[0]);
-
-    } catch (error) {
-        console.error("Erreur récupération caisse :", error);
-
-        res.status(500).json({
-            message: "Impossible de récupérer la caisse"
-        });
-    }
-});
-
 
 // =====================================================
 // POST - Créer une caisse
@@ -391,6 +352,45 @@ router.post("/:id/mouvements", async (req, res) => {
                 message: "Le motif est obligatoire"
             });
         }
+// =====================================================
+// GET - Une caisse
+// =====================================================
+router.get("/:id", async (req, res) => {
+    try {
+        const id = req.params.id;
+
+        const [caisses] = await pool.execute(`
+            SELECT
+                id_caisse,
+                nom_caisse,
+                solde_initial,
+                solde_actuel,
+                statut,
+                utilisateur_ouverture,
+                date_ouverture,
+                date_fermeture,
+                observation
+            FROM caisses
+            WHERE id_caisse = ?
+        `, [id]);
+
+        if (caisses.length === 0) {
+            return res.status(404).json({
+                message: "Caisse introuvable"
+            });
+        }
+
+        res.json(caisses[0]);
+
+    } catch (error) {
+        console.error("Erreur récupération caisse :", error);
+
+        res.status(500).json({
+            message: "Impossible de récupérer la caisse"
+        });
+    }
+});
+
 
         // -----------------------------
         // Vérifier la caisse

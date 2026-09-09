@@ -224,39 +224,49 @@ function Paiements() {
             total + Number(paiement.montant || 0),
         0
     );
+const totalEspeces = paiements
+    .filter(
+        (paiement) =>
+            paiement.mode_paiement === "ESPECES"
+    )
+    .reduce(
+        (total, paiement) =>
+            total + Number(paiement.montant || 0),
+        0
+    );
 
-    const paiementsEspeces = paiements
-        .filter(
-            (paiement) =>
-                paiement.mode_paiement === "ESPECES"
-        )
-        .reduce(
-            (total, paiement) =>
-                total + Number(paiement.montant || 0),
-            0
-        );
+const totalWave = paiements
+    .filter(
+        (paiement) =>
+            paiement.mode_paiement === "WAVE"
+    )
+    .reduce(
+        (total, paiement) =>
+            total + Number(paiement.montant || 0),
+        0
+    );
 
-    const paiementsCarte = paiements
-        .filter(
-            (paiement) =>
-                paiement.mode_paiement === "CARTE"
-        )
-        .reduce(
-            (total, paiement) =>
-                total + Number(paiement.montant || 0),
-            0
-        );
+const totalOrangeMoney = paiements
+    .filter(
+        (paiement) =>
+            paiement.mode_paiement === "ORANGE_MONEY"
+    )
+    .reduce(
+        (total, paiement) =>
+            total + Number(paiement.montant || 0),
+        0
+    );
 
-    const paiementsMobile = paiements
-        .filter(
-            (paiement) =>
-                paiement.mode_paiement === "MOBILE_MONEY"
-        )
-        .reduce(
-            (total, paiement) =>
-                total + Number(paiement.montant || 0),
-            0
-        );
+const totalFreeMoney = paiements
+    .filter(
+        (paiement) =>
+            paiement.mode_paiement === "FREE_MONEY"
+    )
+    .reduce(
+        (total, paiement) =>
+            total + Number(paiement.montant || 0),
+        0
+    );
 
     return (
         <div className="paiements-page">
@@ -293,90 +303,98 @@ function Paiements() {
             {/* =====================================================
                 STATISTIQUES
             ===================================================== */}
+<div className="paiements-stats">
 
-            <div className="paiements-stats">
+    {/* TOTAL */}
+    <div className="stat-card">
 
-                <div className="stat-card">
+        <div className="stat-icon">
+            💰
+        </div>
 
-                    <div className="stat-icon">
-                        💰
-                    </div>
+        <div>
+            <span>Total encaissé</span>
 
-                    <div>
-                        <span>
-                            Total encaissé
-                        </span>
+            <strong>
+                {formatMontant(totalPaiements)} FCFA
+            </strong>
+        </div>
 
-                        <strong>
-                            {formatMontant(
-                                totalPaiements
-                            )} FCFA
-                        </strong>
-                    </div>
+    </div>
 
-                </div>
 
-                <div className="stat-card">
+    {/* ESPÈCES */}
+    <div className="stat-card">
 
-                    <div className="stat-icon">
-                        💵
-                    </div>
+        <div className="stat-icon">
+            💵
+        </div>
 
-                    <div>
-                        <span>
-                            Espèces
-                        </span>
+        <div>
+            <span>Espèces</span>
 
-                        <strong>
-                            {formatMontant(
-                                paiementsEspeces
-                            )} FCFA
-                        </strong>
-                    </div>
+            <strong>
+                {formatMontant(totalEspeces)} FCFA
+            </strong>
+        </div>
 
-                </div>
+    </div>
 
-                <div className="stat-card">
 
-                    <div className="stat-icon">
-                        💳
-                    </div>
+    {/* WAVE */}
+    <div className="stat-card">
 
-                    <div>
-                        <span>
-                            Carte
-                        </span>
+        <div className="stat-icon">
+            📱
+        </div>
 
-                        <strong>
-                            {formatMontant(
-                                paiementsCarte
-                            )} FCFA
-                        </strong>
-                    </div>
+        <div>
+            <span>Wave</span>
 
-                </div>
+            <strong>
+                {formatMontant(totalWave)} FCFA
+            </strong>
+        </div>
 
-                <div className="stat-card">
+    </div>
 
-                    <div className="stat-icon">
-                        📱
-                    </div>
 
-                    <div>
-                        <span>
-                            Mobile Money
-                        </span>
+    {/* ORANGE MONEY */}
+    <div className="stat-card">
 
-                        <strong>
-                            {formatMontant(
-                                paiementsMobile
-                            )} FCFA
-                        </strong>
-                    </div>
+        <div className="stat-icon">
+            🟠
+        </div>
 
-                </div>
+        <div>
+            <span>Orange Money</span>
 
-            </div>
+            <strong>
+                {formatMontant(totalOrangeMoney)} FCFA
+            </strong>
+        </div>
+
+    </div>
+
+
+    {/* FREE MONEY */}
+    <div className="stat-card">
+
+        <div className="stat-icon">
+            🟢
+        </div>
+
+        <div>
+            <span>Free Money</span>
+
+            <strong>
+                {formatMontant(totalFreeMoney)} FCFA
+            </strong>
+        </div>
+
+    </div>
+
+</div>
 
             {/* =====================================================
                 FORMULAIRE
@@ -566,39 +584,16 @@ function Paiements() {
                                 <label>
                                     Mode de paiement *
                                 </label>
-
-                                <select
-                                    name="mode_paiement"
-                                    value={
-                                        formulaire.mode_paiement
-                                    }
-                                    onChange={
-                                        handleChange
-                                    }
-                                    required
-                                >
-
-                                    <option value="ESPECES">
-                                        Espèces
-                                    </option>
-
-                                    <option value="CARTE">
-                                        Carte bancaire
-                                    </option>
-
-                                    <option value="MOBILE_MONEY">
-                                        Mobile Money
-                                    </option>
-
-                                    <option value="CHEQUE">
-                                        Chèque
-                                    </option>
-
-                                    <option value="VIREMENT">
-                                        Virement
-                                    </option>
-
-                                </select>
+                                  <select
+                                        name="mode_paiement"
+                                        value={formulaire.mode_paiement}
+                                        onChange={handleChange}
+                                    >
+                                <option value="ESPECES">Espèces</option>
+                                <option value="WAVE">Wave</option>
+                                <option value="ORANGE_MONEY">Orange Money</option>
+                                <option value="FREE_MONEY">Free Money</option>
+                            </select>
 
                             </div>
 

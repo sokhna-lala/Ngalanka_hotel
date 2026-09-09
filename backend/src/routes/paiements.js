@@ -130,9 +130,6 @@ router.get("/:id", async (req, res) => {
         });
     }
 });
-// =====================================================
-// POST - Ajouter un paiement
-// =====================================================
 router.post("/", async (req, res) => {
     const connection = await pool.getConnection();
 
@@ -147,9 +144,10 @@ router.post("/", async (req, res) => {
 
         const montantPaiement = Number(montant);
 
-        // -------------------------------------------------
-        // Vérifications
-        // -------------------------------------------------
+        // =====================================================
+        // VALIDATIONS
+        // =====================================================
+
         if (!id_facture) {
             return res.status(400).json({
                 message: "La facture est obligatoire"
@@ -168,13 +166,15 @@ router.post("/", async (req, res) => {
             });
         }
 
-        // -------------------------------------------------
-        // Vérifier la facture
-        // -------------------------------------------------
+        // =====================================================
+        // VERIFIER LA FACTURE
+        // =====================================================
+
         const [factures] = await connection.execute(
             `
             SELECT
                 id_facture,
+                numero_facture,
                 net_a_payer,
                 montant_paye,
                 reste_a_payer,
@@ -205,71 +205,106 @@ router.post("/", async (req, res) => {
             });
         }
 
-        if (montantPaiement > Number(facture.reste_a_payer)) {
+        if (
+            montantPaiement >
+            Number(facture.reste_a_payer)
+        ) {
             return res.status(400).json({
                 message: "Le montant dépasse le reste à payer"
             });
         }
 
-        // -------------------------------------------------
-        // Démarrer la transaction
-        // -------------------------------------------------
+        // =====================================================
+        // VERIFIER LA CAISSE OUVERTE
+        // =====================================================
+
+        const [caisses] = await connection.execute(
+            `
+            SELECT
+                id_caisse,
+                nom_caisse,
+                solde_actuel
+            FROM caisses
+            WHERE statut = 'OUVERTE'
+            ORDER BY id_caisse ASC
+            LIMIT 1
+            FOR UPDATE
+            `
+        );
+
+        if (caisses.length === 0) {
+            return res.status(400).json({
+                message:
+                    "Aucune caisse ouverte. Ouvrez une caisse avant d'enregistrer un paiement."
+            });
+        }
+
+        const caisse = caisses[0];
+
+        // =====================================================
+        // DEBUT TRANSACTION
+        // =====================================================
+
         await connection.beginTransaction();
 
-        // -------------------------------------------------
-        // Générer le numéro de paiement
-        // -------------------------------------------------
+        // =====================================================
+        // GENERER NUMERO PAIEMENT
+        // =====================================================
+
         const numeroPaiement =
             await genererNumeroPaiement(connection);
 
-        // -------------------------------------------------
-        // Enregistrer le paiement
-        // -------------------------------------------------
-        await connection.execute(
-            `
-            INSERT INTO paiements (
-                numero_paiement,
-                id_facture,
-                montant,
-                mode_paiement,
-                reference,
-                observation
-            )
-            VALUES (?, ?, ?, ?, ?, ?)
-            `,
-            [
-                numeroPaiement,
-                id_facture,
-                montantPaiement,
-                mode_paiement,
-                reference || null,
-                observation || null
-            ]
-        );
+        // =====================================================
+        // INSERTION DU PAIEMENT
+        // =====================================================
 
-        // -------------------------------------------------
-        // Recalculer le montant payé
-        // -------------------------------------------------
+        const [paiementResult] =
+            await connection.execute(
+                `
+                INSERT INTO paiements (
+                    numero_paiement,
+                    id_facture,
+                    montant,
+                    mode_paiement,
+                    reference,
+                    observation
+                )
+                VALUES (?, ?, ?, ?, ?, ?)
+                `,
+                [
+                    numeroPaiement,
+                    id_facture,
+                    montantPaiement,
+                    mode_paiement,
+                    reference || null,
+                    observation || null
+                ]
+            );
+
+        const idPaiement =
+            paiementResult.insertId;
+
+        // =====================================================
+        // RECALCUL FACTURE
+        // =====================================================
+
         const nouveauMontantPaye =
-            Number(facture.montant_paye) + montantPaiement;
+            Number(facture.montant_paye) +
+            montantPaiement;
 
-        const nouveauReste = Math.max(
-            0,
-            Number(facture.net_a_payer) - nouveauMontantPaye
-        );
+        const nouveauReste =
+            Math.max(
+                0,
+                Number(facture.net_a_payer) -
+                nouveauMontantPaye
+            );
 
-        // -------------------------------------------------
-        // Déterminer le nouveau statut
-        // -------------------------------------------------
         let nouveauStatut = "PARTIELLE";
 
         if (nouveauReste === 0) {
             nouveauStatut = "PAYEE";
         }
 
-        // -------------------------------------------------
-        // Mettre à jour la facture
-        // -------------------------------------------------
         await connection.execute(
             `
             UPDATE factures
@@ -287,42 +322,116 @@ router.post("/", async (req, res) => {
             ]
         );
 
-        // -------------------------------------------------
-        // Valider la transaction
-        // -------------------------------------------------
+        // =====================================================
+        // CREER MOUVEMENT DE CAISSE
+        // =====================================================
+
+        await connection.execute(
+            `
+            INSERT INTO mouvements_caisse (
+                id_caisse,
+                id_paiement,
+                type_mouvement,
+                montant,
+                motif,
+                reference,
+                observation
+            )
+            VALUES (?, ?, 'ENTREE', ?, ?, ?, ?)
+            `,
+            [
+                caisse.id_caisse,
+                idPaiement,
+                montantPaiement,
+                `Paiement facture ${facture.numero_facture}`,
+                reference || numeroPaiement,
+                observation || null
+            ]
+        );
+
+        // =====================================================
+        // MISE A JOUR DU SOLDE CAISSE
+        // =====================================================
+
+        const ancienSolde =
+            Number(caisse.solde_actuel);
+
+        const nouveauSolde =
+            ancienSolde + montantPaiement;
+
+        await connection.execute(
+            `
+            UPDATE caisses
+            SET solde_actuel = ?
+            WHERE id_caisse = ?
+            `,
+            [
+                nouveauSolde,
+                caisse.id_caisse
+            ]
+        );
+
+        // =====================================================
+        // VALIDATION TRANSACTION
+        // =====================================================
+
         await connection.commit();
 
-        // -------------------------------------------------
-        // Réponse
-        // -------------------------------------------------
+        // =====================================================
+        // REPONSE
+        // =====================================================
+
         res.status(201).json({
-            message: "Paiement enregistré avec succès",
-            numero_paiement: numeroPaiement,
-            montant_paye: nouveauMontantPaye,
-            reste_a_payer: nouveauReste,
-            statut: nouveauStatut
+            message:
+                "Paiement et mouvement de caisse enregistrés avec succès",
+
+            paiement: {
+                id_paiement: idPaiement,
+                numero_paiement: numeroPaiement,
+                montant: montantPaiement,
+                mode_paiement
+            },
+
+            facture: {
+                id_facture,
+                montant_paye: nouveauMontantPaye,
+                reste_a_payer: nouveauReste,
+                statut: nouveauStatut
+            },
+
+            caisse: {
+                id_caisse: caisse.id_caisse,
+                nom_caisse: caisse.nom_caisse,
+                ancien_solde: ancienSolde,
+                nouveau_solde: nouveauSolde
+            }
         });
 
     } catch (error) {
 
-        // Annuler la transaction en cas d'erreur
         await connection.rollback();
 
-        console.error("Erreur paiement :", error);
+        console.error(
+            "Erreur paiement + caisse :",
+            error
+        );
 
         if (error.code === "ER_DUP_ENTRY") {
             return res.status(409).json({
-                message: "Le numéro de paiement existe déjà"
+                message:
+                    "Le numéro de paiement existe déjà"
             });
         }
 
         res.status(500).json({
-            message: "Impossible d'enregistrer le paiement"
+            message:
+                "Impossible d'enregistrer le paiement et le mouvement de caisse"
         });
 
     } finally {
         connection.release();
     }
 });
+
 
 module.exports = router;

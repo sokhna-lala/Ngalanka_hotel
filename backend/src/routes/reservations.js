@@ -7,11 +7,8 @@ const pool = require("../config/database");
 // ==========================================
 
 router.get("/", async (req, res) => {
-
     try {
-
         const [reservations] = await pool.execute(`
-
             SELECT
                 r.id_reservation,
                 r.numero_reservation,
@@ -33,6 +30,8 @@ router.get("/", async (req, res) => {
                 r.avance,
                 r.observation,
 
+                rc.id_chambre,
+
                 ch.numero AS numero_chambre,
                 tc.libelle AS type_chambre
 
@@ -51,7 +50,6 @@ router.get("/", async (req, res) => {
                 ON tc.id_type = ch.id_type
 
             ORDER BY r.date_creation DESC
-
         `);
 
         res.json(reservations);
@@ -68,15 +66,17 @@ router.get("/", async (req, res) => {
                 "Impossible de récupérer les réservations"
         });
     }
-
 });
+
 
 // ==========================================
 // GET - Clients pour formulaire réservation
 // IMPORTANT : avant /:id
 // ==========================================
+
 router.get("/data/clients", async (req, res) => {
     try {
+
         const [clients] = await pool.execute(`
             SELECT
                 id_client,
@@ -91,13 +91,15 @@ router.get("/data/clients", async (req, res) => {
         res.json(clients);
 
     } catch (error) {
+
         console.error(
             "Erreur récupération clients :",
             error
         );
 
         res.status(500).json({
-            message: "Impossible de récupérer les clients"
+            message:
+                "Impossible de récupérer les clients"
         });
     }
 });
@@ -107,8 +109,10 @@ router.get("/data/clients", async (req, res) => {
 // GET - Chambres disponibles
 // IMPORTANT : avant /:id
 // ==========================================
+
 router.get("/data/chambres", async (req, res) => {
     try {
+
         const [chambres] = await pool.execute(`
             SELECT
                 c.id_chambre,
@@ -117,23 +121,29 @@ router.get("/data/chambres", async (req, res) => {
                 c.tarif,
                 c.statut,
                 t.libelle AS type_chambre
+
             FROM chambres c
+
             INNER JOIN types_chambre t
                 ON t.id_type = c.id_type
+
             WHERE c.statut = 'DISPONIBLE'
+
             ORDER BY c.numero ASC
         `);
 
         res.json(chambres);
 
     } catch (error) {
+
         console.error(
             "Erreur récupération chambres :",
             error
         );
 
         res.status(500).json({
-            message: "Impossible de récupérer les chambres disponibles"
+            message:
+                "Impossible de récupérer les chambres disponibles"
         });
     }
 });
@@ -142,29 +152,38 @@ router.get("/data/chambres", async (req, res) => {
 // ==========================================
 // GET - Une réservation
 // ==========================================
+
 router.get("/:id", async (req, res) => {
     try {
+
         const [reservations] = await pool.execute(`
             SELECT
                 r.*,
+
                 CONCAT(
                     c.nom,
                     ' ',
                     COALESCE(c.prenom, '')
                 ) AS client
+
             FROM reservations r
+
             INNER JOIN clients c
                 ON c.id_client = r.id_client
+
             WHERE r.id_reservation = ?
         `, [req.params.id]);
 
+
         if (reservations.length === 0) {
+
             return res.status(404).json({
-                message: "Réservation introuvable"
+                message:
+                    "Réservation introuvable"
             });
         }
 
-        // Récupérer les chambres associées
+
         const [chambres] = await pool.execute(`
             SELECT
                 rc.id_reservation_chambre,
@@ -175,13 +194,18 @@ router.get("/:id", async (req, res) => {
                 rc.tarif_nuit,
                 rc.nombre_nuits,
                 rc.montant
+
             FROM reservation_chambres rc
+
             INNER JOIN chambres c
                 ON c.id_chambre = rc.id_chambre
+
             INNER JOIN types_chambre t
                 ON t.id_type = c.id_type
+
             WHERE rc.id_reservation = ?
         `, [req.params.id]);
+
 
         res.json({
             ...reservations[0],
@@ -189,13 +213,15 @@ router.get("/:id", async (req, res) => {
         });
 
     } catch (error) {
+
         console.error(
             "Erreur récupération réservation :",
             error
         );
 
         res.status(500).json({
-            message: "Impossible de récupérer la réservation"
+            message:
+                "Impossible de récupérer la réservation"
         });
     }
 });
@@ -204,10 +230,14 @@ router.get("/:id", async (req, res) => {
 // ==========================================
 // POST - Créer une réservation
 // ==========================================
+
 router.post("/", async (req, res) => {
-    const connection = await pool.getConnection();
+
+    const connection =
+        await pool.getConnection();
 
     try {
+
         await connection.beginTransaction();
 
         const {
@@ -223,13 +253,12 @@ router.post("/", async (req, res) => {
             observation,
             id_utilisateur,
             id_chambre,
-            tarif_nuit,
-            nombre_nuits
+            tarif_nuit
         } = req.body;
 
-        // ==========================================
+
         // Validation
-        // ==========================================
+
         if (
             !numero_reservation ||
             !id_client ||
@@ -237,6 +266,7 @@ router.post("/", async (req, res) => {
             !date_depart ||
             !id_chambre
         ) {
+
             await connection.rollback();
 
             return res.status(400).json({
@@ -245,11 +275,14 @@ router.post("/", async (req, res) => {
             });
         }
 
-        // Vérifier les dates
+
+        // Vérification des dates
+
         if (
             new Date(date_depart) <=
             new Date(date_arrivee)
         ) {
+
             await connection.rollback();
 
             return res.status(400).json({
@@ -258,91 +291,116 @@ router.post("/", async (req, res) => {
             });
         }
 
-        // ==========================================
+
         // Vérifier le client
-        // ==========================================
-        const [clients] = await connection.execute(`
-            SELECT id_client
-            FROM clients
-            WHERE id_client = ?
-        `, [id_client]);
+
+        const [clients] =
+            await connection.execute(`
+                SELECT id_client
+                FROM clients
+                WHERE id_client = ?
+            `, [id_client]);
+
 
         if (clients.length === 0) {
+
             await connection.rollback();
 
             return res.status(404).json({
-                message: "Client introuvable"
+                message:
+                    "Client introuvable"
             });
         }
 
-        // ==========================================
+
         // Vérifier la chambre
-        // ==========================================
-        const [chambres] = await connection.execute(`
-            SELECT
-                id_chambre,
-                numero,
-                tarif,
-                statut
-            FROM chambres
-            WHERE id_chambre = ?
-            FOR UPDATE
-        `, [id_chambre]);
+
+        const [chambres] =
+            await connection.execute(`
+                SELECT
+                    id_chambre,
+                    numero,
+                    tarif,
+                    statut
+
+                FROM chambres
+
+                WHERE id_chambre = ?
+
+                FOR UPDATE
+            `, [id_chambre]);
+
 
         if (chambres.length === 0) {
+
             await connection.rollback();
 
             return res.status(404).json({
-                message: "Chambre introuvable"
+                message:
+                    "Chambre introuvable"
             });
         }
 
-        const chambre = chambres[0];
 
-        if (chambre.statut !== "DISPONIBLE") {
+        const chambre =
+            chambres[0];
+
+
+        if (
+            chambre.statut !==
+            "DISPONIBLE"
+        ) {
+
             await connection.rollback();
 
             return res.status(409).json({
                 message:
-                    `La chambre ${chambre.numero} n'est pas disponible. ` +
-                    `Statut actuel : ${chambre.statut}`
+                    `La chambre ${chambre.numero} n'est pas disponible. Statut actuel : ${chambre.statut}`
             });
         }
 
-        // ==========================================
-        // Calcul du nombre de nuits
-        // ==========================================
+
+        // Calcul nombre nuits
+
         const difference =
             new Date(date_depart).getTime() -
             new Date(date_arrivee).getTime();
 
-        const nuits = Math.ceil(
-            difference /
-            (1000 * 60 * 60 * 24)
-        );
 
-        const totalNuits = Math.max(1, nuits);
+        const totalNuits =
+            Math.max(
+                1,
+                Math.ceil(
+                    difference /
+                    (1000 * 60 * 60 * 24)
+                )
+            );
+
 
         const tarif =
             Number(tarif_nuit) ||
             Number(chambre.tarif) ||
             0;
 
+
         const montantCalcule =
             tarif * totalNuits;
+
 
         const montantPrevuFinal =
             Number(montant_prevu) ||
             montantCalcule;
 
+
         const avanceFinale =
             Number(avance) || 0;
 
-        // ==========================================
-        // Vérifier que l'avance ne dépasse pas
-        // le montant prévu
-        // ==========================================
-        if (avanceFinale > montantPrevuFinal) {
+
+        if (
+            avanceFinale >
+            montantPrevuFinal
+        ) {
+
             await connection.rollback();
 
             return res.status(400).json({
@@ -351,43 +409,49 @@ router.post("/", async (req, res) => {
             });
         }
 
-        // ==========================================
-        // Créer la réservation
-        // ==========================================
-        const [result] = await connection.execute(`
-            INSERT INTO reservations (
+
+        // Créer réservation
+
+        const [result] =
+            await connection.execute(`
+                INSERT INTO reservations (
+                    numero_reservation,
+                    id_client,
+                    date_arrivee,
+                    date_depart,
+                    nb_adultes,
+                    nb_enfants,
+                    statut,
+                    montant_prevu,
+                    avance,
+                    observation,
+                    id_utilisateur
+                )
+
+                VALUES (
+                    ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?
+                )
+            `, [
                 numero_reservation,
                 id_client,
                 date_arrivee,
                 date_depart,
-                nb_adultes,
-                nb_enfants,
-                statut,
-                montant_prevu,
-                avance,
-                observation,
-                id_utilisateur
-            )
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-        `, [
-            numero_reservation,
-            id_client,
-            date_arrivee,
-            date_depart,
-            Number(nb_adultes) || 1,
-            Number(nb_enfants) || 0,
-            statut || "EN_ATTENTE",
-            montantPrevuFinal,
-            avanceFinale,
-            observation || null,
-            id_utilisateur || null
-        ]);
+                Number(nb_adultes) || 1,
+                Number(nb_enfants) || 0,
+                statut || "EN_ATTENTE",
+                montantPrevuFinal,
+                avanceFinale,
+                observation || null,
+                id_utilisateur || null
+            ]);
 
-        const idReservation = result.insertId;
 
-        // ==========================================
-        // Ajouter la chambre à la réservation
-        // ==========================================
+        const idReservation =
+            result.insertId;
+
+
+        // Ajouter chambre
+
         await connection.execute(`
             INSERT INTO reservation_chambres (
                 id_reservation,
@@ -396,6 +460,7 @@ router.post("/", async (req, res) => {
                 nombre_nuits,
                 montant
             )
+
             VALUES (?, ?, ?, ?, ?)
         `, [
             idReservation,
@@ -405,29 +470,32 @@ router.post("/", async (req, res) => {
             montantCalcule
         ]);
 
-        // ==========================================
-        // La chambre devient RESERVEE
-        // ==========================================
+
+        // Chambre réservée
+
         await connection.execute(`
             UPDATE chambres
+
             SET statut = 'RESERVEE'
+
             WHERE id_chambre = ?
         `, [id_chambre]);
 
+
         await connection.commit();
 
+
         res.status(201).json({
+
             message:
                 "Réservation créée avec succès",
 
             id_reservation:
                 idReservation,
 
-            numero_reservation:
-                numero_reservation,
+            numero_reservation,
 
-            id_chambre:
-                id_chambre,
+            id_chambre,
 
             numero_chambre:
                 chambre.numero,
@@ -454,12 +522,17 @@ router.post("/", async (req, res) => {
             error
         );
 
-        if (error.code === "ER_DUP_ENTRY") {
+        if (
+            error.code ===
+            "ER_DUP_ENTRY"
+        ) {
+
             return res.status(409).json({
                 message:
                     "Ce numéro de réservation existe déjà"
             });
         }
+
 
         res.status(500).json({
             message:
@@ -467,6 +540,7 @@ router.post("/", async (req, res) => {
         });
 
     } finally {
+
         connection.release();
     }
 });
@@ -476,38 +550,52 @@ router.post("/", async (req, res) => {
 // POST - CHECK-IN
 // Réservation → Séjour
 // ==========================================
+
 router.post("/:id/checkin", async (req, res) => {
-    const connection = await pool.getConnection();
+
+    const connection =
+        await pool.getConnection();
 
     try {
+
         await connection.beginTransaction();
 
-        const idReservation = req.params.id;
+        const idReservation =
+            req.params.id;
+
 
         const {
             utilisateur_checkin,
             caution = 0
         } = req.body;
 
-        // ==========================================
-        // Récupérer réservation
-        // ==========================================
-        const [reservations] = await connection.execute(`
-            SELECT
-                r.id_reservation,
-                r.numero_reservation,
-                r.id_client,
-                r.date_arrivee,
-                r.date_depart,
-                r.nb_adultes,
-                r.nb_enfants,
-                r.statut
-            FROM reservations r
-            WHERE r.id_reservation = ?
-            FOR UPDATE
-        `, [idReservation]);
 
-        if (reservations.length === 0) {
+        // Récupérer réservation
+
+        const [reservations] =
+            await connection.execute(`
+                SELECT
+                    r.id_reservation,
+                    r.numero_reservation,
+                    r.id_client,
+                    r.date_arrivee,
+                    r.date_depart,
+                    r.nb_adultes,
+                    r.nb_enfants,
+                    r.statut
+
+                FROM reservations r
+
+                WHERE r.id_reservation = ?
+
+                FOR UPDATE
+            `, [idReservation]);
+
+
+        if (
+            reservations.length === 0
+        ) {
+
             await connection.rollback();
 
             return res.status(404).json({
@@ -516,13 +604,16 @@ router.post("/:id/checkin", async (req, res) => {
             });
         }
 
+
         const reservation =
             reservations[0];
 
-        // ==========================================
-        // La réservation doit être CONFIRMEE
-        // ==========================================
-        if (reservation.statut !== "CONFIRMEE") {
+
+        if (
+            reservation.statut !==
+            "CONFIRMEE"
+        ) {
+
             await connection.rollback();
 
             return res.status(400).json({
@@ -531,61 +622,71 @@ router.post("/:id/checkin", async (req, res) => {
             });
         }
 
-        // ==========================================
+
         // Vérifier séjour existant
-        // ==========================================
+
         const [sejoursExistants] =
             await connection.execute(`
                 SELECT
                     id_sejour,
                     numero_sejour,
                     statut
+
                 FROM sejours
+
                 WHERE id_reservation = ?
+
                 AND statut IN (
                     'EN_ATTENTE',
                     'EN_COURS'
                 )
+
                 LIMIT 1
+
                 FOR UPDATE
             `, [idReservation]);
 
-        if (sejoursExistants.length > 0) {
+
+        if (
+            sejoursExistants.length > 0
+        ) {
+
             await connection.rollback();
 
             return res.status(409).json({
                 message:
-                    "Un séjour est déjà associé à cette réservation.",
-
-                id_sejour:
-                    sejoursExistants[0].id_sejour,
-
-                numero_sejour:
-                    sejoursExistants[0].numero_sejour
+                    "Un séjour est déjà associé à cette réservation."
             });
         }
 
-        // ==========================================
-        // Récupérer la chambre
-        // ==========================================
+
+        // Récupérer chambre
+
         const [reservationChambres] =
             await connection.execute(`
                 SELECT
                     rc.id_chambre,
-                    rc.tarif_nuit,
-                    rc.nombre_nuits,
-                    rc.montant,
                     c.numero,
                     c.statut
+
                 FROM reservation_chambres rc
+
                 INNER JOIN chambres c
-                    ON c.id_chambre = rc.id_chambre
+                    ON c.id_chambre =
+                        rc.id_chambre
+
                 WHERE rc.id_reservation = ?
+
                 LIMIT 1
+
                 FOR UPDATE
             `, [idReservation]);
 
-        if (reservationChambres.length === 0) {
+
+        if (
+            reservationChambres.length === 0
+        ) {
+
             await connection.rollback();
 
             return res.status(400).json({
@@ -594,36 +695,36 @@ router.post("/:id/checkin", async (req, res) => {
             });
         }
 
+
         const chambre =
             reservationChambres[0];
 
-        // ==========================================
-        // Vérifier chambre
-        // ==========================================
+
         if (
             chambre.statut !== "RESERVEE" &&
             chambre.statut !== "DISPONIBLE"
         ) {
+
             await connection.rollback();
 
             return res.status(409).json({
                 message:
-                    `La chambre ${chambre.numero} ` +
-                    `ne peut pas être occupée. ` +
-                    `Statut actuel : ${chambre.statut}`
+                    `La chambre ${chambre.numero} ne peut pas être occupée.`
             });
         }
 
-        // ==========================================
-        // Calcul nombre nuits
-        // ==========================================
+
+        // Calcul nuits
+
         const difference =
             new Date(
                 reservation.date_depart
             ).getTime() -
+
             new Date(
                 reservation.date_arrivee
             ).getTime();
+
 
         const nombreNuits =
             Math.max(
@@ -634,50 +735,69 @@ router.post("/:id/checkin", async (req, res) => {
                 )
             );
 
-        // ==========================================
-        // Générer numéro séjour
-        // ==========================================
+
+        // Numéro séjour
+
         const annee =
             new Date().getFullYear();
+
 
         const [dernierSejour] =
             await connection.execute(`
                 SELECT numero_sejour
+
                 FROM sejours
+
                 WHERE numero_sejour LIKE ?
+
                 ORDER BY id_sejour DESC
+
                 LIMIT 1
+
                 FOR UPDATE
-            `, [`SEJ-${annee}-%`]);
+            `, [
+                `SEJ-${annee}-%`
+            ]);
+
 
         let numero = 1;
 
-        if (dernierSejour.length > 0) {
+
+        if (
+            dernierSejour.length > 0
+        ) {
+
             const partie =
                 dernierSejour[0]
                     .numero_sejour
                     .split("-")
                     .pop();
 
+
             const dernierNumero =
                 parseInt(partie, 10);
+
 
             if (
                 !Number.isNaN(
                     dernierNumero
                 )
             ) {
+
                 numero =
                     dernierNumero + 1;
             }
         }
 
-        const numeroSejour =
-            `SEJ-${annee}-${String(numero).padStart(4, "0")}`;
 
-        // ==========================================
+        const numeroSejour =
+            `SEJ-${annee}-${String(
+                numero
+            ).padStart(4, "0")}`;
+
+
         // Créer séjour
-        // ==========================================
+
         const [result] =
             await connection.execute(`
                 INSERT INTO sejours (
@@ -695,6 +815,7 @@ router.post("/:id/checkin", async (req, res) => {
                     caution,
                     utilisateur_checkin
                 )
+
                 VALUES (
                     ?, ?, ?, ?, ?, NOW(), ?,
                     ?, ?, ?, 'EN_COURS', ?, ?
@@ -713,35 +834,36 @@ router.post("/:id/checkin", async (req, res) => {
                 utilisateur_checkin || null
             ]);
 
-        const idSejour =
-            result.insertId;
 
-        // ==========================================
-        // Chambre → OCCUPEE
-        // ==========================================
+        // Chambre occupée
+
         await connection.execute(`
             UPDATE chambres
+
             SET statut = 'OCCUPEE'
+
             WHERE id_chambre = ?
-        `, [chambre.id_chambre]);
+        `, [
+            chambre.id_chambre
+        ]);
+
 
         await connection.commit();
 
+
         res.status(201).json({
+
             message:
                 "Check-in effectué avec succès",
 
             id_sejour:
-                idSejour,
+                result.insertId,
 
             numero_sejour:
                 numeroSejour,
 
             id_reservation:
                 reservation.id_reservation,
-
-            numero_reservation:
-                reservation.numero_reservation,
 
             id_chambre:
                 chambre.id_chambre,
@@ -762,19 +884,13 @@ router.post("/:id/checkin", async (req, res) => {
             error
         );
 
-        if (error.code === "ER_DUP_ENTRY") {
-            return res.status(409).json({
-                message:
-                    "Le numéro de séjour existe déjà."
-            });
-        }
-
         res.status(500).json({
             message:
                 "Impossible d'effectuer le check-in."
         });
 
     } finally {
+
         connection.release();
     }
 });
@@ -783,7 +899,9 @@ router.post("/:id/checkin", async (req, res) => {
 // ==========================================
 // PUT - Modifier une réservation
 // ==========================================
+
 router.put("/:id", async (req, res) => {
+
     try {
 
         const {
@@ -798,30 +916,24 @@ router.put("/:id", async (req, res) => {
             observation
         } = req.body;
 
+
         if (
             !id_client ||
             !date_arrivee ||
             !date_depart
         ) {
+
             return res.status(400).json({
                 message:
                     "Les informations obligatoires sont manquantes"
             });
         }
 
-        if (
-            new Date(date_depart) <=
-            new Date(date_arrivee)
-        ) {
-            return res.status(400).json({
-                message:
-                    "La date de départ doit être après la date d'arrivée"
-            });
-        }
 
         const [result] =
             await pool.execute(`
                 UPDATE reservations
+
                 SET
                     id_client = ?,
                     date_arrivee = ?,
@@ -832,6 +944,7 @@ router.put("/:id", async (req, res) => {
                     montant_prevu = ?,
                     avance = ?,
                     observation = ?
+
                 WHERE id_reservation = ?
             `, [
                 id_client,
@@ -846,12 +959,17 @@ router.put("/:id", async (req, res) => {
                 req.params.id
             ]);
 
-        if (result.affectedRows === 0) {
+
+        if (
+            result.affectedRows === 0
+        ) {
+
             return res.status(404).json({
                 message:
                     "Réservation introuvable"
             });
         }
+
 
         res.json({
             message:
@@ -872,490 +990,12 @@ router.put("/:id", async (req, res) => {
     }
 });
 
+
 // ==========================================
-// POST - ANNULER UNE RÉSERVATION
-// ==========================================
-
-router.post("/:id/annuler", async (req, res) => {
-
-    const connection = await pool.getConnection();
-
-    try {
-
-        await connection.beginTransaction();
-
-        const idReservation = req.params.id;
-
-
-        // ==========================================
-        // RÉCUPÉRER LA RÉSERVATION
-        // ==========================================
-
-        const [reservations] =
-            await connection.execute(
-                `
-                SELECT
-                    id_reservation,
-                    numero_reservation,
-                    statut
-                FROM reservations
-                WHERE id_reservation = ?
-                FOR UPDATE
-                `,
-                [idReservation]
-            );
-
-
-        if (reservations.length === 0) {
-
-            await connection.rollback();
-
-            return res.status(404).json({
-                message: "Réservation introuvable"
-            });
-        }
-
-
-        const reservation =
-            reservations[0];
-
-
-        // ==========================================
-        // VÉRIFIER SI DÉJÀ ANNULÉE
-        // ==========================================
-
-        if (
-            reservation.statut === "ANNULEE"
-        ) {
-
-            await connection.rollback();
-
-            return res.status(400).json({
-                message:
-                    "Cette réservation est déjà annulée."
-            });
-        }
-
-
-        // ==========================================
-        // RÉCUPÉRER LA CHAMBRE
-        // ==========================================
-
-        const [chambresReservation] =
-            await connection.execute(
-                `
-                SELECT
-                    id_chambre
-                FROM reservation_chambres
-                WHERE id_reservation = ?
-                `,
-                [idReservation]
-            );
-
-
-        // ==========================================
-        // ANNULER LA RÉSERVATION
-        // ==========================================
-
-        await connection.execute(
-            `
-            UPDATE reservations
-            SET statut = 'ANNULEE'
-            WHERE id_reservation = ?
-            `,
-            [idReservation]
-        );
-
-
-        // ==========================================
-        // LIBÉRER LES CHAMBRES
-        // ==========================================
-
-        for (
-            const chambreReservation
-            of chambresReservation
-        ) {
-
-            await connection.execute(
-                `
-                UPDATE chambres
-                SET statut = 'DISPONIBLE'
-                WHERE id_chambre = ?
-                `,
-                [
-                    chambreReservation.id_chambre
-                ]
-            );
-        }
-
-
-        // ==========================================
-        // VALIDER TRANSACTION
-        // ==========================================
-
-        await connection.commit();
-
-
-        res.json({
-
-            message:
-                "Réservation annulée avec succès",
-
-            id_reservation:
-                reservation.id_reservation,
-
-            numero_reservation:
-                reservation.numero_reservation,
-
-            statut:
-                "ANNULEE"
-        });
-
-    } catch (error) {
-
-        await connection.rollback();
-
-        console.error(
-            "Erreur annulation réservation :",
-            error
-        );
-
-        res.status(500).json({
-
-            message:
-                "Impossible d'annuler la réservation"
-        });
-
-    } finally {
-
-        connection.release();
-    }
-
-});// ==========================================
-// POST - ANNULER UNE RÉSERVATION
+// POST - Annuler une réservation
 // ==========================================
 
 router.post("/:id/annuler", async (req, res) => {
-
-    const connection = await pool.getConnection();
-
-    try {
-
-        await connection.beginTransaction();
-
-        const idReservation = req.params.id;
-
-
-        // ==========================================
-        // RÉCUPÉRER LA RÉSERVATION
-        // ==========================================
-
-        const [reservations] =
-            await connection.execute(
-                `
-                SELECT
-                    id_reservation,
-                    numero_reservation,
-                    statut
-                FROM reservations
-                WHERE id_reservation = ?
-                FOR UPDATE
-                `,
-                [idReservation]
-            );
-
-
-        if (reservations.length === 0) {
-
-            await connection.rollback();
-
-            return res.status(404).json({
-                message: "Réservation introuvable"
-            });
-        }
-
-
-        const reservation =
-            reservations[0];
-
-
-        // ==========================================
-        // VÉRIFIER SI DÉJÀ ANNULÉE
-        // ==========================================
-
-        if (
-            reservation.statut === "ANNULEE"
-        ) {
-
-            await connection.rollback();
-
-            return res.status(400).json({
-                message:
-                    "Cette réservation est déjà annulée."
-            });
-        }
-
-
-        // ==========================================
-        // RÉCUPÉRER LA CHAMBRE
-        // ==========================================
-
-        const [chambresReservation] =
-            await connection.execute(
-                `
-                SELECT
-                    id_chambre
-                FROM reservation_chambres
-                WHERE id_reservation = ?
-                `,
-                [idReservation]
-            );
-
-
-        // ==========================================
-        // ANNULER LA RÉSERVATION
-        // ==========================================
-
-        await connection.execute(
-            `
-            UPDATE reservations
-            SET statut = 'ANNULEE'
-            WHERE id_reservation = ?
-            `,
-            [idReservation]
-        );
-
-
-        // ==========================================
-        // LIBÉRER LES CHAMBRES
-        // ==========================================
-
-        for (
-            const chambreReservation
-            of chambresReservation
-        ) {
-
-            await connection.execute(
-                `
-                UPDATE chambres
-                SET statut = 'DISPONIBLE'
-                WHERE id_chambre = ?
-                `,
-                [
-                    chambreReservation.id_chambre
-                ]
-            );
-        }
-
-
-        // ==========================================
-        // VALIDER TRANSACTION
-        // ==========================================
-
-        await connection.commit();
-
-
-        res.json({
-
-            message:
-                "Réservation annulée avec succès",
-
-            id_reservation:
-                reservation.id_reservation,
-
-            numero_reservation:
-                reservation.numero_reservation,
-
-            statut:
-                "ANNULEE"
-        });
-
-    } catch (error) {
-
-        await connection.rollback();
-
-        console.error(
-            "Erreur annulation réservation :",
-            error
-        );
-
-        res.status(500).json({
-
-            message:
-                "Impossible d'annuler la réservation"
-        });
-
-    } finally {
-
-        connection.release();
-    }
-
-});// ==========================================
-// POST - ANNULER UNE RÉSERVATION
-// ==========================================
-
-router.post("/:id/annuler", async (req, res) => {
-
-    const connection = await pool.getConnection();
-
-    try {
-
-        await connection.beginTransaction();
-
-        const idReservation = req.params.id;
-
-
-        // ==========================================
-        // RÉCUPÉRER LA RÉSERVATION
-        // ==========================================
-
-        const [reservations] =
-            await connection.execute(
-                `
-                SELECT
-                    id_reservation,
-                    numero_reservation,
-                    statut
-                FROM reservations
-                WHERE id_reservation = ?
-                FOR UPDATE
-                `,
-                [idReservation]
-            );
-
-
-        if (reservations.length === 0) {
-
-            await connection.rollback();
-
-            return res.status(404).json({
-                message: "Réservation introuvable"
-            });
-        }
-
-
-        const reservation =
-            reservations[0];
-
-
-        // ==========================================
-        // VÉRIFIER SI DÉJÀ ANNULÉE
-        // ==========================================
-
-        if (
-            reservation.statut === "ANNULEE"
-        ) {
-
-            await connection.rollback();
-
-            return res.status(400).json({
-                message:
-                    "Cette réservation est déjà annulée."
-            });
-        }
-
-
-        // ==========================================
-        // RÉCUPÉRER LA CHAMBRE
-        // ==========================================
-
-        const [chambresReservation] =
-            await connection.execute(
-                `
-                SELECT
-                    id_chambre
-                FROM reservation_chambres
-                WHERE id_reservation = ?
-                `,
-                [idReservation]
-            );
-
-
-        // ==========================================
-        // ANNULER LA RÉSERVATION
-        // ==========================================
-
-        await connection.execute(
-            `
-            UPDATE reservations
-            SET statut = 'ANNULEE'
-            WHERE id_reservation = ?
-            `,
-            [idReservation]
-        );
-
-
-        // ==========================================
-        // LIBÉRER LES CHAMBRES
-        // ==========================================
-
-        for (
-            const chambreReservation
-            of chambresReservation
-        ) {
-
-            await connection.execute(
-                `
-                UPDATE chambres
-                SET statut = 'DISPONIBLE'
-                WHERE id_chambre = ?
-                `,
-                [
-                    chambreReservation.id_chambre
-                ]
-            );
-        }
-
-
-        // ==========================================
-        // VALIDER TRANSACTION
-        // ==========================================
-
-        await connection.commit();
-
-
-        res.json({
-
-            message:
-                "Réservation annulée avec succès",
-
-            id_reservation:
-                reservation.id_reservation,
-
-            numero_reservation:
-                reservation.numero_reservation,
-
-            statut:
-                "ANNULEE"
-        });
-
-    } catch (error) {
-
-        await connection.rollback();
-
-        console.error(
-            "Erreur annulation réservation :",
-            error
-        );
-
-        res.status(500).json({
-
-            message:
-                "Impossible d'annuler la réservation"
-        });
-
-    } finally {
-
-        connection.release();
-    }
-
-});
-
-// ==========================================
-// PUT - ANNULER UNE RÉSERVATION
-// ==========================================
-
-router.put("/:id/annuler", async (req, res) => {
 
     const connection =
         await pool.getConnection();
@@ -1368,22 +1008,19 @@ router.put("/:id/annuler", async (req, res) => {
             req.params.id;
 
 
-        // ======================================
-        // RÉCUPÉRER LA RÉSERVATION
-        // ======================================
-
         const [reservations] =
-            await connection.execute(
-                `
+            await connection.execute(`
                 SELECT
                     id_reservation,
+                    numero_reservation,
                     statut
+
                 FROM reservations
+
                 WHERE id_reservation = ?
+
                 FOR UPDATE
-                `,
-                [idReservation]
-            );
+            `, [idReservation]);
 
 
         if (
@@ -1403,39 +1040,32 @@ router.put("/:id/annuler", async (req, res) => {
             reservations[0];
 
 
-        // ======================================
-        // DÉJÀ ANNULÉE
-        // ======================================
-
         if (
-            reservation.statut === "ANNULEE"
+            reservation.statut ===
+            "ANNULEE"
         ) {
 
             await connection.rollback();
 
             return res.status(400).json({
                 message:
-                    "Cette réservation est déjà annulée"
+                    "Cette réservation est déjà annulée."
             });
         }
 
 
-        // ======================================
-        // EMPÊCHER ANNULATION SI CHECK-IN
-        // ======================================
+        // Empêcher annulation si séjour actif
 
         const [sejours] =
-            await connection.execute(
-                `
-                SELECT
-                    id_sejour,
-                    statut
+            await connection.execute(`
+                SELECT id_sejour
+
                 FROM sejours
+
                 WHERE id_reservation = ?
+
                 AND statut = 'EN_COURS'
-                `,
-                [idReservation]
-            );
+            `, [idReservation]);
 
 
         if (
@@ -1451,54 +1081,44 @@ router.put("/:id/annuler", async (req, res) => {
         }
 
 
-        // ======================================
-        // RÉCUPÉRER LES CHAMBRES
-        // ======================================
+        // Récupérer chambres
 
         const [chambres] =
-            await connection.execute(
-                `
-                SELECT
-                    id_chambre
+            await connection.execute(`
+                SELECT id_chambre
+
                 FROM reservation_chambres
+
                 WHERE id_reservation = ?
-                `,
-                [idReservation]
-            );
+            `, [idReservation]);
 
 
-        // ======================================
-        // ANNULER LA RÉSERVATION
-        // ======================================
+        // Annuler réservation
 
-        await connection.execute(
-            `
+        await connection.execute(`
             UPDATE reservations
+
             SET statut = 'ANNULEE'
+
             WHERE id_reservation = ?
-            `,
-            [idReservation]
-        );
+        `, [idReservation]);
 
 
-        // ======================================
-        // LIBÉRER LES CHAMBRES
-        // ======================================
+        // Libérer chambres
 
         for (
             const chambre of chambres
         ) {
 
-            await connection.execute(
-                `
+            await connection.execute(`
                 UPDATE chambres
+
                 SET statut = 'DISPONIBLE'
+
                 WHERE id_chambre = ?
-                `,
-                [
-                    chambre.id_chambre
-                ]
-            );
+            `, [
+                chambre.id_chambre
+            ]);
         }
 
 
@@ -1506,12 +1126,18 @@ router.put("/:id/annuler", async (req, res) => {
 
 
         res.json({
-
             message:
-                "Réservation annulée avec succès"
+                "Réservation annulée avec succès",
 
+            id_reservation:
+                reservation.id_reservation,
+
+            numero_reservation:
+                reservation.numero_reservation,
+
+            statut:
+                "ANNULEE"
         });
-
 
     } catch (error) {
 
@@ -1523,18 +1149,15 @@ router.put("/:id/annuler", async (req, res) => {
         );
 
         res.status(500).json({
-
             message:
                 "Impossible d'annuler la réservation"
-
         });
 
     } finally {
 
         connection.release();
-
     }
-
 });
+
 
 module.exports = router;

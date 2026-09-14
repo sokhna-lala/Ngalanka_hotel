@@ -61,7 +61,7 @@ function Sejours() {
             const reservationsConfirmees =
                 response.data.filter(
                     (reservation) =>
-                        reservation.statut === "CONFIRMEE"
+                        reservation.statut === "EN_ATTENTE"
                 );
 
             setReservations(reservationsConfirmees);

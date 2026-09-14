@@ -1,46 +1,40 @@
-
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import axios from "axios";
 import "./Factures.css";
 
 const API_URL = "http://localhost:5000/api";
 
-const creerFormulaireInitial = () => ({
+const formulaireInitial = {
+    id_reservation: "",
     id_client: "",
-    id_sejour: "",
     remise: 0,
     taxe: 0,
     observation: "",
-    lignes: [
-        {
-            type_ligne: "AUTRE",
-            reference_id: "",
-            designation: "",
-            quantite: 1,
-            prix_unitaire: 0,
-            remise: 0
-        }
-    ]
-});
+    lignes: []
+};
 
 function Factures() {
     const [factures, setFactures] = useState([]);
-    const [clients, setClients] = useState([]);
-    const [sejours, setSejours] = useState([]);
+    const [reservations, setReservations] = useState([]);
 
     const [loading, setLoading] = useState(true);
+    const [chargementReservations, setChargementReservations] = useState(true);
+
     const [error, setError] = useState("");
 
     const [afficherFormulaire, setAfficherFormulaire] = useState(false);
     const [factureEnModification, setFactureEnModification] = useState(null);
+    const [factureDetail, setFactureDetail] = useState(null);
 
-    const [formulaire, setFormulaire] = useState(
-        creerFormulaireInitial()
-    );
+    const [formulaire, setFormulaire] = useState(formulaireInitial);
+
+    const [recherche, setRecherche] = useState("");
+    const [filtreStatut, setFiltreStatut] = useState("TOUS");
 
     // =====================================================
     // CHARGER LES FACTURES
     // =====================================================
+
     const chargerFactures = async () => {
         try {
             setLoading(true);
@@ -69,68 +63,171 @@ function Factures() {
     };
 
     // =====================================================
-    // CHARGER LES CLIENTS
+    // CHARGER LES RESERVATIONS
     // =====================================================
-    const chargerClients = async () => {
+
+    const chargerReservations = async () => {
         try {
+            setChargementReservations(true);
+
             const response = await axios.get(
-                `${API_URL}/clients`
+                `${API_URL}/reservations`
             );
 
-            setClients(
+            setReservations(
                 Array.isArray(response.data)
                     ? response.data
                     : []
             );
         } catch (err) {
-            console.error("Erreur clients :", err);
-        }
-    };
-
-    // =====================================================
-    // CHARGER LES SÉJOURS
-    // =====================================================
-    const chargerSejours = async () => {
-        try {
-            const response = await axios.get(
-                `${API_URL}/sejours`
+            console.error(
+                "Erreur réservations :",
+                err
             );
 
-            setSejours(
-                Array.isArray(response.data)
-                    ? response.data
-                    : []
-            );
-        } catch (err) {
-            console.warn(
-                "La route des séjours n'est pas encore disponible."
-            );
-
-            setSejours([]);
+            setReservations([]);
+        } finally {
+            setChargementReservations(false);
         }
     };
 
     // =====================================================
     // CHARGEMENT INITIAL
     // =====================================================
+
     useEffect(() => {
         chargerFactures();
-        chargerClients();
-        chargerSejours();
+        chargerReservations();
     }, []);
+
+    // =====================================================
+    // FORMATAGE
+    // =====================================================
+
+    const formatMontant = (montant) => {
+        return Number(montant || 0).toLocaleString(
+            "fr-FR"
+        );
+    };
+
+    const formatDate = (date) => {
+        if (!date) return "-";
+
+        const d = new Date(date);
+
+        if (Number.isNaN(d.getTime())) {
+            return "-";
+        }
+
+        return d.toLocaleDateString("fr-FR");
+    };
+
+    // =====================================================
+    // STATUT
+    // =====================================================
+
+    const libelleStatut = (statut) => {
+        const statuts = {
+            IMPAYEE: "Impayée",
+            PARTIELLE: "Partielle",
+            PAYEE: "Payée",
+            ANNULEE: "Annulée"
+        };
+
+        return statuts[statut] || statut || "-";
+    };
 
     // =====================================================
     // NOUVELLE FACTURE
     // =====================================================
+
     const nouvelleFacture = () => {
         setFactureEnModification(null);
-        setFormulaire(creerFormulaireInitial());
+        setFormulaire(formulaireInitial);
         setAfficherFormulaire(true);
+    };
+
+    // =====================================================
+    // SELECTION RESERVATION
+    // =====================================================
+
+    const handleReservationChange = (e) => {
+        const idReservation = e.target.value;
+
+        if (!idReservation) {
+            setFormulaire(formulaireInitial);
+            return;
+        }
+
+        const reservation = reservations.find(
+            (item) =>
+                Number(item.id_reservation) ===
+                Number(idReservation)
+        );
+
+        if (!reservation) {
+            return;
+        }
+
+        const nombreNuits =
+            Number(reservation.nombre_nuits) ||
+            Math.max(
+                1,
+                Math.ceil(
+                    (
+                        new Date(reservation.date_depart) -
+                        new Date(reservation.date_arrivee)
+                    ) /
+                        (1000 * 60 * 60 * 24)
+                )
+            );
+
+        const tarifNuit =
+            Number(reservation.tarif_nuit) ||
+            0;
+
+        const montantChambre =
+            Number(reservation.montant_chambre) ||
+            nombreNuits * tarifNuit;
+
+        setFormulaire({
+            id_reservation:
+                reservation.id_reservation,
+
+            id_client:
+                reservation.id_client,
+
+            remise: 0,
+            taxe: 0,
+            observation:
+                reservation.observation || "",
+
+            lignes: [
+                {
+                    type_ligne: "CHAMBRE",
+
+                    reference_id:
+                        reservation.id_chambre || "",
+
+                    designation:
+                        `Chambre ${reservation.numero_chambre || ""}`.trim(),
+
+                    quantite: nombreNuits,
+
+                    prix_unitaire: tarifNuit,
+
+                    remise: 0,
+
+                    montant: montantChambre
+                }
+            ]
+        });
     };
 
     // =====================================================
     // MODIFIER UNE FACTURE
     // =====================================================
+
     const modifierFacture = async (facture) => {
         try {
             const response = await axios.get(
@@ -138,39 +235,57 @@ function Factures() {
             );
 
             const data = response.data;
+            const detail = data.facture;
 
             setFactureEnModification(facture);
 
             setFormulaire({
-                id_client: data.facture?.id_client || "",
-                id_sejour: data.facture?.id_sejour || "",
-                remise: Number(data.facture?.remise) || 0,
-                taxe: Number(data.facture?.taxe) || 0,
-                observation: data.facture?.observation || "",
+                id_reservation:
+                    detail?.id_reservation || "",
+
+                id_client:
+                    detail?.id_client || "",
+
+                remise:
+                    Number(detail?.remise) || 0,
+
+                taxe:
+                    Number(detail?.taxe) || 0,
+
+                observation:
+                    detail?.observation || "",
 
                 lignes:
-                    Array.isArray(data.lignes) &&
-                    data.lignes.length > 0
+                    Array.isArray(data.lignes)
                         ? data.lignes.map((ligne) => ({
                               type_ligne:
-                                  ligne.type_ligne || "AUTRE",
+                                  ligne.type_ligne ||
+                                  "AUTRE",
 
                               reference_id:
-                                  ligne.reference_id || "",
+                                  ligne.reference_id ||
+                                  "",
 
                               designation:
-                                  ligne.designation || "",
+                                  ligne.designation ||
+                                  "",
 
                               quantite:
-                                  Number(ligne.quantite) || 1,
+                                  Number(
+                                      ligne.quantite
+                                  ) || 1,
 
                               prix_unitaire:
-                                  Number(ligne.prix_unitaire) || 0,
+                                  Number(
+                                      ligne.prix_unitaire
+                                  ) || 0,
 
                               remise:
-                                  Number(ligne.remise) || 0
+                                  Number(
+                                      ligne.remise
+                                  ) || 0
                           }))
-                        : creerFormulaireInitial().lignes
+                        : []
             });
 
             setAfficherFormulaire(true);
@@ -187,60 +302,42 @@ function Factures() {
         }
     };
 
-    // =====================================================
-    // VOIR UNE FACTURE
-    // =====================================================
-    const voirFacture = async (facture) => {
-        try {
-            const response = await axios.get(
-                `${API_URL}/factures/${facture.id_facture}`
-            );
+   // =====================================================
+// VOIR UNE FACTURE
+// =====================================================
 
-            const data = response.data;
+const voirFacture = async (facture) => {
+    try {
+        const response = await axios.get(
+            `${API_URL}/factures/${facture.id_facture}`
+        );
 
-            const factureDetail = data.facture;
+        setFactureDetail({
+            facture: response.data.facture,
+            lignes: Array.isArray(response.data.lignes)
+                ? response.data.lignes
+                : []
+        });
 
-            alert(
-                `Facture : ${factureDetail.numero_facture}\n\n` +
-                `Client : ${factureDetail.nom || ""} ${factureDetail.prenom || ""}\n` +
-                `Séjour : ${factureDetail.numero_sejour || "-"}\n` +
-                `Date : ${formatDate(factureDetail.date_facture)}\n\n` +
-                `Total : ${formatMontant(
-                    factureDetail.montant_total
-                )} FCFA\n` +
-                `Remise : ${formatMontant(
-                    factureDetail.remise
-                )} FCFA\n` +
-                `Taxe : ${formatMontant(
-                    factureDetail.taxe
-                )} FCFA\n` +
-                `Net à payer : ${formatMontant(
-                    factureDetail.net_a_payer
-                )} FCFA\n` +
-                `Payé : ${formatMontant(
-                    factureDetail.montant_paye
-                )} FCFA\n` +
-                `Reste : ${formatMontant(
-                    factureDetail.reste_a_payer
-                )} FCFA\n` +
-                `Statut : ${factureDetail.statut}`
-            );
-        } catch (err) {
-            console.error(
-                "Erreur consultation facture :",
-                err
-            );
+    } catch (err) {
+        console.error(
+            "Erreur consultation facture :",
+            err
+        );
 
-            alert(
-                err.response?.data?.message ||
-                "Impossible de consulter la facture."
-            );
-        }
-    };
-
+        alert(
+            err.response?.data?.message ||
+            "Impossible de consulter la facture."
+        );
+    }
+};
+const fermerDetail = () => {
+    setFactureDetail(null);
+};
     // =====================================================
     // CHANGEMENT FORMULAIRE
     // =====================================================
+
     const handleChange = (e) => {
         const { name, value } = e.target;
 
@@ -251,17 +348,22 @@ function Factures() {
     };
 
     // =====================================================
-    // CHANGEMENT D'UNE LIGNE
+    // CHANGEMENT LIGNE
     // =====================================================
-    const handleLigneChange = (index, e) => {
-        const { name, value } = e.target;
 
+    const handleLigneChange = (
+        index,
+        champ,
+        value
+    ) => {
         setFormulaire((ancien) => {
-            const lignes = [...ancien.lignes];
+            const lignes = [
+                ...ancien.lignes
+            ];
 
             lignes[index] = {
                 ...lignes[index],
-                [name]: value
+                [champ]: value
             };
 
             return {
@@ -272,49 +374,14 @@ function Factures() {
     };
 
     // =====================================================
-    // AJOUTER UNE LIGNE
+    // CALCULS
     // =====================================================
-    const ajouterLigne = () => {
-        setFormulaire((ancien) => ({
-            ...ancien,
-            lignes: [
-                ...ancien.lignes,
-                {
-                    type_ligne: "AUTRE",
-                    reference_id: "",
-                    designation: "",
-                    quantite: 1,
-                    prix_unitaire: 0,
-                    remise: 0
-                }
-            ]
-        }));
-    };
 
-    // =====================================================
-    // SUPPRIMER UNE LIGNE
-    // =====================================================
-    const supprimerLigne = (index) => {
-        if (formulaire.lignes.length <= 1) {
-            return;
-        }
-
-        setFormulaire((ancien) => ({
-            ...ancien,
-            lignes: ancien.lignes.filter(
-                (_, i) => i !== index
-            )
-        }));
-    };
-
-    // =====================================================
-    // CALCUL MONTANT D'UNE LIGNE
-    // =====================================================
     const calculerMontantLigne = (ligne) => {
         const quantite =
             Number(ligne.quantite) || 0;
 
-        const prixUnitaire =
+        const prix =
             Number(ligne.prix_unitaire) || 0;
 
         const remise =
@@ -322,22 +389,18 @@ function Factures() {
 
         return Math.max(
             0,
-            quantite * prixUnitaire - remise
+            quantite * prix - remise
         );
     };
 
-    // =====================================================
-    // CALCUL TOTAL
-    // =====================================================
-    const calculerTotal = () => {
+    const montantTotal = useMemo(() => {
         return formulaire.lignes.reduce(
             (total, ligne) =>
-                total + calculerMontantLigne(ligne),
+                total +
+                calculerMontantLigne(ligne),
             0
         );
-    };
-
-    const montantTotal = calculerTotal();
+    }, [formulaire.lignes]);
 
     const remiseFacture =
         Number(formulaire.remise) || 0;
@@ -353,21 +416,28 @@ function Factures() {
     );
 
     // =====================================================
-    // ENREGISTRER / MODIFIER
+    // ENREGISTRER
     // =====================================================
+
     const enregistrerFacture = async (e) => {
         e.preventDefault();
 
-        // Vérification client
-        if (!formulaire.id_client) {
-            alert("Veuillez sélectionner un client.");
+        if (!formulaire.id_reservation) {
+            alert(
+                "Veuillez sélectionner une réservation."
+            );
             return;
         }
 
-        // Vérification des lignes
+        if (!formulaire.id_client) {
+            alert(
+                "Le client de la réservation est introuvable."
+            );
+            return;
+        }
+
         if (
-            !Array.isArray(formulaire.lignes) ||
-            formulaire.lignes.length === 0
+            !formulaire.lignes.length
         ) {
             alert(
                 "La facture doit contenir au moins une ligne."
@@ -375,7 +445,6 @@ function Factures() {
             return;
         }
 
-        // Vérification désignation
         const ligneInvalide =
             formulaire.lignes.find(
                 (ligne) =>
@@ -392,58 +461,65 @@ function Factures() {
 
         try {
             const donnees = {
-                id_client: Number(
-                    formulaire.id_client
-                ),
+                id_client:
+                    Number(
+                        formulaire.id_client
+                    ),
 
-                id_sejour:
-                    formulaire.id_sejour
-                        ? Number(
-                              formulaire.id_sejour
-                          )
-                        : null,
+                id_reservation:
+                    Number(
+                        formulaire.id_reservation
+                    ),
+
+                id_sejour: null,
 
                 remise:
-                    Number(formulaire.remise) || 0,
+                    Number(
+                        formulaire.remise
+                    ) || 0,
 
                 taxe:
-                    Number(formulaire.taxe) || 0,
+                    Number(
+                        formulaire.taxe
+                    ) || 0,
 
                 observation:
-                    formulaire.observation || "",
+                    formulaire.observation ||
+                    "",
 
-                lignes: formulaire.lignes.map(
-                    (ligne) => ({
-                        type_ligne:
-                            ligne.type_ligne ||
-                            "AUTRE",
+                lignes:
+                    formulaire.lignes.map(
+                        (ligne) => ({
+                            type_ligne:
+                                ligne.type_ligne ||
+                                "AUTRE",
 
-                        reference_id:
-                            ligne.reference_id
-                                ? Number(
-                                      ligne.reference_id
-                                  )
-                                : null,
+                            reference_id:
+                                ligne.reference_id
+                                    ? Number(
+                                          ligne.reference_id
+                                      )
+                                    : null,
 
-                        designation:
-                            ligne.designation.trim(),
+                            designation:
+                                ligne.designation.trim(),
 
-                        quantite:
-                            Number(
-                                ligne.quantite
-                            ) || 0,
+                            quantite:
+                                Number(
+                                    ligne.quantite
+                                ) || 0,
 
-                        prix_unitaire:
-                            Number(
-                                ligne.prix_unitaire
-                            ) || 0,
+                            prix_unitaire:
+                                Number(
+                                    ligne.prix_unitaire
+                                ) || 0,
 
-                        remise:
-                            Number(
-                                ligne.remise
-                            ) || 0
-                    })
-                )
+                            remise:
+                                Number(
+                                    ligne.remise
+                                ) || 0
+                        })
+                    )
             };
 
             if (factureEnModification) {
@@ -467,6 +543,7 @@ function Factures() {
             }
 
             fermerFormulaire();
+
             await chargerFactures();
         } catch (err) {
             console.error(
@@ -484,757 +561,1385 @@ function Factures() {
     // =====================================================
     // FERMER FORMULAIRE
     // =====================================================
+
     const fermerFormulaire = () => {
         setAfficherFormulaire(false);
         setFactureEnModification(null);
-        setFormulaire(creerFormulaireInitial());
+        setFormulaire(formulaireInitial);
     };
 
     // =====================================================
-    // FORMATAGE MONTANT
+    // FILTRAGE
     // =====================================================
-    const formatMontant = (montant) => {
-        return Number(montant || 0).toLocaleString(
-            "fr-FR"
-        );
-    };
+
+    const facturesFiltrees = useMemo(() => {
+        const terme =
+            recherche.trim().toLowerCase();
+
+        return factures.filter((facture) => {
+            const texte = [
+                facture.numero_facture,
+                facture.numero_reservation,
+                facture.numero_sejour,
+                facture.nom,
+                facture.prenom,
+                facture.code_client
+            ]
+                .filter(Boolean)
+                .join(" ")
+                .toLowerCase();
+
+            const correspondRecherche =
+                !terme ||
+                texte.includes(terme);
+
+            const correspondStatut =
+                filtreStatut === "TOUS" ||
+                facture.statut === filtreStatut;
+
+            return (
+                correspondRecherche &&
+                correspondStatut
+            );
+        });
+    }, [
+        factures,
+        recherche,
+        filtreStatut
+    ]);
 
     // =====================================================
-    // FORMATAGE DATE
+    // STATISTIQUES
     // =====================================================
-    const formatDate = (date) => {
-        if (!date) {
-            return "-";
-        }
 
-        const dateFormatee = new Date(date);
+    const statistiques = useMemo(() => {
+        const totalFactures =
+            factures.length;
 
-        if (Number.isNaN(dateFormatee.getTime())) {
-            return "-";
-        }
+        const chiffreAffaires =
+            factures.reduce(
+                (total, facture) =>
+                    total +
+                    Number(
+                        facture.net_a_payer
+                    || 0),
+                0
+            );
 
-        return dateFormatee.toLocaleDateString(
-            "fr-FR"
-        );
-    };
+        const encaisse =
+            factures.reduce(
+                (total, facture) =>
+                    total +
+                    Number(
+                        facture.montant_paye
+                    || 0),
+                0
+            );
+
+        const impayes =
+            factures.reduce(
+                (total, facture) =>
+                    total +
+                    Number(
+                        facture.reste_a_payer
+                    || 0),
+                0
+            );
+
+        return {
+            totalFactures,
+            chiffreAffaires,
+            encaisse,
+            impayes
+        };
+    }, [factures]);
 
     // =====================================================
     // RENDU
     // =====================================================
+
     return (
         <div className="factures-page">
 
-            {/* =========================
-                EN-TÊTE
-            ========================== */}
+            {/* EN-TÊTE */}
 
-            <div className="page-header">
-
+            <div className="factures-header">
                 <div>
                     <h1>Factures</h1>
 
                     <p>
-                        Gestion des factures et paiements
+                        Préparez et gérez vos factures
+                        à partir des réservations.
                     </p>
                 </div>
 
                 <button
-                    type="button"
                     className="btn-primary"
                     onClick={nouvelleFacture}
                 >
                     + Nouvelle facture
                 </button>
+            </div>
+            {/* =====================================================
+    MODAL DETAIL FACTURE
+===================================================== */}
+
+{factureDetail && (
+    <div className="modal-overlay">
+
+        <div className="detail-modal">
+
+            {/* EN-TÊTE */}
+
+            <div className="detail-header">
+
+                <div>
+                    <span className="detail-label">
+                        FACTURE
+                    </span>
+
+                    <h2>
+                        {
+                            factureDetail.facture
+                                ?.numero_facture
+                        }
+                    </h2>
+
+                    <p>
+                        Émise le{" "}
+                        {
+                            formatDate(
+                                factureDetail.facture
+                                    ?.date_facture
+                            )
+                        }
+                    </p>
+                </div>
+
+                <button
+                    className="modal-close"
+                    onClick={fermerDetail}
+                >
+                    ×
+                </button>
 
             </div>
 
-            {/* =========================
-                FORMULAIRE
-            ========================== */}
+            {/* INFORMATIONS CLIENT */}
 
-            {afficherFormulaire && (
-                <div className="facture-form">
+            <div className="detail-section">
 
-                    <div className="form-header">
+                <div className="detail-section-title">
+                    Informations client
+                </div>
 
-                        <div>
+                <div className="detail-info-grid">
 
-                            <h2>
-                                {factureEnModification
-                                    ? "Modifier la facture"
-                                    : "Nouvelle facture"}
-                            </h2>
+                    <div>
+                        <span>
+                            Client
+                        </span>
 
-                            {factureEnModification && (
-                                <p>
-                                    {
-                                        factureEnModification.numero_facture
-                                    }
-                                </p>
-                            )}
-
-                        </div>
-
-                        <button
-                            type="button"
-                            className="btn-close"
-                            onClick={fermerFormulaire}
-                        >
-                            ✕
-                        </button>
-
+                        <strong>
+                            {
+                                factureDetail.facture
+                                    ?.nom
+                            }{" "}
+                            {
+                                factureDetail.facture
+                                    ?.prenom
+                            }
+                        </strong>
                     </div>
 
-                    <form
-                        onSubmit={enregistrerFacture}
-                    >
+                    <div>
+                        <span>
+                            Code client
+                        </span>
 
-                        {/* =========================
-                            CLIENT / SÉJOUR
-                        ========================== */}
+                        <strong>
+                            {
+                                factureDetail.facture
+                                    ?.code_client ||
+                                "-"
+                            }
+                        </strong>
+                    </div>
 
-                        <div className="form-grid">
+                    <div>
+                        <span>
+                            Réservation
+                        </span>
 
-                            <div>
+                        <strong className="detail-reservation">
+                            {
+                                factureDetail.facture
+                                    ?.numero_reservation ||
+                                "-"
+                            }
+                        </strong>
+                    </div>
 
-                                <label>
-                                    Client *
-                                </label>
+                </div>
 
-                                <select
-                                    name="id_client"
-                                    value={
-                                        formulaire.id_client
-                                    }
-                                    onChange={
-                                        handleChange
-                                    }
-                                    required
-                                >
+            </div>
 
-                                    <option value="">
-                                        Sélectionner un client
-                                    </option>
+            {/* LIGNES */}
 
-                                    {clients.map(
-                                        (client) => (
-                                            <option
-                                                key={
-                                                    client.id_client
-                                                }
-                                                value={
-                                                    client.id_client
-                                                }
-                                            >
-                                                {
-                                                    client.nom
-                                                }{" "}
-                                                {
-                                                    client.prenom
-                                                }
-                                            </option>
-                                        )
-                                    )}
+            <div className="detail-section">
 
-                                </select>
+                <div className="detail-section-title">
+                    Détail des prestations
+                </div>
 
-                            </div>
+                <div className="detail-lines">
 
-                            <div>
+                    <div className="detail-line detail-line-head">
+                        <span>
+                            Désignation
+                        </span>
 
-                                <label>
-                                    Séjour
-                                </label>
+                        <span>
+                            Qté
+                        </span>
 
-                                <select
-                                    name="id_sejour"
-                                    value={
-                                        formulaire.id_sejour
-                                    }
-                                    onChange={
-                                        handleChange
-                                    }
-                                >
+                        <span>
+                            Prix unitaire
+                        </span>
 
-                                    <option value="">
-                                        Aucun séjour
-                                    </option>
+                        <span>
+                            Total
+                        </span>
+                    </div>
 
-                                    {sejours.map(
-                                        (sejour) => (
-                                            <option
-                                                key={
-                                                    sejour.id_sejour
-                                                }
-                                                value={
-                                                    sejour.id_sejour
-                                                }
-                                            >
-                                                {
-                                                    sejour.numero_sejour
-                                                }
-                                            </option>
-                                        )
-                                    )}
-
-                                </select>
-
-                            </div>
-
-                        </div>
-
-                        {/* =========================
-                            LIGNES
-                        ========================== */}
-
-                        <div className="lignes-header">
-
-                            <h3>
-                                Lignes de facture
-                            </h3>
-
-                            <button
-                                type="button"
-                                className="btn-secondary"
-                                onClick={ajouterLigne}
+                    {factureDetail.lignes.map(
+                        (ligne, index) => (
+                            <div
+                                className="detail-line"
+                                key={index}
                             >
-                                + Ajouter une ligne
-                            </button>
 
-                        </div>
+                                <span>
+                                    <strong>
+                                        {
+                                            ligne.designation
+                                        }
+                                    </strong>
 
-                        <div className="lignes-container">
+                                    <small>
+                                        {
+                                            ligne.type_ligne
+                                        }
+                                    </small>
+                                </span>
 
-                            {formulaire.lignes.map(
-                                (ligne, index) => (
-                                    <div
-                                        className="ligne-facture"
-                                        key={index}
-                                    >
+                                <span>
+                                    {
+                                        Number(
+                                            ligne.quantite
+                                        )
+                                    }
+                                </span>
 
-                                        {/* TYPE */}
+                                <span>
+                                    {
+                                        formatMontant(
+                                            ligne.prix_unitaire
+                                        )
+                                    }{" "}
+                                    FCFA
+                                </span>
 
-                                        <div>
+                                <span>
+                                    <strong>
+                                        {
+                                            formatMontant(
+                                                ligne.montant
+                                            )
+                                        }{" "}
+                                        FCFA
+                                    </strong>
+                                </span>
 
-                                            <label>
-                                                Type
-                                            </label>
+                            </div>
+                        )
+                    )}
 
-                                            <select
-                                                name="type_ligne"
-                                                value={
-                                                    ligne.type_ligne
-                                                }
-                                                onChange={(
-                                                    e
-                                                ) =>
-                                                    handleLigneChange(
-                                                        index,
-                                                        e
-                                                    )
-                                                }
-                                            >
+                </div>
 
-                                                <option value="CHAMBRE">
-                                                    Chambre
-                                                </option>
+            </div>
 
-                                                <option value="RESTAURANT">
-                                                    Restaurant
-                                                </option>
+            {/* TOTALS */}
 
-                                                <option value="BAR">
-                                                    Bar
-                                                </option>
+            <div className="detail-total-section">
 
-                                                <option value="PISCINE">
-                                                    Piscine
-                                                </option>
+                <div className="detail-total-row">
+                    <span>
+                        Sous-total
+                    </span>
 
-                                                <option value="LOISIR">
-                                                    Loisir
-                                                </option>
+                    <strong>
+                        {
+                            formatMontant(
+                                factureDetail.facture
+                                    ?.montant_total
+                            )
+                        }{" "}
+                        FCFA
+                    </strong>
+                </div>
 
-                                                <option value="SEMINAIRE">
-                                                    Séminaire
-                                                </option>
+                <div className="detail-total-row">
+                    <span>
+                        Remise
+                    </span>
 
-                                                <option value="AUTRE">
-                                                    Autre
-                                                </option>
+                    <strong>
+                        -{" "}
+                        {
+                            formatMontant(
+                                factureDetail.facture
+                                    ?.remise
+                            )
+                        }{" "}
+                        FCFA
+                    </strong>
+                </div>
 
-                                            </select>
+                <div className="detail-total-row">
+                    <span>
+                        Taxe
+                    </span>
 
-                                        </div>
+                    <strong>
+                        +{" "}
+                        {
+                            formatMontant(
+                                factureDetail.facture
+                                    ?.taxe
+                            )
+                        }{" "}
+                        FCFA
+                    </strong>
+                </div>
 
-                                        {/* DESIGNATION */}
+                <div className="detail-total-final">
+                    <span>
+                        NET À PAYER
+                    </span>
 
-                                        <div>
+                    <strong>
+                        {
+                            formatMontant(
+                                factureDetail.facture
+                                    ?.net_a_payer
+                            )
+                        }{" "}
+                        FCFA
+                    </strong>
+                </div>
 
-                                            <label>
-                                                Désignation *
-                                            </label>
+            </div>
 
-                                            <input
-                                                type="text"
-                                                name="designation"
-                                                value={
-                                                    ligne.designation
-                                                }
-                                                onChange={(
-                                                    e
-                                                ) =>
-                                                    handleLigneChange(
-                                                        index,
-                                                        e
-                                                    )
-                                                }
-                                                placeholder="Ex : Chambre 101"
-                                                required
-                                            />
+            {/* PAIEMENT */}
 
-                                        </div>
+            <div className="detail-payment">
 
-                                        {/* QUANTITE */}
+                <div>
+                    <span>
+                        Montant payé
+                    </span>
 
-                                        <div>
+                    <strong className="payment-paid">
+                        {
+                            formatMontant(
+                                factureDetail.facture
+                                    ?.montant_paye
+                            )
+                        }{" "}
+                        FCFA
+                    </strong>
+                </div>
 
-                                            <label>
-                                                Quantité
-                                            </label>
+                <div>
+                    <span>
+                        Reste à payer
+                    </span>
 
-                                            <input
-                                                type="number"
-                                                name="quantite"
-                                                min="0"
-                                                step="0.01"
-                                                value={
-                                                    ligne.quantite
-                                                }
-                                                onChange={(
-                                                    e
-                                                ) =>
-                                                    handleLigneChange(
-                                                        index,
-                                                        e
-                                                    )
-                                                }
-                                            />
+                    <strong className="payment-rest">
+                        {
+                            formatMontant(
+                                factureDetail.facture
+                                    ?.reste_a_payer
+                            )
+                        }{" "}
+                        FCFA
+                    </strong>
+                </div>
 
-                                        </div>
+                <div>
+                    <span>
+                        Statut
+                    </span>
 
-                                        {/* PRIX */}
-
-                                        <div>
-
-                                            <label>
-                                                Prix unitaire
-                                            </label>
-
-                                            <input
-                                                type="number"
-                                                name="prix_unitaire"
-                                                min="0"
-                                                step="0.01"
-                                                value={
-                                                    ligne.prix_unitaire
-                                                }
-                                                onChange={(
-                                                    e
-                                                ) =>
-                                                    handleLigneChange(
-                                                        index,
-                                                        e
-                                                    )
-                                                }
-                                            />
-
-                                        </div>
-
-                                        {/* REMISE */}
-
-                                        <div>
-
-                                            <label>
-                                                Remise
-                                            </label>
-
-                                            <input
-                                                type="number"
-                                                name="remise"
-                                                min="0"
-                                                step="0.01"
-                                                value={
-                                                    ligne.remise
-                                                }
-                                                onChange={(
-                                                    e
-                                                ) =>
-                                                    handleLigneChange(
-                                                        index,
-                                                        e
-                                                    )
-                                                }
-                                            />
-
-                                        </div>
-
-                                        {/* MONTANT */}
-
-                                        <div className="ligne-montant">
-
-                                            <label>
-                                                Montant
-                                            </label>
-
-                                            <strong>
-                                                {formatMontant(
-                                                    calculerMontantLigne(
-                                                        ligne
-                                                    )
-                                                )}{" "}
-                                                FCFA
-                                            </strong>
-
-                                        </div>
-
-                                        {/* SUPPRIMER */}
-
-                                        <button
-                                            type="button"
-                                            className="btn-delete"
-                                            onClick={() =>
-                                                supprimerLigne(
-                                                    index
-                                                )
-                                            }
-                                            title="Supprimer la ligne"
-                                        >
-                                            🗑️
-                                        </button>
-
-                                    </div>
+                    <strong>
+                        <span
+                            className={`status-badge status-${String(
+                                factureDetail.facture
+                                    ?.statut || ""
+                            ).toLowerCase()}`}
+                        >
+                            {
+                                libelleStatut(
+                                    factureDetail.facture
+                                        ?.statut
                                 )
-                            )}
+                            }
+                        </span>
+                    </strong>
+                </div>
 
-                        </div>
+            </div>
 
-                        {/* =========================
-                            TOTAUX
-                        ========================== */}
+            {/* OBSERVATION */}
 
-                        <div className="totaux-facture">
+            {factureDetail.facture
+                ?.observation && (
+                <div className="detail-observation">
 
-                            <div>
+                    <span>
+                        Observation
+                    </span>
 
-                                <span>
-                                    Montant total
-                                </span>
-
-                                <strong>
-                                    {formatMontant(
-                                        montantTotal
-                                    )}{" "}
-                                    FCFA
-                                </strong>
-
-                            </div>
-
-                            <div>
-
-                                <label>
-                                    Remise globale
-                                </label>
-
-                                <input
-                                    type="number"
-                                    name="remise"
-                                    min="0"
-                                    step="0.01"
-                                    value={
-                                        formulaire.remise
-                                    }
-                                    onChange={
-                                        handleChange
-                                    }
-                                />
-
-                            </div>
-
-                            <div>
-
-                                <label>
-                                    Taxe
-                                </label>
-
-                                <input
-                                    type="number"
-                                    name="taxe"
-                                    min="0"
-                                    step="0.01"
-                                    value={
-                                        formulaire.taxe
-                                    }
-                                    onChange={
-                                        handleChange
-                                    }
-                                />
-
-                            </div>
-
-                            <div className="net-a-payer">
-
-                                <span>
-                                    Net à payer
-                                </span>
-
-                                <strong>
-                                    {formatMontant(
-                                        netAPayer
-                                    )}{" "}
-                                    FCFA
-                                </strong>
-
-                            </div>
-
-                        </div>
-
-                        {/* =========================
-                            OBSERVATION
-                        ========================== */}
-
-                        <div className="full-width">
-
-                            <label>
-                                Observation
-                            </label>
-
-                            <textarea
-                                name="observation"
-                                value={
-                                    formulaire.observation
-                                }
-                                onChange={
-                                    handleChange
-                                }
-                                rows="3"
-                                placeholder="Observation..."
-                            />
-
-                        </div>
-
-                        {/* =========================
-                            ACTIONS
-                        ========================== */}
-
-                        <div className="form-actions">
-
-                            <button
-                                type="button"
-                                onClick={fermerFormulaire}
-                            >
-                                Annuler
-                            </button>
-
-                            <button
-                                type="submit"
-                                className="btn-primary"
-                            >
-                                {factureEnModification
-                                    ? "Modifier la facture"
-                                    : "Enregistrer la facture"}
-                            </button>
-
-                        </div>
-
-                    </form>
+                    <p>
+                        {
+                            factureDetail.facture
+                                .observation
+                        }
+                    </p>
 
                 </div>
             )}
 
-            {/* =========================
-                TABLEAU
-            ========================== */}
+            {/* ACTIONS */}
 
-            {!afficherFormulaire && (
-                <>
-                    {loading && (
+            <div className="detail-actions">
+
+                <button
+                    type="button"
+                    className="btn-secondary"
+                    onClick={fermerDetail}
+                >
+                    Fermer
+                </button>
+
+            </div>
+
+        </div>
+
+    </div>
+)}
+
+            {/* ERREUR */}
+
+            {error && (
+                <div className="factures-alert">
+                    {error}
+                </div>
+            )}
+
+            {/* STATISTIQUES */}
+
+            <div className="factures-stats">
+
+                <div className="stat-card">
+                    <div className="stat-icon">
+                        🧾
+                    </div>
+
+                    <div>
+                        <span>
+                            Factures
+                        </span>
+
+                        <strong>
+                            {
+                                statistiques.totalFactures
+                            }
+                        </strong>
+                    </div>
+                </div>
+
+                <div className="stat-card">
+                    <div className="stat-icon">
+                        💰
+                    </div>
+
+                    <div>
+                        <span>
+                            Net à payer
+                        </span>
+
+                        <strong>
+                            {formatMontant(
+                                statistiques.chiffreAffaires
+                            )} FCFA
+                        </strong>
+                    </div>
+                </div>
+
+                <div className="stat-card">
+                    <div className="stat-icon">
+                        ✓
+                    </div>
+
+                    <div>
+                        <span>
+                            Encaissé
+                        </span>
+
+                        <strong>
+                            {formatMontant(
+                                statistiques.encaisse
+                            )} FCFA
+                        </strong>
+                    </div>
+                </div>
+
+                <div className="stat-card stat-danger">
+                    <div className="stat-icon">
+                        !
+                    </div>
+
+                    <div>
+                        <span>
+                            Reste à payer
+                        </span>
+
+                        <strong>
+                            {formatMontant(
+                                statistiques.impayes
+                            )} FCFA
+                        </strong>
+                    </div>
+                </div>
+
+            </div>
+
+            {/* RECHERCHE */}
+
+            <div className="factures-toolbar">
+
+                <div className="search-box">
+                    🔎
+
+                    <input
+                        type="text"
+                        placeholder="Rechercher une facture, un client ou une réservation..."
+                        value={recherche}
+                        onChange={(e) =>
+                            setRecherche(
+                                e.target.value
+                            )
+                        }
+                    />
+                </div>
+
+                <select
+                    value={filtreStatut}
+                    onChange={(e) =>
+                        setFiltreStatut(
+                            e.target.value
+                        )
+                    }
+                >
+                    <option value="TOUS">
+                        Tous les statuts
+                    </option>
+
+                    <option value="IMPAYEE">
+                        Impayées
+                    </option>
+
+                    <option value="PARTIELLE">
+                        Partielles
+                    </option>
+
+                    <option value="PAYEE">
+                        Payées
+                    </option>
+
+                    <option value="ANNULEE">
+                        Annulées
+                    </option>
+                </select>
+
+            </div>
+
+            {/* TABLEAU */}
+
+            <div className="factures-table-card">
+
+                <div className="table-header">
+                    <div>
+                        <h2>
+                            Liste des factures
+                        </h2>
+
+                        <span>
+                            {
+                                facturesFiltrees.length
+                            } facture(s)
+                        </span>
+                    </div>
+                </div>
+
+                {loading ? (
+                    <div className="empty-state">
+                        <div className="loader"></div>
                         <p>
                             Chargement des factures...
                         </p>
-                    )}
+                    </div>
+                ) : facturesFiltrees.length === 0 ? (
+                    <div className="empty-state">
+                        <div className="empty-icon">
+                            🧾
+                        </div>
 
-                    {error && (
-                        <p className="error-message">
-                            {error}
+                        <h3>
+                            Aucune facture
+                        </h3>
+
+                        <p>
+                            Aucune facture ne
+                            correspond à votre recherche.
                         </p>
-                    )}
+                    </div>
+                ) : (
+                    <div className="table-container">
 
-                    {!loading && !error && (
-                        <div className="table-container">
+                        <table>
 
-                            <table>
+                            <thead>
+                                <tr>
+                                    <th>
+                                        Facture
+                                    </th>
 
-                                <thead>
+                                    <th>
+                                        Client
+                                    </th>
 
-                                    <tr>
-                                        <th>N° Facture</th>
-                                        <th>Client</th>
-                                        <th>Séjour</th>
-                                        <th>Date</th>
-                                        <th>Total</th>
-                                        <th>Net à payer</th>
-                                        <th>Payé</th>
-                                        <th>Reste</th>
-                                        <th>Statut</th>
-                                        <th>Actions</th>
-                                    </tr>
+                                    <th>
+                                        Réservation
+                                    </th>
 
-                                </thead>
+                                    <th>
+                                        Date
+                                    </th>
 
-                                <tbody>
+                                    <th>
+                                        Net à payer
+                                    </th>
 
-                                    {factures.length === 0 ? (
-                                        <tr>
+                                    <th>
+                                        Reste
+                                    </th>
 
-                                            <td
-                                                colSpan="10"
-                                                className="empty"
-                                            >
-                                                Aucune facture enregistrée
+                                    <th>
+                                        Statut
+                                    </th>
+
+                                    <th>
+                                        Actions
+                                    </th>
+                                </tr>
+                            </thead>
+
+                            <tbody>
+
+                                {facturesFiltrees.map(
+                                    (facture) => (
+                                        <tr
+                                            key={
+                                                facture.id_facture
+                                            }
+                                        >
+
+                                            <td>
+                                                <strong>
+                                                    {
+                                                        facture.numero_facture
+                                                    }
+                                                </strong>
                                             </td>
 
-                                        </tr>
-                                    ) : (
-                                        factures.map(
-                                            (facture) => (
-                                                <tr
-                                                    key={
-                                                        facture.id_facture
-                                                    }
-                                                >
-
-                                                    <td>
-                                                        <strong>
-                                                            {
-                                                                facture.numero_facture
-                                                            }
-                                                        </strong>
-                                                    </td>
-
-                                                    <td>
+                                            <td>
+                                                <div className="client-cell">
+                                                    <strong>
                                                         {
                                                             facture.nom
                                                         }{" "}
                                                         {
                                                             facture.prenom
                                                         }
-                                                    </td>
+                                                    </strong>
 
-                                                    <td>
+                                                    <small>
                                                         {
-                                                            facture.numero_sejour ||
-                                                            "-"
+                                                            facture.code_client
                                                         }
-                                                    </td>
+                                                    </small>
+                                                </div>
+                                            </td>
 
-                                                    <td>
-                                                        {formatDate(
-                                                            facture.date_facture
-                                                        )}
-                                                    </td>
+                                            <td>
+                                                <span className="reservation-badge">
+                                                    {
+                                                        facture.numero_reservation ||
+                                                        facture.numero_sejour ||
+                                                        "-"
+                                                    }
+                                                </span>
+                                            </td>
 
-                                                    <td>
-                                                        {formatMontant(
-                                                            facture.montant_total
-                                                        )}{" "}
-                                                        FCFA
-                                                    </td>
+                                            <td>
+                                                {
+                                                    formatDate(
+                                                        facture.date_facture
+                                                    )
+                                                }
+                                            </td>
 
-                                                    <td>
-                                                        <strong>
-                                                            {formatMontant(
-                                                                facture.net_a_payer
-                                                            )}{" "}
-                                                            FCFA
-                                                        </strong>
-                                                    </td>
+                                            <td>
+                                                <strong>
+                                                    {
+                                                        formatMontant(
+                                                            facture.net_a_payer
+                                                        )
+                                                    }{" "}
+                                                    FCFA
+                                                </strong>
+                                            </td>
 
-                                                    <td>
-                                                        {formatMontant(
-                                                            facture.montant_paye
-                                                        )}{" "}
-                                                        FCFA
-                                                    </td>
+                                            <td>
+                                                {
+                                                    formatMontant(
+                                                        facture.reste_a_payer
+                                                    )
+                                                }{" "}
+                                                FCFA
+                                            </td>
 
-                                                    <td>
-                                                        {formatMontant(
-                                                            facture.reste_a_payer
-                                                        )}{" "}
-                                                        FCFA
-                                                    </td>
+                                            <td>
+                                                <span
+                                                    className={`status-badge status-${String(
+                                                        facture.statut ||
+                                                            ""
+                                                    ).toLowerCase()}`}
+                                                >
+                                                    {libelleStatut(
+                                                        facture.statut
+                                                    )}
+                                                </span>
+                                            </td>
 
-                                                    <td>
+                                            <td>
+                                                <div className="action-buttons">
 
-                                                        <span
-                                                            className={`statut statut-${String(
-                                                                facture.statut ||
-                                                                    ""
-                                                            ).toLowerCase()}`}
-                                                        >
-                                                            {
-                                                                facture.statut
-                                                            }
-                                                        </span>
+                                                    <button
+                                                        className="btn-action btn-view"
+                                                        title="Voir"
+                                                        onClick={() =>
+                                                            voirFacture(
+                                                                facture
+                                                            )
+                                                        }
+                                                    >
+                                                        👁
+                                                    </button>
 
-                                                    </td>
+                                                    <button
+                                                        className="btn-action btn-edit"
+                                                        title="Modifier"
+                                                        onClick={() =>
+                                                            modifierFacture(
+                                                                facture
+                                                            )
+                                                        }
+                                                    >
+                                                        ✎
+                                                    </button>
 
-                                                    <td>
+                                                </div>
+                                            </td>
 
-                                                        <div className="actions">
+                                        </tr>
+                                    )
+                                )}
 
-                                                            <button
-                                                                type="button"
-                                                                className="btn-action"
-                                                                title="Voir"
-                                                                onClick={() =>
-                                                                    voirFacture(
-                                                                        facture
-                                                                    )
-                                                                }
-                                                            >
-                                                                👁️
-                                                            </button>
+                            </tbody>
 
-                                                            <button
-                                                                type="button"
-                                                                className="btn-action"
-                                                                title="Modifier"
-                                                                onClick={() =>
-                                                                    modifierFacture(
-                                                                        facture
-                                                                    )
-                                                                }
-                                                            >
-                                                                ✏️
-                                                            </button>
+                        </table>
 
-                                                        </div>
+                    </div>
+                )}
 
-                                                    </td>
+            </div>
 
-                                                </tr>
-                                            )
-                                        )
-                                    )}
+            {/* FORMULAIRE */}
 
-                                </tbody>
+            {afficherFormulaire && (
+                <div className="modal-overlay">
 
-                            </table>
+                    <div className="facture-modal">
+
+                        <div className="modal-header">
+
+                            <div>
+                                <h2>
+                                    {factureEnModification
+                                        ? "Modifier la facture"
+                                        : "Nouvelle facture"}
+                                </h2>
+
+                                <p>
+                                    {factureEnModification
+                                        ? "Modifiez les informations de la facture."
+                                        : "Sélectionnez une réservation pour préparer la facture."}
+                                </p>
+                            </div>
+
+                            <button
+                                className="modal-close"
+                                onClick={
+                                    fermerFormulaire
+                                }
+                            >
+                                ×
+                            </button>
 
                         </div>
-                    )}
-                </>
+
+                        <form
+                            onSubmit={
+                                enregistrerFacture
+                            }
+                        >
+
+                            {/* RESERVATION */}
+
+                            <section className="form-section">
+
+                                <div className="section-title">
+                                    <span>
+                                        01
+                                    </span>
+
+                                    <div>
+                                        <h3>
+                                            Réservation
+                                        </h3>
+
+                                        <p>
+                                            Les informations
+                                            seront récupérées
+                                            automatiquement.
+                                        </p>
+                                    </div>
+                                </div>
+
+                                <select
+                                    className="reservation-select"
+                                    value={
+                                        formulaire.id_reservation
+                                    }
+                                    onChange={
+                                        handleReservationChange
+                                    }
+                                    disabled={
+                                        Boolean(
+                                            factureEnModification
+                                        )
+                                    }
+                                    required
+                                >
+
+                                    <option value="">
+                                        {chargementReservations
+                                            ? "Chargement des réservations..."
+                                            : "Sélectionner une réservation"}
+                                    </option>
+
+                                    {reservations
+    .filter((reservation) => {
+        const factureExistante =
+            factures.some(
+                (facture) =>
+                    String(facture.id_reservation) ===
+                        String(reservation.id_reservation)
+            );
+
+        return !factureExistante;
+    })
+    .map((reservation) => (
+        <option
+            key={reservation.id_reservation}
+            value={reservation.id_reservation}
+        >
+            {reservation.numero_reservation}
+            {" — "}
+            {reservation.client}
+            {" — Chambre "}
+            {reservation.numero_chambre}
+        </option>
+    ))}
+
+                                </select>
+
+                            </section>
+
+                            {/* INFORMATIONS RESERVATION */}
+
+                            {formulaire.id_reservation && (
+                                (() => {
+                                    const reservation =
+                                        reservations.find(
+                                            (item) =>
+                                                Number(
+                                                    item.id_reservation
+                                                ) ===
+                                                Number(
+                                                    formulaire.id_reservation
+                                                )
+                                        );
+
+                                    if (!reservation) {
+                                        return null;
+                                    }
+
+                                    return (
+                                        <section className="reservation-summary">
+
+                                            <div className="summary-title">
+                                                Informations de la réservation
+                                            </div>
+
+                                            <div className="summary-grid">
+
+                                                <div>
+                                                    <span>
+                                                        Client
+                                                    </span>
+
+                                                    <strong>
+                                                        {
+                                                            reservation.client
+                                                        }
+                                                    </strong>
+                                                </div>
+
+                                                <div>
+                                                    <span>
+                                                        Chambre
+                                                    </span>
+
+                                                    <strong>
+                                                        {
+                                                            reservation.numero_chambre ||
+                                                            "-"
+                                                        }
+
+                                                        {reservation.type_chambre
+                                                            ? ` — ${reservation.type_chambre}`
+                                                            : ""}
+                                                    </strong>
+                                                </div>
+
+                                                <div>
+                                                    <span>
+                                                        Arrivée
+                                                    </span>
+
+                                                    <strong>
+                                                        {
+                                                            formatDate(
+                                                                reservation.date_arrivee
+                                                            )
+                                                        }
+                                                    </strong>
+                                                </div>
+
+                                                <div>
+                                                    <span>
+                                                        Départ
+                                                    </span>
+
+                                                    <strong>
+                                                        {
+                                                            formatDate(
+                                                                reservation.date_depart
+                                                            )
+                                                        }
+                                                    </strong>
+                                                </div>
+
+                                                <div>
+                                                    <span>
+                                                        Nombre de nuits
+                                                    </span>
+
+                                                    <strong>
+                                                        {
+                                                            reservation.nombre_nuits ||
+                                                            "-"
+                                                        }
+                                                    </strong>
+                                                </div>
+
+                                                <div>
+                                                    <span>
+                                                        Tarif / nuit
+                                                    </span>
+
+                                                    <strong>
+                                                        {
+                                                            formatMontant(
+                                                                reservation.tarif_nuit
+                                                            )
+                                                        }{" "}
+                                                        FCFA
+                                                    </strong>
+                                                </div>
+
+                                                <div className="summary-total">
+                                                    <span>
+                                                        Montant prévu
+                                                    </span>
+
+                                                    <strong>
+                                                        {
+                                                            formatMontant(
+                                                                reservation.montant_prevu ||
+                                                                reservation.montant_chambre
+                                                            )
+                                                        }{" "}
+                                                        FCFA
+                                                    </strong>
+                                                </div>
+
+                                            </div>
+
+                                        </section>
+                                    );
+                                })()
+                            )}
+
+                            {/* DETAILS FACTURE */}
+
+                            <section className="form-section">
+
+                                <div className="section-title">
+                                    <span>
+                                        02
+                                    </span>
+
+                                    <div>
+                                        <h3>
+                                            Détail de la facture
+                                        </h3>
+
+                                        <p>
+                                            Vérifiez les prestations
+                                            avant l'enregistrement.
+                                        </p>
+                                    </div>
+                                </div>
+
+                                <div className="invoice-line">
+
+                                    <div className="line-main">
+
+                                        <label>
+                                            Désignation
+                                        </label>
+
+                                        <input
+                                            type="text"
+                                            value={
+                                                formulaire
+                                                    .lignes[0]
+                                                    ?.designation ||
+                                                ""
+                                            }
+                                            onChange={(e) =>
+                                                handleLigneChange(
+                                                    0,
+                                                    "designation",
+                                                    e.target.value
+                                                )
+                                            }
+                                            required
+                                        />
+
+                                    </div>
+
+                                    <div>
+                                        <label>
+                                            Nuits
+                                        </label>
+
+                                        <input
+                                            type="number"
+                                            min="1"
+                                            value={
+                                                formulaire
+                                                    .lignes[0]
+                                                    ?.quantite ||
+                                                1
+                                            }
+                                            onChange={(e) =>
+                                                handleLigneChange(
+                                                    0,
+                                                    "quantite",
+                                                    e.target.value
+                                                )
+                                            }
+                                        />
+                                    </div>
+
+                                    <div>
+                                        <label>
+                                            Tarif
+                                        </label>
+
+                                        <input
+                                            type="number"
+                                            min="0"
+                                            value={
+                                                formulaire
+                                                    .lignes[0]
+                                                    ?.prix_unitaire ||
+                                                0
+                                            }
+                                            onChange={(e) =>
+                                                handleLigneChange(
+                                                    0,
+                                                    "prix_unitaire",
+                                                    e.target.value
+                                                )
+                                            }
+                                        />
+                                    </div>
+
+                                    <div className="line-total">
+
+                                        <label>
+                                            Total
+                                        </label>
+
+                                        <strong>
+                                            {
+                                                formatMontant(
+                                                    calculerMontantLigne(
+                                                        formulaire
+                                                            .lignes[0] ||
+                                                            {}
+                                                    )
+                                                )
+                                            }{" "}
+                                            FCFA
+                                        </strong>
+
+                                    </div>
+
+                                </div>
+
+                            </section>
+
+                            {/* AJUSTEMENTS */}
+
+                            <section className="form-section">
+
+                                <div className="section-title">
+                                    <span>
+                                        03
+                                    </span>
+
+                                    <div>
+                                        <h3>
+                                            Ajustements
+                                        </h3>
+
+                                        <p>
+                                            Remise, taxe et observation.
+                                        </p>
+                                    </div>
+                                </div>
+
+                                <div className="form-grid">
+
+                                    <div className="form-group">
+                                        <label>
+                                            Remise
+                                        </label>
+
+                                        <input
+                                            type="number"
+                                            min="0"
+                                            name="remise"
+                                            value={
+                                                formulaire.remise
+                                            }
+                                            onChange={
+                                                handleChange
+                                            }
+                                        />
+                                    </div>
+
+                                    <div className="form-group">
+                                        <label>
+                                            Taxe
+                                        </label>
+
+                                        <input
+                                            type="number"
+                                            min="0"
+                                            name="taxe"
+                                            value={
+                                                formulaire.taxe
+                                            }
+                                            onChange={
+                                                handleChange
+                                            }
+                                        />
+                                    </div>
+
+                                </div>
+
+                                <div className="form-group">
+
+                                    <label>
+                                        Observation
+                                    </label>
+
+                                    <textarea
+                                        name="observation"
+                                        rows="3"
+                                        placeholder="Ajouter une observation..."
+                                        value={
+                                            formulaire.observation
+                                        }
+                                        onChange={
+                                            handleChange
+                                        }
+                                    />
+
+                                </div>
+
+                            </section>
+
+                            {/* TOTAL */}
+
+                            <div className="invoice-total-box">
+
+                                <div>
+                                    <span>
+                                        Sous-total
+                                    </span>
+
+                                    <strong>
+                                        {
+                                            formatMontant(
+                                                montantTotal
+                                            )
+                                        }{" "}
+                                        FCFA
+                                    </strong>
+                                </div>
+
+                                <div>
+                                    <span>
+                                        Remise
+                                    </span>
+
+                                    <strong>
+                                        -{" "}
+                                        {
+                                            formatMontant(
+                                                remiseFacture
+                                            )
+                                        }{" "}
+                                        FCFA
+                                    </strong>
+                                </div>
+
+                                <div>
+                                    <span>
+                                        Taxe
+                                    </span>
+
+                                    <strong>
+                                        +{" "}
+                                        {
+                                            formatMontant(
+                                                taxeFacture
+                                            )
+                                        }{" "}
+                                        FCFA
+                                    </strong>
+                                </div>
+
+                                <div className="grand-total">
+
+                                    <span>
+                                        NET À PAYER
+                                    </span>
+
+                                    <strong>
+                                        {
+                                            formatMontant(
+                                                netAPayer
+                                            )
+                                        }{" "}
+                                        FCFA
+                                    </strong>
+
+                                </div>
+
+                            </div>
+
+                            {/* ACTIONS */}
+
+                            <div className="modal-actions">
+
+                                <button
+                                    type="button"
+                                    className="btn-secondary"
+                                    onClick={
+                                        fermerFormulaire
+                                    }
+                                >
+                                    Annuler
+                                </button>
+
+                                <button
+                                    type="submit"
+                                    className="btn-primary"
+                                >
+                                    {factureEnModification
+                                        ? "Enregistrer les modifications"
+                                        : "Enregistrer la facture"}
+                                </button>
+
+                            </div>
+
+                        </form>
+
+                    </div>
+
+                </div>
             )}
 
         </div>
@@ -1242,4 +1947,3 @@ function Factures() {
 }
 
 export default Factures;
-

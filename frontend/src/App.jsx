@@ -3,6 +3,7 @@ import { Routes, Route, Navigate } from "react-router-dom";
 import Login from "./pages/Login";
 import Dashboard from "./pages/Dashboard";
 import Layout from "./components/Layouts";
+import HotelHeader from "./components/HotelHeader";
 
 import { useAuth } from "./context/AuthContext";
 
@@ -13,6 +14,7 @@ import Sejours from "./pages/Sejours";
 import Factures from "./pages/Factures";
 import Paiements from "./pages/Paiements";
 import Caisse from "./pages/Caisse";
+import Comptabilite from "./pages/Comptabilite";
 
 function ProtectedRoute({ children }) {
 const { estConnecte } = useAuth();
@@ -23,199 +25,179 @@ return <Navigate to="/" replace />;
 
 return children;
 }
-
 function App() {
-return ( <Routes>
+    return (
+        <Routes>
 
-```
-  {/* ==========================
-      LOGIN
-  ========================== */}
+            {/* ==========================
+                LOGIN
+            ========================== */}
 
-  <Route
-    path="/"
-    element={<Login />}
-  />
-
-
-  {/* ==========================
-      APPLICATION PROTÉGÉE
-  ========================== */}
-
-  <Route
-    element={
-      <ProtectedRoute>
-        <Layout />
-      </ProtectedRoute>
-    }
-  >
-
-    {/* ==========================
-        DASHBOARD
-    ========================== */}
-
-    <Route
-      path="/dashboard"
-      element={<Dashboard />}
-    />
+            <Route
+                path="/"
+                element={<Login />}
+            />
 
 
-    {/* ==========================
-        HÉBERGEMENT
-    ========================== */}
+            {/* ==========================
+                APPLICATION PROTÉGÉE
+            ========================== */}
 
-    <Route
-      path="/clients"
-      element={<Clients />}
-    />
+            <Route
+                element={
+                    <ProtectedRoute>
+                        <>
+                            <HotelHeader />
 
-    <Route
-      path="/chambres"
-      element={<Chambres />}
-    />
+                            <Layout />
+                        </>
+                    </ProtectedRoute>
+                }
+            >
 
-    <Route
-      path="/reservations"
-      element={<Reservations />}
-    />
+                {/* ==========================
+                    DASHBOARD
+                ========================== */}
 
-    <Route
-      path="/sejours"
-      element={<Sejours />}
-    />
-
-
-    {/* ==========================
-        FINANCES
-    ========================== */}
-
-    <Route
-      path="/factures"
-      element={<Factures />}
-    />
-
-    <Route
-      path="/paiements"
-      element={<Paiements />}
-    />
-
-    <Route
-        path="/caisse"
-        element={<Caisse />}
-    />
+                <Route
+                    path="/dashboard"
+                    element={<Dashboard />}
+                />
 
 
-    {/* ==========================
-        RESTAURANT & BAR
-    ========================== */}
+                {/* ==========================
+                    HÉBERGEMENT
+                ========================== */}
 
-    <Route
-      path="/restaurant"
-      element={<h1>Restaurant / Bar</h1>}
-    />
+                <Route
+                    path="/clients"
+                    element={<Clients />}
+                />
 
+                <Route
+                    path="/chambres"
+                    element={<Chambres />}
+                />
 
-    {/* ==========================
-        LOISIRS & ÉVÉNEMENTS
-    ========================== */}
+                <Route
+                    path="/reservations"
+                    element={<Reservations />}
+                />
 
-    <Route
-      path="/prestations"
-      element={<h1>Piscine & Loisirs</h1>}
-    />
-
-    <Route
-      path="/seminaires"
-      element={<h1>Salles de séminaire</h1>}
-    />
-
-
-    {/* ==========================
-        GESTION DES STOCKS
-    ========================== */}
-
-    <Route
-      path="/produits"
-      element={<h1>Produits</h1>}
-    />
-
-    <Route
-      path="/stocks"
-      element={<h1>Stock</h1>}
-    />
-
-    <Route
-      path="/fournisseurs"
-      element={<h1>Fournisseurs</h1>}
-    />
-
-    <Route
-      path="/achats"
-      element={<h1>Achats</h1>}
-    />
+                <Route
+                    path="/sejours"
+                    element={<Sejours />}
+                />
 
 
-    {/* ==========================
-        ADMINISTRATION
-    ========================== */}
+                {/* ==========================
+                    FINANCES
+                ========================== */}
 
-    <Route
-      path="/personnel"
-      element={<h1>Personnel</h1>}
-    />
+                <Route
+                    path="/comptabilite"
+                    element={<Comptabilite />}
+                />
 
-    <Route
-      path="/utilisateurs"
-      element={<h1>Utilisateurs</h1>}
-    />
+                <Route
+                    path="/factures"
+                    element={<Factures />}
+                />
 
-    <Route
-      path="/parametres"
-      element={<h1>Paramètres</h1>}
-    />
-    <Route
-  path="/caisse"
-  element={<h1>Caisse</h1>}
-/>
+                <Route
+                    path="/paiements"
+                    element={<Paiements />}
+                />
 
-<Route
-  path="/produits"
-  element={<h1>Produits</h1>}
-/>
-
-<Route
-  path="/fournisseurs"
-  element={<h1>Fournisseurs</h1>}
-/>
-
-<Route
-  path="/achats"
-  element={<h1>Achats</h1>}
-/>
-
-<Route
-  path="/personnel"
-  element={<h1>Personnel</h1>}
-/>
-
-<Route
-  path="/parametres"
-  element={<h1>Paramètres</h1>}
-/>
-
-  </Route>
+                <Route
+                    path="/caisse"
+                    element={<Caisse />}
+                />
 
 
+                {/* ==========================
+                    RESTAURANT & BAR
+                ========================== */}
 
-  <Route
-    path="*"
-    element={<Navigate to="/dashboard" replace />}
-  />
-
-</Routes>
+                <Route
+                    path="/restaurant"
+                    element={<h1>Restaurant / Bar</h1>}
+                />
 
 
-);
+                {/* ==========================
+                    LOISIRS & ÉVÉNEMENTS
+                ========================== */}
+
+                <Route
+                    path="/prestations"
+                    element={<h1>Piscine & Loisirs</h1>}
+                />
+
+                <Route
+                    path="/seminaires"
+                    element={<h1>Salles de séminaire</h1>}
+                />
+
+
+                {/* ==========================
+                    GESTION DES STOCKS
+                ========================== */}
+
+                <Route
+                    path="/produits"
+                    element={<h1>Produits</h1>}
+                />
+
+                <Route
+                    path="/stocks"
+                    element={<h1>Stock</h1>}
+                />
+
+                <Route
+                    path="/fournisseurs"
+                    element={<h1>Fournisseurs</h1>}
+                />
+
+                <Route
+                    path="/achats"
+                    element={<h1>Achats</h1>}
+                />
+
+
+                {/* ==========================
+                    ADMINISTRATION
+                ========================== */}
+
+                <Route
+                    path="/personnel"
+                    element={<h1>Personnel</h1>}
+                />
+
+                <Route
+                    path="/utilisateurs"
+                    element={<h1>Utilisateurs</h1>}
+                />
+
+                <Route
+                    path="/parametres"
+                    element={<h1>Paramètres</h1>}
+                />
+
+            </Route>
+
+
+            {/* ==========================
+                ROUTE INCONNUE
+            ========================== */}
+
+            <Route
+                path="*"
+                element={<Navigate to="/dashboard" replace />}
+            />
+
+        </Routes>
+    );
 }
 
 export default App;

@@ -1,0 +1,187 @@
+/* =========================================================
+   HEADER NGALANKA HOTEL
+========================================================= */
+
+.hotel-header {
+    width: 100%;
+    background: #ffffff;
+}
+
+
+/* LOGO TEXTE */
+
+.hotel-logo-text {
+    font-family: Georgia, "Times New Roman", serif;
+
+    font-size: 20px;
+    font-weight: 500;
+
+    color: #0f3d63;
+    letter-spacing: 0.3px;
+}
+
+/* UTILISATEUR */
+
+.hotel-user {
+    text-align: right;
+}
+
+.hotel-user-name {
+    font-size: 14px;
+    font-weight: 700;
+
+    color: #1f2937;
+
+    margin-bottom: 6px;
+}
+
+.hotel-user-role {
+    font-size: 11px;
+    font-weight: 400;
+
+    color: #6b7280;
+}
+
+/* =========================================================
+   HERO
+========================================================= */
+
+.hotel-hero {
+    position: relative;
+
+    width: calc(100% - 44px);
+    height: 215px;
+
+
+    margin: 0px 2px 25px;
+
+    border-radius: 18px;
+
+    overflow: hidden;
+
+    background-image:
+        url("/hotel-banner.png");
+
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+}
+
+/* VOILE SOMBRE */
+
+.hotel-hero::before {
+    content: "";
+
+    position: absolute;
+    inset: 0;
+
+    background:
+        linear-gradient(
+            90deg,
+            rgba(0, 25, 45, 0.78) 0%,
+            rgba(0, 25, 45, 0.52) 35%,
+            rgba(0, 25, 45, 0.08) 75%
+        );
+}
+
+/* CONTENU HERO */
+
+.hotel-hero-overlay {
+    position: relative;
+    z-index: 1;
+
+    height: 100%;
+
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+
+    padding: 0 38px;
+}
+
+/* BIENVENUE */
+
+.hotel-welcome {
+    color: #ffffff;
+
+    font-size: 13px;
+    font-weight: 800;
+
+    letter-spacing: 0.3px;
+
+    margin-bottom: 16px;
+}
+
+/* TITRE */
+
+.hotel-hero h1 {
+    margin: 0 0 14px;
+
+    color: #ffffff;
+
+    font-size: 38px;
+    font-weight: 800;
+
+    letter-spacing: 0.5px;
+}
+
+/* LOCALISATION */
+
+.hotel-location {
+    color: #ffffff;
+
+    font-size: 18px;
+    font-weight: 600;
+
+    font-style: italic;
+}
+
+/* =========================================================
+   RESPONSIVE
+========================================================= */
+
+@media (max-width: 768px) {
+
+    .hotel-topbar {
+        height: auto;
+        min-height: 75px;
+
+        padding: 15px;
+
+        gap: 15px;
+    }
+
+    .hotel-logo-text {
+        font-size: 17px;
+    }
+
+    .hotel-user-name {
+        font-size: 12px;
+    }
+
+    .hotel-user-role {
+        font-size: 9px;
+    }
+
+    .hotel-hero {
+        width: calc(100% - 24px);
+
+        margin: 18px 12px 20px;
+
+        height: 190px;
+
+        border-radius: 14px;
+    }
+
+    .hotel-hero-overlay {
+        padding: 0 24px;
+    }
+
+    .hotel-hero h1 {
+        font-size: 28px;
+    }
+
+    .hotel-location {
+        font-size: 15px;
+    }
+}

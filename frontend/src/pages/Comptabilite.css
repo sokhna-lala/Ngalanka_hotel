@@ -1,0 +1,494 @@
+.comptabilite-page {
+    min-height: 100vh;
+    padding: 30px;
+    background: #f5f7fb;
+    color: #1f2937;
+}
+
+/* =========================
+   EN-TÊTE
+========================= */
+
+.comptabilite-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 25px;
+}
+
+.comptabilite-header h1 {
+    margin: 0 0 6px;
+    font-size: 30px;
+    font-weight: 700;
+}
+
+.comptabilite-header p {
+    margin: 0;
+    color: #6b7280;
+    font-size: 15px;
+}
+
+.btn-actualiser {
+    border: none;
+    background: #2563eb;
+    color: white;
+    padding: 11px 18px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 600;
+    transition: 0.2s;
+}
+
+.btn-actualiser:hover {
+    background: #1d4ed8;
+}
+
+/* =========================
+   FILTRES
+========================= */
+
+.comptabilite-filtres {
+    display: flex;
+    align-items: flex-end;
+    gap: 15px;
+    background: white;
+    padding: 20px;
+    border-radius: 12px;
+    margin-bottom: 25px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.06);
+}
+
+.filtre-groupe {
+    display: flex;
+    flex-direction: column;
+    gap: 7px;
+}
+
+.filtre-groupe label {
+    font-size: 13px;
+    font-weight: 600;
+    color: #4b5563;
+}
+
+.filtre-groupe input {
+    width: 180px;
+    padding: 10px 12px;
+    border: 1px solid #d1d5db;
+    border-radius: 7px;
+    font-size: 14px;
+    outline: none;
+}
+
+.filtre-groupe input:focus {
+    border-color: #2563eb;
+}
+
+.btn-filtrer,
+.btn-reinitialiser {
+    border: none;
+    padding: 10px 17px;
+    border-radius: 7px;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 600;
+}
+
+.btn-filtrer {
+    background: #2563eb;
+    color: white;
+}
+
+.btn-filtrer:hover {
+    background: #1d4ed8;
+}
+
+.btn-reinitialiser {
+    background: #e5e7eb;
+    color: #374151;
+}
+
+.btn-reinitialiser:hover {
+    background: #d1d5db;
+}
+
+/* =========================
+   KPI
+========================= */
+
+.kpi-grid {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 18px;
+    margin-bottom: 25px;
+}
+
+.kpi-card {
+    background: white;
+    border-radius: 12px;
+    padding: 20px;
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.06);
+    border-left: 4px solid #2563eb;
+}
+
+.kpi-card .kpi-icon {
+    width: 45px;
+    height: 45px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #eff6ff;
+    border-radius: 10px;
+    font-size: 21px;
+    flex-shrink: 0;
+}
+
+.kpi-card .kpi-label {
+    display: block;
+    color: #6b7280;
+    font-size: 12px;
+    margin-bottom: 6px;
+}
+
+.kpi-card strong {
+    display: block;
+    font-size: 18px;
+    color: #111827;
+}
+
+.kpi-card.chiffre-affaires {
+    border-left-color: #2563eb;
+}
+
+.kpi-card.encaissements {
+    border-left-color: #16a34a;
+}
+
+.kpi-card.sorties {
+    border-left-color: #dc2626;
+}
+
+.kpi-card.solde {
+    border-left-color: #7c3aed;
+}
+
+.kpi-card.impayes {
+    border-left-color: #f59e0b;
+}
+
+/* =========================
+   SECTIONS
+========================= */
+
+.section-comptabilite {
+    background: white;
+    border-radius: 12px;
+    padding: 22px;
+    margin-bottom: 25px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.06);
+}
+
+.section-title {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.section-title h2 {
+    margin: 0 0 5px;
+    font-size: 19px;
+    color: #111827;
+}
+
+.section-title p {
+    margin: 0;
+    color: #6b7280;
+    font-size: 13px;
+}
+
+.journal-count {
+    background: #eff6ff;
+    color: #2563eb;
+    padding: 7px 12px;
+    border-radius: 20px;
+    font-size: 13px;
+    font-weight: 600;
+}
+
+/* =========================
+   STATISTIQUES FACTURES
+========================= */
+
+.factures-stats {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 18px;
+}
+
+.facture-stat {
+    padding: 20px;
+    background: #f9fafb;
+    border-radius: 10px;
+    border: 1px solid #e5e7eb;
+}
+
+.facture-stat span {
+    display: block;
+    color: #6b7280;
+    font-size: 13px;
+    margin-bottom: 8px;
+}
+
+.facture-stat strong {
+    font-size: 26px;
+    color: #111827;
+}
+
+.facture-stat.payees {
+    border-left: 4px solid #16a34a;
+}
+
+.facture-stat.partielles {
+    border-left: 4px solid #f59e0b;
+}
+
+/* =========================
+   MODES DE PAIEMENT
+========================= */
+
+.modes-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 18px;
+}
+
+.mode-card {
+    padding: 20px;
+    border-radius: 10px;
+    background: #f9fafb;
+    border: 1px solid #e5e7eb;
+}
+
+.mode-card span {
+    display: block;
+    color: #4b5563;
+    font-size: 14px;
+    font-weight: 600;
+    margin-bottom: 10px;
+}
+
+.mode-card strong {
+    display: block;
+    font-size: 20px;
+    color: #111827;
+    margin-bottom: 6px;
+}
+
+.mode-card small {
+    color: #9ca3af;
+    font-size: 12px;
+}
+
+/* =========================
+   TABLEAUX
+========================= */
+
+.table-container {
+    width: 100%;
+    overflow-x: auto;
+}
+
+.comptabilite-table {
+    width: 100%;
+    border-collapse: collapse;
+    min-width: 900px;
+}
+
+.comptabilite-table thead {
+    background: #f9fafb;
+}
+
+.comptabilite-table th {
+    text-align: left;
+    padding: 13px 12px;
+    font-size: 12px;
+    color: #6b7280;
+    text-transform: uppercase;
+    border-bottom: 1px solid #e5e7eb;
+    white-space: nowrap;
+}
+
+.comptabilite-table td {
+    padding: 14px 12px;
+    font-size: 13px;
+    border-bottom: 1px solid #f0f0f0;
+    color: #374151;
+    white-space: nowrap;
+}
+
+.comptabilite-table tbody tr:hover {
+    background: #f9fafb;
+}
+
+.montant-cell {
+    font-weight: 700;
+    color: #111827 !important;
+}
+
+/* =========================
+   BADGES
+========================= */
+
+.badge-entree,
+.badge-sortie {
+    display: inline-block;
+    padding: 5px 9px;
+    border-radius: 15px;
+    font-size: 11px;
+    font-weight: 700;
+}
+
+.badge-entree {
+    background: #dcfce7;
+    color: #15803d;
+}
+
+.badge-sortie {
+    background: #fee2e2;
+    color: #b91c1c;
+}
+
+.montant-entree {
+    font-weight: 700;
+    color: #16a34a !important;
+}
+
+.montant-sortie {
+    font-weight: 700;
+    color: #dc2626 !important;
+}
+
+/* =========================
+   CELLULE VIDE
+========================= */
+
+.empty-cell {
+    text-align: center !important;
+    padding: 35px !important;
+    color: #9ca3af !important;
+}
+
+/* =========================
+   CHARGEMENT
+========================= */
+
+.comptabilite-loading {
+    min-height: 70vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: #6b7280;
+    font-size: 16px;
+}
+
+/* =========================
+   ERREUR
+========================= */
+
+.comptabilite-error {
+    max-width: 500px;
+    margin: 80px auto;
+    background: white;
+    padding: 30px;
+    text-align: center;
+    border-radius: 12px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
+}
+
+.comptabilite-error h2 {
+    color: #dc2626;
+    margin-top: 0;
+}
+
+.comptabilite-error p {
+    color: #6b7280;
+    margin-bottom: 20px;
+}
+
+.comptabilite-error button {
+    border: none;
+    background: #2563eb;
+    color: white;
+    padding: 10px 18px;
+    border-radius: 7px;
+    cursor: pointer;
+    font-weight: 600;
+}
+
+/* =========================
+   RESPONSIVE
+========================= */
+
+@media (max-width: 1300px) {
+    .kpi-grid {
+        grid-template-columns: repeat(3, 1fr);
+    }
+
+    .modes-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (max-width: 900px) {
+    .comptabilite-page {
+        padding: 20px;
+    }
+
+    .kpi-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .comptabilite-filtres {
+        flex-wrap: wrap;
+    }
+
+    .factures-stats {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 600px) {
+    .comptabilite-page {
+        padding: 15px;
+    }
+
+    .comptabilite-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 15px;
+    }
+
+    .kpi-grid,
+    .modes-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .comptabilite-filtres {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .filtre-groupe input {
+        width: 100%;
+        box-sizing: border-box;
+    }
+
+    .btn-filtrer,
+    .btn-reinitialiser {
+        width: 100%;
+    }
+}

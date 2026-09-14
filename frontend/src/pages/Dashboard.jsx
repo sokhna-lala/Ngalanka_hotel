@@ -8,40 +8,6 @@ function Dashboard() {
 
         <div className="dashboard-page">
 
-            {/* =====================================
-                BANNIÈRE HÔTEL
-            ====================================== */}
-
-            <section
-                className="hotel-banner"
-                style={{
-                    backgroundImage: `url(${hotelBanner})`
-                }}
-            >
-
-                {/* OVERLAY */}
-
-                <div className="hotel-overlay">
-
-                    <div className="hotel-welcome">
-
-                        <span className="welcome-text">
-                            BIENVENUE À
-                        </span>
-
-                        <h1>
-                            NGALANKA HÔTEL
-                        </h1>
-
-                        <p>
-                            📍 Lompoul sur Mer
-                        </p>
-
-                    </div>
-
-                </div>
-
-            </section>
 
 
             {/* =====================================

@@ -1,527 +1,1008 @@
-/* =====================================================
-   PAGE FACTURES
-===================================================== */
-
 .factures-page {
-    padding: 24px;
-    background: #f5f7fa;
+    padding: 28px;
     min-height: 100vh;
-    color: #1f2937;
+    background: #f5f7fb;
+    color: #172033;
 }
 
-/* =====================================================
-   EN-TÊTE
-===================================================== */
+/* ================================
+   HEADER
+================================ */
 
-.page-header {
+.factures-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 24px;
+    gap: 20px;
+    margin-bottom: 26px;
 }
 
-.page-header h1 {
+.factures-header h1 {
     margin: 0;
-    font-size: 28px;
-    font-weight: 700;
-    color: #1f2937;
+    font-size: 30px;
+    font-weight: 750;
 }
 
-.page-header p {
-    margin: 6px 0 0;
-    color: #6b7280;
+.factures-header p {
+    margin: 7px 0 0;
+    color: #718096;
     font-size: 14px;
 }
 
-/* =====================================================
+/* ================================
    BOUTONS
-===================================================== */
+================================ */
 
 .btn-primary {
     border: none;
+    border-radius: 10px;
+    padding: 12px 18px;
     background: #2563eb;
     color: white;
-    padding: 11px 18px;
-    border-radius: 8px;
     font-size: 14px;
-    font-weight: 600;
+    font-weight: 650;
     cursor: pointer;
     transition: 0.2s;
 }
 
 .btn-primary:hover {
-    background: #1d4ed8;
+    transform: translateY(-1px);
+    box-shadow: 0 8px 18px rgba(37, 99, 235, 0.2);
 }
 
 .btn-secondary {
-    border: 1px solid #d1d5db;
+    border: 1px solid #d9dee8;
     background: white;
-    color: #374151;
-    padding: 9px 14px;
-    border-radius: 7px;
-    font-size: 14px;
-    font-weight: 500;
-    cursor: pointer;
-}
-
-.btn-secondary:hover {
-    background: #f3f4f6;
-}
-
-.btn-close {
-    border: none;
-    background: transparent;
-    color: #6b7280;
-    font-size: 22px;
-    cursor: pointer;
-    width: 38px;
-    height: 38px;
-    border-radius: 50%;
-}
-
-.btn-close:hover {
-    background: #f3f4f6;
-    color: #111827;
-}
-
-.btn-delete {
-    border: none;
-    background: #fee2e2;
-    color: #dc2626;
-    width: 38px;
-    height: 38px;
-    border-radius: 7px;
-    cursor: pointer;
-    margin-top: 24px;
-}
-
-.btn-delete:hover {
-    background: #fecaca;
-}
-
-/* =====================================================
-   FORMULAIRE FACTURE
-===================================================== */
-
-.facture-form {
-    background: white;
-    border-radius: 12px;
-    border: 1px solid #e5e7eb;
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.06);
-    overflow: hidden;
-}
-
-/* =====================================================
-   HEADER FORMULAIRE
-===================================================== */
-
-.form-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 20px 24px;
-    border-bottom: 1px solid #e5e7eb;
-    background: #f8fafc;
-}
-
-.form-header h2 {
-    margin: 0;
-    font-size: 20px;
-    color: #111827;
-}
-
-.form-header p {
-    margin: 5px 0 0;
-    color: #6b7280;
-    font-size: 13px;
-}
-
-/* =====================================================
-   FORMULAIRE
-===================================================== */
-
-.facture-form form {
-    padding: 24px;
-}
-
-.form-grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 20px;
-    margin-bottom: 28px;
-}
-
-.facture-form label {
-    display: block;
-    margin-bottom: 7px;
-    font-size: 13px;
-    font-weight: 600;
-    color: #374151;
-}
-
-.facture-form input,
-.facture-form select,
-.facture-form textarea {
-    width: 100%;
-    box-sizing: border-box;
-    border: 1px solid #d1d5db;
-    border-radius: 7px;
-    padding: 10px 12px;
-    background: white;
-    color: #111827;
-    font-size: 14px;
-    outline: none;
-    transition: border-color 0.2s, box-shadow 0.2s;
-}
-
-.facture-form input:focus,
-.facture-form select:focus,
-.facture-form textarea:focus {
-    border-color: #2563eb;
-    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
-}
-
-.facture-form textarea {
-    resize: vertical;
-}
-
-/* =====================================================
-   LIGNES DE FACTURE
-===================================================== */
-
-.lignes-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 14px;
-}
-
-.lignes-header h3 {
-    margin: 0;
-    font-size: 17px;
-    color: #111827;
-}
-
-.lignes-container {
-    display: flex;
-    flex-direction: column;
-    gap: 12px;
-}
-
-.ligne-facture {
-    display: grid;
-    grid-template-columns:
-        130px
-        minmax(180px, 1.8fr)
-        100px
-        140px
-        120px
-        150px
-        45px;
-
-    gap: 12px;
-    align-items: end;
-
-    padding: 16px;
-    border: 1px solid #e5e7eb;
-    border-radius: 9px;
-    background: #fafafa;
-}
-
-.ligne-facture input,
-.ligne-facture select {
-    background: white;
-}
-
-.ligne-montant {
-    min-width: 120px;
-}
-
-.ligne-montant strong {
-    display: block;
-    padding: 10px 0;
-    color: #111827;
-    font-size: 14px;
-}
-
-/* =====================================================
-   TOTAUX
-===================================================== */
-
-.totaux-facture {
-    margin-top: 24px;
-    margin-left: auto;
-    width: 420px;
-    max-width: 100%;
-
-    display: flex;
-    flex-direction: column;
-    gap: 12px;
-
-    padding: 18px;
+    color: #465066;
     border-radius: 10px;
-    background: #f8fafc;
-    border: 1px solid #e5e7eb;
-}
-
-.totaux-facture > div {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    gap: 20px;
-}
-
-.totaux-facture span {
-    font-size: 14px;
-    color: #4b5563;
-}
-
-.totaux-facture strong {
-    font-size: 15px;
-    color: #111827;
-}
-
-.totaux-facture input {
-    width: 150px;
-}
-
-.net-a-payer {
-    margin-top: 8px;
-    padding-top: 14px;
-    border-top: 1px solid #d1d5db;
-}
-
-.net-a-payer span {
-    font-size: 16px;
-    font-weight: 700;
-    color: #111827;
-}
-
-.net-a-payer strong {
-    font-size: 20px;
-    color: #2563eb;
-}
-
-/* =====================================================
-   OBSERVATION
-===================================================== */
-
-.full-width {
-    margin-top: 24px;
-}
-
-.full-width textarea {
-    min-height: 90px;
-}
-
-/* =====================================================
-   ACTIONS FORMULAIRE
-===================================================== */
-
-.form-actions {
-    display: flex;
-    justify-content: flex-end;
-    gap: 12px;
-    margin-top: 24px;
-    padding-top: 20px;
-    border-top: 1px solid #e5e7eb;
-}
-
-.form-actions button {
-    border: 1px solid #d1d5db;
-    background: white;
-    color: #374151;
-    padding: 10px 18px;
-    border-radius: 7px;
-    font-size: 14px;
+    padding: 12px 18px;
+    font-weight: 600;
     cursor: pointer;
 }
 
-.form-actions button:hover {
-    background: #f3f4f6;
+/* ================================
+   ALERT
+================================ */
+
+.factures-alert {
+    padding: 13px 16px;
+    margin-bottom: 20px;
+    border-radius: 10px;
+    background: #fff1f2;
+    border: 1px solid #fecdd3;
+    color: #be123c;
 }
 
-.form-actions .btn-primary {
+/* ================================
+   STATISTIQUES
+================================ */
+
+.factures-stats {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 18px;
+    margin-bottom: 22px;
+}
+
+.stat-card {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    padding: 20px;
+    background: white;
+    border: 1px solid #e8ebf1;
+    border-radius: 14px;
+    box-shadow: 0 4px 15px rgba(20, 30, 50, 0.04);
+}
+
+.stat-icon {
+    width: 46px;
+    height: 46px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 12px;
+    background: #eef4ff;
+    font-size: 20px;
+}
+
+.stat-card span {
+    display: block;
+    color: #7b8497;
+    font-size: 12px;
+    margin-bottom: 5px;
+}
+
+.stat-card strong {
+    display: block;
+    font-size: 18px;
+}
+
+.stat-danger .stat-icon {
+    background: #fff1f2;
+}
+
+/* ================================
+   TOOLBAR
+================================ */
+
+.factures-toolbar {
+    display: flex;
+    gap: 12px;
+    margin-bottom: 18px;
+}
+
+.search-box {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    background: white;
+    border: 1px solid #e0e5ed;
+    border-radius: 10px;
+    padding: 0 14px;
+}
+
+.search-box input {
+    width: 100%;
     border: none;
-    background: #2563eb;
-    color: white;
+    outline: none;
+    padding: 13px 0;
+    font-size: 14px;
+    background: transparent;
 }
 
-.form-actions .btn-primary:hover {
-    background: #1d4ed8;
+.factures-toolbar select {
+    min-width: 180px;
+    border: 1px solid #e0e5ed;
+    border-radius: 10px;
+    padding: 0 13px;
+    background: white;
+    color: #3d4658;
+    outline: none;
 }
 
-/* =====================================================
-   TABLEAU
-===================================================== */
+/* ================================
+   TABLE
+================================ */
+
+.factures-table-card {
+    background: white;
+    border: 1px solid #e8ebf1;
+    border-radius: 14px;
+    overflow: hidden;
+    box-shadow: 0 4px 15px rgba(20, 30, 50, 0.04);
+}
+
+.table-header {
+    display: flex;
+    justify-content: space-between;
+    padding: 20px 22px;
+    border-bottom: 1px solid #edf0f4;
+}
+
+.table-header h2 {
+    margin: 0 0 5px;
+    font-size: 17px;
+}
+
+.table-header span {
+    color: #8a93a5;
+    font-size: 13px;
+}
 
 .table-container {
     width: 100%;
     overflow-x: auto;
-    background: white;
-    border: 1px solid #e5e7eb;
-    border-radius: 10px;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
 }
 
-.table-container table {
+table {
     width: 100%;
     border-collapse: collapse;
-    min-width: 1100px;
 }
 
-.table-container th {
-    padding: 13px 14px;
+thead th {
+    padding: 13px 18px;
     text-align: left;
-    background: #f8fafc;
-    color: #4b5563;
-    font-size: 12px;
+    background: #fafbfc;
+    color: #7a8497;
+    font-size: 11px;
     font-weight: 700;
-    border-bottom: 1px solid #e5e7eb;
+    text-transform: uppercase;
+    white-space: nowrap;
 }
 
-.table-container td {
-    padding: 14px;
-    border-bottom: 1px solid #f1f5f9;
+tbody td {
+    padding: 16px 18px;
+    border-top: 1px solid #edf0f4;
     font-size: 13px;
-    color: #374151;
+    white-space: nowrap;
 }
 
-.table-container tbody tr:hover {
-    background: #f9fafb;
+tbody tr:hover {
+    background: #fafcff;
 }
 
-.table-container tbody tr:last-child td {
-    border-bottom: none;
+.client-cell strong {
+    display: block;
 }
 
-.empty {
-    text-align: center;
-    padding: 45px !important;
-    color: #6b7280 !important;
+.client-cell small {
+    color: #929bad;
+    margin-top: 3px;
+    display: block;
 }
 
-/* =====================================================
+.reservation-badge {
+    display: inline-block;
+    padding: 5px 9px;
+    border-radius: 7px;
+    background: #f0f5ff;
+    color: #2563eb;
+    font-size: 12px;
+    font-weight: 650;
+}
+
+/* ================================
    STATUTS
-===================================================== */
+================================ */
 
-.statut {
+.status-badge {
     display: inline-flex;
     align-items: center;
-    padding: 5px 9px;
+    padding: 6px 10px;
     border-radius: 20px;
     font-size: 11px;
     font-weight: 700;
 }
 
-.statut-brouillon {
-    background: #f3f4f6;
-    color: #4b5563;
+.status-impayee {
+    background: #fff1f2;
+    color: #be123c;
 }
 
-.statut-partielle {
-    background: #fef3c7;
-    color: #92400e;
+.status-partielle {
+    background: #fff7ed;
+    color: #c2410c;
 }
 
-.statut-payee {
-    background: #dcfce7;
-    color: #166534;
+.status-payee {
+    background: #ecfdf5;
+    color: #047857;
 }
 
-.statut-annulee {
-    background: #fee2e2;
-    color: #991b1b;
+.status-annulee {
+    background: #f1f5f9;
+    color: #64748b;
 }
 
-/* =====================================================
-   ACTIONS TABLEAU
-===================================================== */
+/* ================================
+   ACTIONS
+================================ */
 
-.actions {
+.action-buttons {
     display: flex;
-    gap: 6px;
+    gap: 7px;
 }
 
 .btn-action {
     width: 34px;
     height: 34px;
-    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+    border: 1px solid #e1e5ec;
     background: white;
-    border-radius: 6px;
     cursor: pointer;
+    transition: 0.2s;
+}
+
+.btn-view:hover {
+    background: #eef4ff;
+    border-color: #bfd3ff;
+}
+
+.btn-edit:hover {
+    background: #fff7ed;
+    border-color: #fed7aa;
+}
+
+/* ================================
+   EMPTY
+================================ */
+
+.empty-state {
+    min-height: 260px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    color: #8992a4;
+}
+
+.empty-icon {
+    font-size: 40px;
+    margin-bottom: 10px;
+}
+
+.empty-state h3 {
+    margin: 0 0 5px;
+    color: #374151;
+}
+
+.empty-state p {
+    margin: 0;
+    font-size: 13px;
+}
+
+.loader {
+    width: 30px;
+    height: 30px;
+    border: 3px solid #e5e7eb;
+    border-top-color: #2563eb;
+    border-radius: 50%;
+    animation: rotation 0.8s linear infinite;
+    margin-bottom: 12px;
+}
+
+@keyframes rotation {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+/* ================================
+   MODAL
+================================ */
+
+.modal-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 1000;
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    padding: 35px 20px;
+    background: rgba(15, 23, 42, 0.55);
+    overflow-y: auto;
+}
+
+.facture-modal {
+    width: min(900px, 100%);
+    background: white;
+    border-radius: 16px;
+    box-shadow: 0 25px 70px rgba(0, 0, 0, 0.2);
+    overflow: hidden;
+}
+
+.modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    padding: 24px 26px;
+    border-bottom: 1px solid #edf0f4;
+}
+
+.modal-header h2 {
+    margin: 0;
+    font-size: 21px;
+}
+
+.modal-header p {
+    margin: 6px 0 0;
+    color: #7b8497;
+    font-size: 13px;
+}
+
+.modal-close {
+    width: 34px;
+    height: 34px;
+    border: none;
+    background: #f3f5f8;
+    border-radius: 8px;
+    font-size: 22px;
+    color: #667085;
+    cursor: pointer;
+}
+
+/* ================================
+   SECTIONS
+================================ */
+
+.form-section {
+    padding: 23px 26px;
+    border-bottom: 1px solid #edf0f4;
+}
+
+.section-title {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    margin-bottom: 17px;
+}
+
+.section-title > span {
+    width: 30px;
+    height: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #eef4ff;
+    color: #2563eb;
+    border-radius: 8px;
+    font-size: 12px;
+    font-weight: 750;
+}
+
+.section-title h3 {
+    margin: 0;
     font-size: 15px;
 }
 
-.btn-action:hover {
-    background: #f3f4f6;
+.section-title p {
+    margin: 4px 0 0;
+    color: #8992a4;
+    font-size: 12px;
 }
 
-/* =====================================================
-   ERREUR
-===================================================== */
-
-.error-message {
-    padding: 14px 16px;
-    border-radius: 8px;
-    background: #fee2e2;
-    color: #991b1b;
-    border: 1px solid #fecaca;
+.reservation-select {
+    width: 100%;
+    height: 48px;
+    padding: 0 13px;
+    border: 1px solid #dce2eb;
+    border-radius: 9px;
+    background: white;
+    color: #273247;
+    outline: none;
+    font-size: 14px;
 }
 
-/* =====================================================
+.reservation-select:focus {
+    border-color: #2563eb;
+}
+
+/* ================================
+   RESERVATION SUMMARY
+================================ */
+
+.reservation-summary {
+    margin: 22px 26px 0;
+    padding: 18px;
+    border-radius: 12px;
+    background: #f8faff;
+    border: 1px solid #dfe9ff;
+}
+
+.summary-title {
+    font-size: 13px;
+    font-weight: 700;
+    color: #334155;
+    margin-bottom: 15px;
+}
+
+.summary-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 15px;
+}
+
+.summary-grid div {
+    padding: 11px;
+    background: white;
+    border: 1px solid #e7edf7;
+    border-radius: 9px;
+}
+
+.summary-grid span {
+    display: block;
+    color: #8a93a5;
+    font-size: 11px;
+    margin-bottom: 5px;
+}
+
+.summary-grid strong {
+    font-size: 13px;
+}
+
+.summary-total {
+    grid-column: span 3;
+}
+
+.summary-total strong {
+    color: #2563eb;
+    font-size: 16px;
+}
+
+/* ================================
+   LIGNE FACTURE
+================================ */
+
+.invoice-line {
+    display: grid;
+    grid-template-columns: 2fr 100px 150px 160px;
+    gap: 12px;
+    align-items: end;
+}
+
+.invoice-line label,
+.form-group label {
+    display: block;
+    margin-bottom: 7px;
+    color: #5d6678;
+    font-size: 12px;
+    font-weight: 650;
+}
+
+.invoice-line input,
+.form-group input,
+.form-group textarea {
+    width: 100%;
+    box-sizing: border-box;
+    border: 1px solid #dce2eb;
+    border-radius: 9px;
+    padding: 11px 12px;
+    outline: none;
+    font-size: 13px;
+    color: #273247;
+    background: white;
+}
+
+.invoice-line input:focus,
+.form-group input:focus,
+.form-group textarea:focus {
+    border-color: #2563eb;
+}
+
+.line-total strong {
+    display: block;
+    padding: 11px 0;
+    color: #172033;
+}
+
+.form-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 15px;
+    margin-bottom: 15px;
+}
+
+.form-group {
+    margin-bottom: 15px;
+}
+
+.form-group textarea {
+    resize: vertical;
+}
+
+/* ================================
+   TOTAL
+================================ */
+
+.invoice-total-box {
+    margin: 22px 26px;
+    margin-top: 0;
+    padding: 18px;
+    background: #f8fafc;
+    border: 1px solid #e7ebf2;
+    border-radius: 12px;
+}
+
+.invoice-total-box > div {
+    display: flex;
+    justify-content: space-between;
+    padding: 7px 0;
+    color: #667085;
+    font-size: 13px;
+}
+
+.invoice-total-box .grand-total {
+    margin-top: 10px;
+    padding-top: 15px;
+    border-top: 1px solid #dfe4eb;
+    color: #172033;
+}
+
+.grand-total span {
+    font-size: 13px;
+    font-weight: 750;
+}
+
+.grand-total strong {
+    color: #2563eb;
+    font-size: 21px;
+}
+
+/* ================================
+   MODAL ACTIONS
+================================ */
+
+.modal-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+    padding: 20px 26px;
+    background: #fafbfc;
+}
+
+/* ================================
    RESPONSIVE
-===================================================== */
+================================ */
 
-@media (max-width: 1200px) {
-    .ligne-facture {
-        grid-template-columns:
-            repeat(3, 1fr);
+@media (max-width: 1100px) {
+    .factures-stats {
+        grid-template-columns: repeat(2, 1fr);
     }
 
-    .ligne-facture .btn-delete {
-        margin-top: 0;
+    .invoice-line {
+        grid-template-columns: 1fr 100px;
+    }
+
+    .line-main {
+        grid-column: span 2;
     }
 }
 
-@media (max-width: 768px) {
+@media (max-width: 700px) {
     .factures-page {
-        padding: 15px;
+        padding: 18px;
     }
 
-    .page-header {
+    .factures-header {
         flex-direction: column;
         align-items: flex-start;
-        gap: 15px;
     }
 
-    .page-header .btn-primary {
+    .factures-header .btn-primary {
         width: 100%;
+    }
+
+    .factures-stats {
+        grid-template-columns: 1fr;
+    }
+
+    .factures-toolbar {
+        flex-direction: column;
+    }
+
+    .factures-toolbar select {
+        height: 45px;
+    }
+
+    .summary-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .summary-total {
+        grid-column: span 1;
     }
 
     .form-grid {
         grid-template-columns: 1fr;
     }
 
-    .ligne-facture {
+    .invoice-line {
         grid-template-columns: 1fr;
     }
 
-    .ligne-facture .btn-delete {
-        width: 100%;
-        margin-top: 5px;
+    .line-main {
+        grid-column: span 1;
     }
 
-    .totaux-facture {
-        width: 100%;
-        box-sizing: border-box;
+    .modal-overlay {
+        padding: 10px;
     }
 
-    .form-actions {
+    .form-section,
+    .modal-header {
+        padding: 18px;
+    }
+
+    .reservation-summary {
+        margin-left: 18px;
+        margin-right: 18px;
+    }
+
+    .invoice-total-box {
+        margin-left: 18px;
+        margin-right: 18px;
+    }
+
+    .modal-actions {
+        padding: 16px 18px;
         flex-direction: column-reverse;
     }
 
-    .form-actions button {
+    .modal-actions button {
         width: 100%;
+    }
+}
+/* ================================
+   MODAL DETAIL FACTURE
+================================ */
+
+.detail-modal {
+    width: min(850px, 100%);
+    background: white;
+    border-radius: 16px;
+    box-shadow: 0 25px 70px rgba(0, 0, 0, 0.2);
+    overflow: hidden;
+}
+
+.detail-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    padding: 24px 26px;
+    border-bottom: 1px solid #edf0f4;
+    background: #fafbfc;
+}
+
+.detail-label {
+    display: block;
+    color: #2563eb;
+    font-size: 11px;
+    font-weight: 750;
+    letter-spacing: 0.08em;
+    margin-bottom: 5px;
+}
+
+.detail-header h2 {
+    margin: 0;
+    font-size: 23px;
+    color: #172033;
+}
+
+.detail-header p {
+    margin: 5px 0 0;
+    color: #8992a4;
+    font-size: 12px;
+}
+
+/* ================================
+   DETAIL SECTIONS
+================================ */
+
+.detail-section {
+    padding: 22px 26px;
+    border-bottom: 1px solid #edf0f4;
+}
+
+.detail-section-title {
+    margin-bottom: 15px;
+    font-size: 14px;
+    font-weight: 750;
+    color: #273247;
+}
+
+.detail-info-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
+}
+
+.detail-info-grid > div {
+    padding: 13px;
+    border: 1px solid #e7ebf1;
+    border-radius: 10px;
+    background: #fafbfc;
+}
+
+.detail-info-grid span {
+    display: block;
+    margin-bottom: 5px;
+    color: #8992a4;
+    font-size: 11px;
+}
+
+.detail-info-grid strong {
+    color: #273247;
+    font-size: 13px;
+}
+
+.detail-reservation {
+    color: #2563eb !important;
+}
+
+/* ================================
+   LIGNES
+================================ */
+
+.detail-lines {
+    border: 1px solid #e7ebf1;
+    border-radius: 10px;
+    overflow: hidden;
+}
+
+.detail-line {
+    display: grid;
+    grid-template-columns: 2fr 70px 160px 160px;
+    gap: 12px;
+    align-items: center;
+    padding: 13px 15px;
+    border-top: 1px solid #edf0f4;
+    font-size: 13px;
+}
+
+.detail-line:first-child {
+    border-top: none;
+}
+
+.detail-line-head {
+    background: #f8fafc;
+    color: #7b8497;
+    font-size: 10px;
+    font-weight: 750;
+    text-transform: uppercase;
+}
+
+.detail-line small {
+    display: block;
+    margin-top: 3px;
+    color: #9aa2b1;
+    font-size: 10px;
+}
+
+/* ================================
+   TOTAL
+================================ */
+
+.detail-total-section {
+    padding: 20px 26px;
+    background: #fafbfc;
+}
+
+.detail-total-row {
+    display: flex;
+    justify-content: space-between;
+    padding: 6px 0;
+    color: #687386;
+    font-size: 13px;
+}
+
+.detail-total-row strong {
+    color: #273247;
+}
+
+.detail-total-final {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 10px;
+    padding-top: 15px;
+    border-top: 1px solid #dfe4eb;
+}
+
+.detail-total-final span {
+    font-size: 13px;
+    font-weight: 750;
+    color: #172033;
+}
+
+.detail-total-final strong {
+    font-size: 21px;
+    color: #2563eb;
+}
+
+/* ================================
+   PAIEMENT
+================================ */
+
+.detail-payment {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
+    padding: 20px 26px;
+}
+
+.detail-payment > div {
+    padding: 13px;
+    border: 1px solid #e7ebf1;
+    border-radius: 10px;
+    background: white;
+}
+
+.detail-payment span {
+    display: block;
+    margin-bottom: 6px;
+    color: #8992a4;
+    font-size: 11px;
+}
+
+.detail-payment strong {
+    font-size: 14px;
+}
+
+.payment-paid {
+    color: #047857;
+}
+
+.payment-rest {
+    color: #be123c;
+}
+
+/* ================================
+   OBSERVATION
+================================ */
+
+.detail-observation {
+    margin: 0 26px 20px;
+    padding: 14px;
+    border-radius: 10px;
+    background: #f8faff;
+    border: 1px solid #dfe9ff;
+}
+
+.detail-observation span {
+    display: block;
+    margin-bottom: 5px;
+    color: #7b8497;
+    font-size: 11px;
+    font-weight: 700;
+}
+
+.detail-observation p {
+    margin: 0;
+    color: #465066;
+    font-size: 13px;
+    line-height: 1.5;
+}
+
+/* ================================
+   ACTIONS DETAIL
+================================ */
+
+.detail-actions {
+    display: flex;
+    justify-content: flex-end;
+    padding: 17px 26px;
+    background: #fafbfc;
+    border-top: 1px solid #edf0f4;
+}
+
+/* ================================
+   RESPONSIVE DETAIL
+================================ */
+
+@media (max-width: 700px) {
+
+    .detail-modal {
+        width: 100%;
+    }
+
+    .detail-info-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .detail-line {
+        grid-template-columns: 1fr 60px;
+    }
+
+    .detail-line-head {
+        display: none;
+    }
+
+    .detail-line span:nth-child(3),
+    .detail-line span:nth-child(4) {
+        text-align: right;
+    }
+
+    .detail-payment {
+        grid-template-columns: 1fr;
+    }
+
+    .detail-header,
+    .detail-section {
+        padding-left: 18px;
+        padding-right: 18px;
+    }
+
+    .detail-total-section,
+    .detail-payment,
+    .detail-actions {
+        padding-left: 18px;
+        padding-right: 18px;
+    }
+
+    .detail-observation {
+        margin-left: 18px;
+        margin-right: 18px;
     }
 }

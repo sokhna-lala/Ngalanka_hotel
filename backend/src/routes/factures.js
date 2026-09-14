@@ -66,7 +66,7 @@ const genererNumeroPaiement = async (connection) => {
     return `PAY-${annee}-${String(numero).padStart(4, "0")}`;
 };
 
-// =====================================================
+/// =====================================================
 // GET - Liste des factures
 // =====================================================
 router.get("/", async (req, res) => {
@@ -77,6 +77,7 @@ router.get("/", async (req, res) => {
                 f.numero_facture,
                 f.id_client,
                 f.id_sejour,
+                f.id_reservation,
                 f.date_facture,
                 f.montant_total,
                 f.remise,
@@ -91,7 +92,8 @@ router.get("/", async (req, res) => {
                 c.nom,
                 c.prenom,
 
-                s.numero_sejour
+                s.numero_sejour,
+                r.numero_reservation
 
             FROM factures f
 
@@ -101,16 +103,18 @@ router.get("/", async (req, res) => {
             LEFT JOIN sejours s
                 ON f.id_sejour = s.id_sejour
 
+            LEFT JOIN reservations r
+                ON f.id_reservation = r.id_reservation
+
             ORDER BY f.date_facture DESC
         `);
 
         res.json(factures);
-
     } catch (error) {
         console.error("Erreur récupération factures :", error);
-
         res.status(500).json({
-            message: "Impossible de récupérer les factures"
+            message: "Erreur lors de la récupération des factures",
+            erreur: error.message
         });
     }
 });
@@ -221,7 +225,6 @@ router.get("/:id", async (req, res) => {
         });
     }
 });
-
 // =====================================================
 // POST - Créer une facture
 // =====================================================
@@ -231,6 +234,7 @@ router.post("/", async (req, res) => {
     try {
         const {
             id_client,
+            id_reservation,
             id_sejour,
             remise = 0,
             taxe = 0,
@@ -272,6 +276,63 @@ router.post("/", async (req, res) => {
             return res.status(404).json({
                 message: "Client introuvable"
             });
+        }
+
+        // -----------------------------
+        // Vérifier réservation si fournie
+        // -----------------------------
+        let reservation = null;
+
+        if (id_reservation) {
+            const [reservations] = await connection.execute(
+                `
+                SELECT
+                    r.id_reservation,
+                    r.numero_reservation,
+                    r.id_client,
+                    r.date_arrivee,
+                    r.date_depart,
+                    r.montant_prevu,
+                    r.avance,
+
+                    rc.id_chambre,
+                    rc.tarif_nuit,
+                    rc.nombre_nuits,
+                    rc.montant AS montant_chambre,
+
+                    ch.numero AS numero_chambre,
+                    tc.libelle AS type_chambre
+
+                FROM reservations r
+
+                LEFT JOIN reservation_chambres rc
+                    ON rc.id_reservation = r.id_reservation
+
+                LEFT JOIN chambres ch
+                    ON ch.id_chambre = rc.id_chambre
+
+                LEFT JOIN types_chambre tc
+                    ON tc.id_type = ch.id_type
+
+                WHERE r.id_reservation = ?
+                `,
+                [id_reservation]
+            );
+
+            if (reservations.length === 0) {
+                return res.status(404).json({
+                    message: "Réservation introuvable"
+                });
+            }
+
+            reservation = reservations[0];
+
+            // Vérifier que la réservation appartient bien au client
+            if (Number(reservation.id_client) !== Number(id_client)) {
+                return res.status(400).json({
+                    message: "La réservation sélectionnée ne correspond pas au client"
+                });
+            }
         }
 
         // -----------------------------
@@ -370,7 +431,7 @@ router.post("/", async (req, res) => {
         await connection.beginTransaction();
 
         // -----------------------------
-        // Générer numéro
+        // Générer numéro facture
         // -----------------------------
         const numeroFacture =
             await genererNumeroFacture(connection);
@@ -384,6 +445,7 @@ router.post("/", async (req, res) => {
                 numero_facture,
                 id_client,
                 id_sejour,
+                id_reservation,
                 montant_total,
                 remise,
                 taxe,
@@ -394,19 +456,20 @@ router.post("/", async (req, res) => {
                 observation
             )
 
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
             `,
             [
                 numeroFacture,
                 id_client,
                 id_sejour || null,
+                id_reservation || null,
                 montantTotal,
                 remiseFacture,
                 taxeFacture,
                 netAPayer,
                 0,
                 netAPayer,
-                "BROUILLON",
+                "IMPAYEE",
                 observation || null
             ]
         );
@@ -450,7 +513,8 @@ router.post("/", async (req, res) => {
         res.status(201).json({
             message: "Facture créée avec succès",
             id_facture: idFacture,
-            numero_facture: numeroFacture
+            numero_facture: numeroFacture,
+            id_reservation: id_reservation || null
         });
 
     } catch (error) {
@@ -460,19 +524,19 @@ router.post("/", async (req, res) => {
 
         if (error.code === "ER_DUP_ENTRY") {
             return res.status(409).json({
-                message: "Le numéro de facture existe déjà"
+                message: "Cette facture existe déjà"
             });
         }
 
         res.status(500).json({
-            message: "Impossible de créer la facture"
+            message: "Impossible de créer la facture",
+            erreur: error.message
         });
 
     } finally {
         connection.release();
     }
 });
-
 // =====================================================
 // PUT - Modifier une facture
 // =====================================================
@@ -627,7 +691,7 @@ router.put("/:id", async (req, res) => {
             netAPayer - montantPaye
         );
 
-        let statut = "BROUILLON";
+        let statut = "IMPAYEE";
 
         if (montantPaye > 0 && resteAPayer > 0) {
             statut = "PARTIELLE";

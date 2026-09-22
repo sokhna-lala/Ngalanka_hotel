@@ -1,0 +1,540 @@
+.services-fonctions-page {
+    width: 100%;
+    min-height: 100vh;
+    padding: 28px;
+    box-sizing: border-box;
+    background: #f4f7fb;
+}
+
+/* ================= HEADER ================= */
+
+.sf-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 22px;
+}
+
+.sf-header h1 {
+    margin: 0 0 6px;
+    color: #173d5f;
+    font-size: 28px;
+    font-weight: 700;
+}
+
+.sf-header p {
+    margin: 0;
+    color: #718096;
+    font-size: 14px;
+}
+
+/* ================= MESSAGES ================= */
+
+.sf-message {
+    margin-bottom: 18px;
+    padding: 13px 16px;
+    border-radius: 10px;
+    font-size: 14px;
+    font-weight: 600;
+}
+
+.sf-message.succes {
+    color: #17663c;
+    background: #eaf8f0;
+    border: 1px solid #bce8cf;
+}
+
+.sf-message.erreur {
+    color: #a32929;
+    background: #fff0f0;
+    border: 1px solid #f0c1c1;
+}
+
+/* ================= STATISTIQUES ================= */
+
+.sf-stats {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 18px;
+    margin-bottom: 22px;
+}
+
+.sf-stat-card {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding: 20px;
+    background: #ffffff;
+    border: 1px solid #e4eaf1;
+    border-radius: 14px;
+    box-shadow: 0 5px 18px rgba(30, 55, 80, 0.07);
+}
+
+.sf-stat-icon {
+    width: 54px;
+    height: 54px;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 13px;
+    background: #edf4fa;
+    font-size: 25px;
+}
+
+.sf-stat-card span {
+    display: block;
+    margin-bottom: 4px;
+    color: #718096;
+    font-size: 13px;
+    font-weight: 600;
+}
+
+.sf-stat-card strong {
+    display: block;
+    color: #173d5f;
+    font-size: 28px;
+    line-height: 1.1;
+}
+
+.sf-stat-card small {
+    display: block;
+    margin-top: 4px;
+    color: #4b8a68;
+    font-size: 12px;
+}
+
+/* ================= COLONNES ================= */
+
+.sf-columns {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 22px;
+    align-items: start;
+}
+
+/* ================= CARTES ================= */
+
+.sf-card {
+    min-width: 0;
+    overflow: hidden;
+    background: #ffffff;
+    border: 1px solid #e1e8ef;
+    border-radius: 15px;
+    box-shadow: 0 6px 22px rgba(30, 55, 80, 0.07);
+}
+
+.sf-card-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    padding: 19px 20px;
+    border-bottom: 1px solid #e9eef3;
+}
+
+.sf-card-header h2 {
+    margin: 0 0 5px;
+    color: #173d5f;
+    font-size: 19px;
+    font-weight: 700;
+}
+
+.sf-card-header span {
+    color: #7a8795;
+    font-size: 12px;
+    font-weight: 600;
+}
+
+/* ================= BOUTON AJOUTER ================= */
+
+.sf-btn-ajouter {
+    border: none;
+    border-radius: 9px;
+    padding: 10px 16px;
+    background: #1f587f;
+    color: #ffffff;
+    font-size: 13px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: 0.2s ease;
+}
+
+.sf-btn-ajouter:hover {
+    background: #174665;
+    transform: translateY(-1px);
+}
+
+/* ================= RECHERCHE ================= */
+
+.sf-recherche {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+    height: 43px;
+    margin: 16px 18px;
+    padding: 0 13px;
+    box-sizing: border-box;
+    background: #f8fafc;
+    border: 1px solid #dfe6ee;
+    border-radius: 9px;
+}
+
+.sf-recherche span {
+    flex-shrink: 0;
+    font-size: 16px;
+}
+
+.sf-recherche input {
+    width: 100%;
+    min-width: 0;
+    height: 100%;
+    padding: 0;
+    border: none;
+    outline: none;
+    background: transparent;
+    color: #263646;
+    font-size: 13px;
+}
+
+.sf-recherche input::placeholder {
+    color: #9aa6b2;
+}
+
+/* ================= LISTE ================= */
+
+.sf-liste {
+    padding: 0 18px 18px;
+}
+
+.sf-element {
+    display: flex;
+    align-items: center;
+    gap: 13px;
+    min-height: 76px;
+    padding: 12px 6px;
+    border-bottom: 1px solid #edf1f5;
+    transition: background 0.18s ease;
+}
+
+.sf-element:last-child {
+    border-bottom: none;
+}
+
+.sf-element:hover {
+    background: #fafcfe;
+}
+
+/* ================= ICONE ================= */
+
+.sf-element-icon {
+    width: 44px;
+    height: 44px;
+    flex: 0 0 44px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 11px;
+    background: #edf4fa;
+    font-size: 20px;
+}
+
+/* ================= INFORMATIONS ================= */
+
+.sf-element-info {
+    min-width: 0;
+    flex: 1;
+}
+
+.sf-element-info strong {
+    display: block;
+    margin-bottom: 4px;
+    color: #263746;
+    font-size: 14px;
+    font-weight: 700;
+}
+
+.sf-element-info span {
+    display: block;
+    overflow: hidden;
+    margin-bottom: 5px;
+    color: #7b8794;
+    font-size: 12px;
+    line-height: 1.4;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.sf-element-info small {
+    font-size: 11px;
+    font-weight: 700;
+}
+
+.sf-actif {
+    color: #218653;
+}
+
+.sf-inactif {
+    color: #a56b17;
+}
+
+/* ================= ACTIONS ================= */
+
+.sf-actions {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    flex-shrink: 0;
+}
+
+.sf-actions button {
+    width: 34px;
+    height: 34px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+    border: 1px solid #dfe6ec;
+    border-radius: 8px;
+    background: #ffffff;
+    color: #425466;
+    cursor: pointer;
+    font-size: 14px;
+    transition: all 0.18s ease;
+}
+
+.sf-actions button:hover {
+    background: #f1f5f8;
+    border-color: #c7d2dc;
+    transform: translateY(-1px);
+}
+
+.sf-actions .sf-action-delete:hover {
+    background: #fff1f1;
+    border-color: #efc1c1;
+}
+
+/* ================= ETAT VIDE ================= */
+
+.sf-vide {
+    padding: 42px 15px;
+    text-align: center;
+    color: #9aa5b1;
+    font-size: 13px;
+}
+
+/* ================= MODAL ================= */
+
+.sf-modal-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 9999;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    box-sizing: border-box;
+    background: rgba(15, 35, 52, 0.58);
+    backdrop-filter: blur(3px);
+}
+
+.sf-modal {
+    width: min(520px, 100%);
+    max-height: 90vh;
+    overflow-y: auto;
+    background: #ffffff;
+    border-radius: 16px;
+    box-shadow: 0 25px 70px rgba(0, 0, 0, 0.25);
+}
+
+.sf-modal-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 15px;
+    padding: 21px 23px;
+    border-bottom: 1px solid #e8edf2;
+}
+
+.sf-modal-header h2 {
+    margin: 0 0 5px;
+    color: #173d5f;
+    font-size: 20px;
+    font-weight: 700;
+}
+
+.sf-modal-header p {
+    margin: 0;
+    color: #7b8794;
+    font-size: 12px;
+}
+
+.sf-modal-close {
+    width: 34px;
+    height: 34px;
+    border: none;
+    border-radius: 8px;
+    background: #f1f4f7;
+    color: #52606d;
+    font-size: 22px;
+    cursor: pointer;
+}
+
+.sf-modal-close:hover {
+    background: #e5eaef;
+}
+
+/* ================= FORMULAIRE ================= */
+
+.sf-modal form {
+    padding: 23px;
+}
+
+.sf-form-group {
+    margin-bottom: 18px;
+}
+
+.sf-form-group label {
+    display: block;
+    margin-bottom: 7px;
+    color: #344454;
+    font-size: 13px;
+    font-weight: 700;
+}
+
+.sf-form-group input,
+.sf-form-group textarea {
+    width: 100%;
+    box-sizing: border-box;
+    padding: 11px 12px;
+    border: 1px solid #d6dfe7;
+    border-radius: 9px;
+    outline: none;
+    background: #ffffff;
+    color: #263746;
+    font-family: inherit;
+    font-size: 13px;
+    transition: 0.2s ease;
+}
+
+.sf-form-group input {
+    height: 43px;
+}
+
+.sf-form-group textarea {
+    min-height: 105px;
+    resize: vertical;
+}
+
+.sf-form-group input:focus,
+.sf-form-group textarea:focus {
+    border-color: #1f587f;
+    box-shadow: 0 0 0 3px rgba(31, 88, 127, 0.10);
+}
+
+/* ================= ACTIONS MODAL ================= */
+
+.sf-modal-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+    padding-top: 6px;
+}
+
+.sf-btn-annuler,
+.sf-btn-enregistrer {
+    min-height: 41px;
+    padding: 0 17px;
+    border-radius: 9px;
+    font-size: 13px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: 0.2s ease;
+}
+
+.sf-btn-annuler {
+    border: 1px solid #d6dee6;
+    background: #ffffff;
+    color: #52606d;
+}
+
+.sf-btn-annuler:hover {
+    background: #f5f7f9;
+}
+
+.sf-btn-enregistrer {
+    border: none;
+    background: #1f587f;
+    color: #ffffff;
+}
+
+.sf-btn-enregistrer:hover {
+    background: #174665;
+}
+
+.sf-btn-enregistrer:disabled {
+    opacity: 0.65;
+    cursor: not-allowed;
+}
+
+/* ================= RESPONSIVE ================= */
+
+@media (max-width: 1100px) {
+    .sf-columns {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 700px) {
+    .services-fonctions-page {
+        padding: 18px;
+    }
+
+    .sf-header h1 {
+        font-size: 23px;
+    }
+
+    .sf-stats {
+        grid-template-columns: 1fr;
+    }
+
+    .sf-card-header {
+        align-items: flex-start;
+        flex-direction: column;
+    }
+
+    .sf-btn-ajouter {
+        width: 100%;
+    }
+}
+
+@media (max-width: 500px) {
+    .services-fonctions-page {
+        padding: 12px;
+    }
+
+    .sf-element {
+        align-items: flex-start;
+    }
+
+    .sf-actions {
+        flex-direction: column;
+    }
+
+    .sf-modal-overlay {
+        padding: 10px;
+    }
+
+    .sf-modal form {
+        padding: 18px;
+    }
+
+    .sf-modal-actions {
+        flex-direction: column-reverse;
+    }
+
+    .sf-btn-annuler,
+    .sf-btn-enregistrer {
+        width: 100%;
+    }
+}

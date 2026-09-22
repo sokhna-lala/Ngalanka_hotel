@@ -1,0 +1,53 @@
+CREATE TABLE services (
+    id_service INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    nom_service VARCHAR(100) NOT NULL UNIQUE,
+    description VARCHAR(255),
+    statut ENUM('ACTIF', 'INACTIF') NOT NULL DEFAULT 'ACTIF',
+    date_creation DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    date_modification DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
+        ON UPDATE CURRENT_TIMESTAMP
+);
+
+CREATE TABLE fonctions (
+    id_fonction INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    nom_fonction VARCHAR(100) NOT NULL UNIQUE,
+    description VARCHAR(255),
+    statut ENUM('ACTIF', 'INACTIF') NOT NULL DEFAULT 'ACTIF',
+    date_creation DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    date_modification DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
+        ON UPDATE CURRENT_TIMESTAMP
+);
+
+
+
+
+INSERT INTO services (nom_service, description) VALUES
+('Direction', 'Direction générale de l''hôtel'),
+('Réception', 'Accueil et réception des clients'),
+('Caisse', 'Encaissements et gestion de la caisse'),
+('Comptabilité', 'Gestion comptable et financière'),
+('Hébergement', 'Gestion des chambres et hébergement'),
+('Restaurant', 'Service restauration'),
+('Bar', 'Service bar'),
+('Stock', 'Gestion des stocks et approvisionnements'),
+('Personnel / RH', 'Gestion des ressources humaines'),
+('Maintenance', 'Maintenance des équipements et installations'),
+('Entretien', 'Entretien et nettoyage'),
+('Sécurité', 'Sécurité de l''établissement');
+
+
+
+INSERT INTO fonctions (nom_fonction, description) VALUES
+('Directeur', 'Direction de l''établissement'),
+('Réceptionniste', 'Accueil et gestion des clients'),
+('Caissier / Caissière', 'Gestion des encaissements'),
+('Responsable comptabilité', 'Gestion comptable'),
+('Gouvernant(e)', 'Supervision de l''hébergement et entretien'),
+('Femme / Valet de chambre', 'Entretien des chambres'),
+('Serveur / Serveuse', 'Service en salle'),
+('Cuisinier / Cuisinière', 'Préparation des repas'),
+('Barman / Barmaid', 'Service au bar'),
+('Responsable stock', 'Gestion des stocks'),
+('Agent de maintenance', 'Maintenance des équipements'),
+('Agent d''entretien', 'Entretien des locaux'),
+('Responsable RH', 'Gestion du personnel');

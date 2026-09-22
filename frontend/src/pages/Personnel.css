@@ -1,0 +1,669 @@
+.personnel-page {
+    padding: 28px;
+    min-height: 100%;
+    background: #f5f7fb;
+}
+
+/* =========================
+   HEADER
+========================= */
+
+.personnel-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 20px;
+    margin-bottom: 24px;
+}
+
+.personnel-header h1 {
+    margin: 0 0 6px;
+    font-size: 28px;
+    font-weight: 700;
+    color: #172033;
+}
+
+.personnel-header p {
+    margin: 0;
+    color: #7b8498;
+    font-size: 14px;
+}
+
+.btn-ajouter-employe {
+    border: none;
+    border-radius: 10px;
+    padding: 12px 20px;
+    background: #172b4d;
+    color: white;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: 0.2s ease;
+    box-shadow: 0 4px 12px rgba(23, 43, 77, 0.18);
+}
+
+.btn-ajouter-employe:hover {
+    background: #0f1f38;
+    transform: translateY(-1px);
+}
+
+/* =========================
+   MESSAGES
+========================= */
+
+.personnel-message {
+    padding: 13px 16px;
+    border-radius: 9px;
+    margin-bottom: 18px;
+    font-size: 14px;
+    font-weight: 500;
+}
+
+.personnel-message.succes {
+    background: #eaf8f0;
+    color: #18794e;
+    border: 1px solid #bce8cf;
+}
+
+.personnel-message.erreur {
+    background: #fff0f0;
+    color: #c0392b;
+    border: 1px solid #f2c1bd;
+}
+
+/* =========================
+   STATISTIQUES
+========================= */
+
+.stats-personnel {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 18px;
+    margin-bottom: 22px;
+}
+
+.personnel-stat-card {
+    background: white;
+    border-radius: 13px;
+    padding: 18px;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    border: 1px solid #e8ebf1;
+    box-shadow: 0 3px 12px rgba(23, 32, 51, 0.04);
+}
+
+.personnel-stat-icon {
+    width: 45px;
+    height: 45px;
+    border-radius: 11px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #eef3fa;
+    font-size: 21px;
+}
+
+.personnel-stat-card span {
+    display: block;
+    color: #7b8498;
+    font-size: 12px;
+    margin-bottom: 4px;
+}
+
+.personnel-stat-card strong {
+    display: block;
+    color: #172033;
+    font-size: 22px;
+    font-weight: 700;
+}
+
+/* =========================
+   FILTRES
+========================= */
+
+.personnel-filtres {
+    background: white;
+    padding: 16px;
+    border-radius: 12px;
+    border: 1px solid #e8ebf1;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    margin-bottom: 20px;
+}
+
+.recherche-personnel {
+    flex: 1;
+    height: 43px;
+    border: 1px solid #dfe4ec;
+    border-radius: 9px;
+    display: flex;
+    align-items: center;
+    padding: 0 13px;
+    gap: 9px;
+    background: #fafbfc;
+}
+
+.recherche-personnel span {
+    font-size: 16px;
+}
+
+.recherche-personnel input {
+    width: 100%;
+    border: none;
+    outline: none;
+    background: transparent;
+    color: #172033;
+    font-size: 14px;
+}
+
+.recherche-personnel input::placeholder {
+    color: #a0a7b5;
+}
+
+.personnel-filtres select {
+    min-width: 180px;
+    height: 43px;
+    border: 1px solid #dfe4ec;
+    border-radius: 9px;
+    padding: 0 12px;
+    background: white;
+    color: #344054;
+    outline: none;
+    cursor: pointer;
+}
+
+/* =========================
+   TABLEAU
+========================= */
+
+.tableau-personnel {
+    background: white;
+    border: 1px solid #e8ebf1;
+    border-radius: 13px;
+    overflow: hidden;
+    box-shadow: 0 3px 12px rgba(23, 32, 51, 0.04);
+}
+
+.tableau-personnel-header {
+    padding: 18px 20px;
+    border-bottom: 1px solid #edf0f4;
+}
+
+.tableau-personnel-header h2 {
+    margin: 0 0 4px;
+    color: #172033;
+    font-size: 17px;
+}
+
+.tableau-personnel-header span {
+    color: #8a92a3;
+    font-size: 12px;
+}
+
+.personnel-table-responsive {
+    width: 100%;
+    overflow-x: auto;
+}
+
+.personnel-table-responsive table {
+    width: 100%;
+    min-width: 1150px;
+    border-collapse: collapse;
+}
+
+.personnel-table-responsive th {
+    padding: 13px 15px;
+    text-align: left;
+    background: #f8f9fb;
+    color: #697386;
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+    border-bottom: 1px solid #e9edf2;
+}
+
+.personnel-table-responsive td {
+    padding: 14px 15px;
+    color: #344054;
+    font-size: 13px;
+    border-bottom: 1px solid #eef1f5;
+    vertical-align: middle;
+}
+
+.personnel-table-responsive tbody tr {
+    transition: 0.15s ease;
+}
+
+.personnel-table-responsive tbody tr:hover {
+    background: #fafbfd;
+}
+
+.personnel-table-responsive tbody tr:last-child td {
+    border-bottom: none;
+}
+
+/* =========================
+   EMPLOYE
+========================= */
+
+.employe-cell {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    min-width: 180px;
+}
+
+.avatar-employe {
+    width: 38px;
+    height: 38px;
+    flex-shrink: 0;
+    border-radius: 50%;
+    background: #172b4d;
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
+    font-weight: 700;
+}
+
+.employe-cell strong {
+    display: block;
+    color: #172033;
+    font-size: 13px;
+}
+
+.employe-cell small {
+    display: block;
+    color: #98a0af;
+    font-size: 10px;
+    margin-top: 2px;
+}
+
+.badge-matricule {
+    display: inline-flex;
+    align-items: center;
+    padding: 5px 9px;
+    border-radius: 6px;
+    background: #eef3fa;
+    color: #29466e;
+    font-size: 11px;
+    font-weight: 600;
+}
+
+.salaire-cell {
+    color: #172033;
+    font-size: 12px;
+    white-space: nowrap;
+}
+
+/* =========================
+   STATUTS
+========================= */
+
+.badge-statut-personnel {
+    display: inline-flex;
+    align-items: center;
+    padding: 5px 9px;
+    border-radius: 20px;
+    font-size: 10px;
+    font-weight: 700;
+}
+
+.statut-actif {
+    background: #e9f8ef;
+    color: #18794e;
+}
+
+.statut-inactif {
+    background: #fff4df;
+    color: #a86600;
+}
+
+.statut-suspendu {
+    background: #ffebeb;
+    color: #c0392b;
+}
+
+/* =========================
+   ACTIONS
+========================= */
+
+.actions-personnel {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.btn-personnel-action {
+    width: 31px;
+    height: 31px;
+    border-radius: 7px;
+    border: 1px solid #e1e5eb;
+    background: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    font-size: 13px;
+    transition: 0.15s ease;
+}
+
+.btn-personnel-action:hover {
+    transform: translateY(-1px);
+}
+
+.btn-personnel-action.modifier:hover {
+    background: #eef3fa;
+    border-color: #bfcde0;
+}
+
+.btn-personnel-action.activer:hover {
+    background: #e9f8ef;
+    border-color: #bce8cf;
+}
+
+.btn-personnel-action.suspendre:hover {
+    background: #fff4df;
+    border-color: #efd39d;
+}
+
+.btn-personnel-action.supprimer:hover {
+    background: #ffebeb;
+    border-color: #efb9b5;
+}
+
+/* =========================
+   CHARGEMENT / VIDE
+========================= */
+
+.personnel-chargement,
+.personnel-vide {
+    padding: 50px 20px;
+    text-align: center;
+    color: #8a92a3;
+    font-size: 14px;
+}
+
+/* =========================
+   MODAL
+========================= */
+
+.personnel-modal-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 1000;
+    background: rgba(15, 23, 42, 0.58);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+}
+
+.personnel-modal {
+    width: min(760px, 100%);
+    max-height: 92vh;
+    overflow-y: auto;
+    background: white;
+    border-radius: 15px;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.2);
+    animation: apparitionPersonnelModal 0.2s ease;
+}
+
+@keyframes apparitionPersonnelModal {
+    from {
+        opacity: 0;
+        transform: translateY(12px) scale(0.98);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
+.personnel-modal-header {
+    padding: 22px 24px;
+    border-bottom: 1px solid #edf0f4;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+}
+
+.personnel-modal-header h2 {
+    margin: 0 0 5px;
+    color: #172033;
+    font-size: 20px;
+}
+
+.personnel-modal-header p {
+    margin: 0;
+    color: #8a92a3;
+    font-size: 12px;
+}
+
+.personnel-modal-close {
+    width: 34px;
+    height: 34px;
+    border: none;
+    border-radius: 8px;
+    background: #f4f6f8;
+    color: #667085;
+    font-size: 22px;
+    cursor: pointer;
+    line-height: 1;
+}
+
+.personnel-modal-close:hover {
+    background: #e9edf2;
+}
+
+/* =========================
+   FORMULAIRE
+========================= */
+
+.personnel-modal form {
+    padding: 22px 24px 24px;
+}
+
+.personnel-form-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 17px;
+}
+
+.personnel-form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 7px;
+}
+
+.personnel-form-group.full-width {
+    grid-column: 1 / -1;
+}
+
+.personnel-form-group label {
+    color: #344054;
+    font-size: 12px;
+    font-weight: 600;
+}
+
+.personnel-form-group input,
+.personnel-form-group select,
+.personnel-form-group textarea {
+    width: 100%;
+    box-sizing: border-box;
+    border: 1px solid #dfe4ec;
+    border-radius: 8px;
+    padding: 0 12px;
+    outline: none;
+    background: white;
+    color: #172033;
+    font-size: 13px;
+    transition: 0.15s ease;
+    font-family: inherit;
+}
+
+.personnel-form-group input,
+.personnel-form-group select {
+    height: 42px;
+}
+
+.personnel-form-group textarea {
+    padding-top: 11px;
+    padding-bottom: 11px;
+    resize: vertical;
+    min-height: 90px;
+}
+
+.personnel-form-group input:focus,
+.personnel-form-group select:focus,
+.personnel-form-group textarea:focus {
+    border-color: #6d82a3;
+    box-shadow: 0 0 0 3px rgba(76, 102, 138, 0.1);
+}
+
+.personnel-form-group input::placeholder,
+.personnel-form-group textarea::placeholder {
+    color: #a0a7b5;
+}
+
+/* =========================
+   SALAIRE
+========================= */
+
+.salaire-input {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.salaire-input input {
+    padding-right: 65px;
+}
+
+.salaire-input span {
+    position: absolute;
+    right: 12px;
+    color: #8a92a3;
+    font-size: 11px;
+    font-weight: 600;
+    pointer-events: none;
+}
+
+/* =========================
+   BOUTONS MODAL
+========================= */
+
+.personnel-modal-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+    margin-top: 25px;
+    padding-top: 18px;
+    border-top: 1px solid #edf0f4;
+}
+
+.btn-personnel-annuler,
+.btn-personnel-enregistrer {
+    min-height: 41px;
+    padding: 0 17px;
+    border-radius: 8px;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: 0.2s ease;
+}
+
+.btn-personnel-annuler {
+    border: 1px solid #dfe4ec;
+    background: white;
+    color: #667085;
+}
+
+.btn-personnel-annuler:hover {
+    background: #f8f9fb;
+}
+
+.btn-personnel-enregistrer {
+    border: none;
+    background: #172b4d;
+    color: white;
+}
+
+.btn-personnel-enregistrer:hover {
+    background: #0f1f38;
+}
+
+.btn-personnel-enregistrer:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+/* =========================
+   RESPONSIVE
+========================= */
+
+@media (max-width: 1100px) {
+    .stats-personnel {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (max-width: 750px) {
+    .personnel-page {
+        padding: 18px;
+    }
+
+    .personnel-header {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .btn-ajouter-employe {
+        width: 100%;
+    }
+
+    .stats-personnel {
+        grid-template-columns: 1fr;
+    }
+
+    .personnel-filtres {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .personnel-filtres select {
+        width: 100%;
+    }
+
+    .personnel-form-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .personnel-form-group.full-width {
+        grid-column: auto;
+    }
+
+    .personnel-modal-overlay {
+        padding: 10px;
+    }
+
+    .personnel-modal-header,
+    .personnel-modal form {
+        padding-left: 18px;
+        padding-right: 18px;
+    }
+
+    .personnel-modal-actions {
+        flex-direction: column-reverse;
+    }
+
+    .btn-personnel-annuler,
+    .btn-personnel-enregistrer {
+        width: 100%;
+    }
+}

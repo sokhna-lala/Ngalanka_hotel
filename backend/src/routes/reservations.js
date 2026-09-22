@@ -31,6 +31,9 @@ router.get("/", async (req, res) => {
                 r.observation,
 
                 rc.id_chambre,
+                rc.tarif_nuit,
+                rc.nombre_nuits,
+                rc.montant AS montant_chambre,
 
                 ch.numero AS numero_chambre,
                 tc.libelle AS type_chambre

@@ -12,7 +12,12 @@ const sejoursRoutes = require("./routes/sejours");
 const comptabiliteRoutes = require("./routes/comptabilite");
 const paiementsRoutes = require("./routes/paiements");
 const caissesRoutes = require("./routes/caisses");
-
+const utilisateursRoutes = require("./routes/utilisateurs");
+const employesRoutes = require("./routes/employes");
+const servicesRoutes = require("./routes/services");
+const fonctionsRoutes = require("./routes/fonctions");
+const parametresRoutes = require("./routes/parametres");
+const auditRoutes = require("./routes/audit");
 
 const app = express();
 
@@ -49,8 +54,12 @@ app.use("/api/sejours", sejoursRoutes);
 app.use("/api/comptabilite", comptabiliteRoutes);
 app.use("/api/paiements", paiementsRoutes);
 app.use("/api/caisses", caissesRoutes);
-
-
+app.use("/api/utilisateurs", utilisateursRoutes);
+app.use("/api/employes", employesRoutes);
+app.use("/api/services", servicesRoutes);
+app.use("/api/fonctions", fonctionsRoutes);
+app.use("/api/parametres", parametresRoutes);
+app.use("/api/audit", auditRoutes);
 // ==========================================
 // DÉMARRAGE DU SERVEUR
 // ==========================================

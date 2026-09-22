@@ -3,7 +3,8 @@ import { Routes, Route, Navigate } from "react-router-dom";
 import Login from "./pages/Login";
 import Dashboard from "./pages/Dashboard";
 import Layout from "./components/Layouts";
-import HotelHeader from "./components/HotelHeader";
+import ServicesFonctions from "./pages/ServicesFonctions";
+
 
 import { useAuth } from "./context/AuthContext";
 
@@ -15,6 +16,10 @@ import Factures from "./pages/Factures";
 import Paiements from "./pages/Paiements";
 import Caisse from "./pages/Caisse";
 import Comptabilite from "./pages/Comptabilite";
+import Utilisateurs from "./pages/Utilisateurs";
+import Personnel from "./pages/Personnel";
+import Parametres from "./pages/Parametres";
+import JournalAudit from "./pages/JournalAudit";
 
 function ProtectedRoute({ children }) {
 const { estConnecte } = useAuth();
@@ -47,7 +52,7 @@ function App() {
                 element={
                     <ProtectedRoute>
                         <>
-                            <HotelHeader />
+
 
                             <Layout />
                         </>
@@ -168,20 +173,27 @@ function App() {
                 {/* ==========================
                     ADMINISTRATION
                 ========================== */}
-
                 <Route
                     path="/personnel"
-                    element={<h1>Personnel</h1>}
+                    element={<Personnel />}
+                />
+                <Route
+                    path="/services-fonctions"
+                    element={<ServicesFonctions />}
                 />
 
-                <Route
+               <Route
                     path="/utilisateurs"
-                    element={<h1>Utilisateurs</h1>}
+                    element={<Utilisateurs />}
                 />
 
-                <Route
+                 <Route
                     path="/parametres"
-                    element={<h1>Paramètres</h1>}
+                    element={<Parametres />}
+                />
+                <Route
+                    path="/journal-audit"
+                    element={<JournalAudit />}
                 />
 
             </Route>

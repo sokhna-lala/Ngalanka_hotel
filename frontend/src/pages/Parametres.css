@@ -1,0 +1,424 @@
+/* =========================================================
+   NGALANKA HÔTEL — PARAMÈTRES
+   ========================================================= */
+
+.parametres-page {
+    width: 100%;
+    min-height: 100vh;
+    padding: 28px;
+    box-sizing: border-box;
+    background: #f4f7fb;
+}
+
+/* ================= HEADER ================= */
+
+.parametres-header {
+    margin-bottom: 24px;
+}
+
+.parametres-header h1 {
+    margin: 0 0 6px;
+    color: #173d5f;
+    font-size: 28px;
+    font-weight: 700;
+}
+
+.parametres-header p {
+    margin: 0;
+    color: #718096;
+    font-size: 14px;
+}
+
+/* ================= MESSAGES ================= */
+
+.param-message {
+    margin-bottom: 20px;
+    padding: 13px 16px;
+    border-radius: 10px;
+    font-size: 14px;
+    font-weight: 600;
+}
+
+.param-message.succes {
+    color: #17663c;
+    background: #eaf8f0;
+    border: 1px solid #bce8cf;
+}
+
+.param-message.erreur {
+    color: #a32929;
+    background: #fff0f0;
+    border: 1px solid #f0c1c1;
+}
+
+/* ================= GRILLE ================= */
+
+.parametres-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 18px;
+}
+
+/* ================= CARTE PARAMÈTRE ================= */
+
+.parametre-card {
+    position: relative;
+    display: flex;
+    align-items: flex-start;
+    gap: 15px;
+    min-height: 125px;
+    padding: 20px;
+    box-sizing: border-box;
+    background: #ffffff;
+    border: 1px solid #e2e9f0;
+    border-radius: 14px;
+    box-shadow: 0 5px 18px rgba(30, 55, 80, 0.07);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.parametre-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 9px 25px rgba(30, 55, 80, 0.10);
+}
+
+/* ================= ICÔNE ================= */
+
+.parametre-icon {
+    width: 52px;
+    height: 52px;
+    flex: 0 0 52px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 12px;
+    background: #edf4fa;
+    font-size: 23px;
+}
+
+/* ================= CONTENU ================= */
+
+.parametre-contenu {
+    min-width: 0;
+    flex: 1;
+    padding-right: 38px;
+}
+
+.parametre-titre {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    margin-bottom: 8px;
+}
+
+.parametre-titre h3 {
+    margin: 0;
+    color: #263746;
+    font-size: 15px;
+    font-weight: 700;
+}
+
+.parametre-titre span {
+    flex-shrink: 0;
+    padding: 4px 7px;
+    border-radius: 6px;
+    background: #f1f4f7;
+    color: #7b8794;
+    font-size: 9px;
+    font-weight: 700;
+}
+
+.parametre-valeur {
+    overflow: hidden;
+    margin-bottom: 6px;
+    color: #1f587f;
+    font-size: 15px;
+    font-weight: 700;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.parametre-contenu p {
+    margin: 0;
+    color: #8995a1;
+    font-size: 12px;
+    line-height: 1.4;
+}
+
+/* ================= BOUTON MODIFIER ================= */
+
+.parametre-modifier {
+    position: absolute;
+    top: 18px;
+    right: 18px;
+    width: 34px;
+    height: 34px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+    border: 1px solid #dfe6ec;
+    border-radius: 8px;
+    background: #ffffff;
+    cursor: pointer;
+    font-size: 14px;
+    transition: all 0.18s ease;
+}
+
+.parametre-modifier:hover {
+    background: #edf4fa;
+    border-color: #bfd0de;
+    transform: translateY(-1px);
+}
+
+/* ================= CHARGEMENT ================= */
+
+.param-chargement {
+    min-height: 180px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #ffffff;
+    border: 1px solid #e2e9f0;
+    border-radius: 14px;
+    color: #7b8794;
+    font-size: 14px;
+    box-shadow: 0 5px 18px rgba(30, 55, 80, 0.06);
+}
+
+/* ================= MODAL ================= */
+
+.param-modal-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 9999;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    box-sizing: border-box;
+    background: rgba(15, 35, 52, 0.58);
+    backdrop-filter: blur(3px);
+}
+
+.param-modal {
+    width: min(500px, 100%);
+    background: #ffffff;
+    border-radius: 16px;
+    box-shadow: 0 25px 70px rgba(0, 0, 0, 0.25);
+    overflow: hidden;
+}
+
+/* ================= HEADER MODAL ================= */
+
+.param-modal-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 15px;
+    padding: 21px 23px;
+    border-bottom: 1px solid #e8edf2;
+}
+
+.param-modal-header h2 {
+    margin: 0 0 5px;
+    color: #173d5f;
+    font-size: 20px;
+    font-weight: 700;
+}
+
+.param-modal-header p {
+    margin: 0;
+    color: #7b8794;
+    font-size: 13px;
+}
+
+.param-modal-close {
+    width: 34px;
+    height: 34px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: none;
+    border-radius: 8px;
+    background: #f1f4f7;
+    color: #52606d;
+    font-size: 22px;
+    cursor: pointer;
+    transition: 0.2s ease;
+}
+
+.param-modal-close:hover {
+    background: #e5eaef;
+}
+
+/* ================= FORMULAIRE MODAL ================= */
+
+.param-modal form {
+    padding: 23px;
+}
+
+.param-form-group {
+    margin-bottom: 18px;
+}
+
+.param-form-group label {
+    display: block;
+    margin-bottom: 7px;
+    color: #344454;
+    font-size: 13px;
+    font-weight: 700;
+}
+
+.param-form-group input {
+    width: 100%;
+    height: 44px;
+    box-sizing: border-box;
+    padding: 0 12px;
+    border: 1px solid #d6dfe7;
+    border-radius: 9px;
+    outline: none;
+    background: #ffffff;
+    color: #263746;
+    font-family: inherit;
+    font-size: 14px;
+    transition: 0.2s ease;
+}
+
+.param-form-group input:focus {
+    border-color: #1f587f;
+    box-shadow: 0 0 0 3px rgba(31, 88, 127, 0.10);
+}
+
+/* ================= INFO CLÉ ================= */
+
+.param-info {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 22px;
+    padding: 11px 13px;
+    border-radius: 8px;
+    background: #f6f8fa;
+    color: #7b8794;
+    font-size: 12px;
+}
+
+.param-info strong {
+    color: #52606d;
+}
+
+.param-info span {
+    color: #1f587f;
+    font-family: monospace;
+    font-weight: 600;
+}
+
+/* ================= ACTIONS MODAL ================= */
+
+.param-modal-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+    padding-top: 6px;
+}
+
+.param-btn-annuler,
+.param-btn-enregistrer {
+    min-height: 42px;
+    padding: 0 17px;
+    border-radius: 9px;
+    font-size: 13px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: 0.2s ease;
+}
+
+.param-btn-annuler {
+    border: 1px solid #d6dee6;
+    background: #ffffff;
+    color: #52606d;
+}
+
+.param-btn-annuler:hover {
+    background: #f5f7f9;
+}
+
+.param-btn-enregistrer {
+    border: none;
+    background: #1f587f;
+    color: #ffffff;
+}
+
+.param-btn-enregistrer:hover {
+    background: #174665;
+}
+
+/* ================= RESPONSIVE ================= */
+
+@media (max-width: 1000px) {
+    .parametres-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 650px) {
+    .parametres-page {
+        padding: 18px;
+    }
+
+    .parametres-header h1 {
+        font-size: 24px;
+    }
+
+    .parametre-card {
+        padding: 16px;
+    }
+
+    .parametre-titre {
+        align-items: flex-start;
+        flex-direction: column;
+    }
+
+    .parametre-titre span {
+        align-self: flex-start;
+    }
+}
+
+@media (max-width: 450px) {
+    .parametres-page {
+        padding: 12px;
+    }
+
+    .parametre-icon {
+        width: 44px;
+        height: 44px;
+        flex-basis: 44px;
+        font-size: 20px;
+    }
+
+    .parametre-contenu {
+        padding-right: 30px;
+    }
+
+    .parametre-valeur {
+        font-size: 14px;
+    }
+
+    .param-modal-overlay {
+        padding: 10px;
+    }
+
+    .param-modal form {
+        padding: 18px;
+    }
+
+    .param-modal-actions {
+        flex-direction: column-reverse;
+    }
+
+    .param-btn-annuler,
+    .param-btn-enregistrer {
+        width: 100%;
+    }
+}

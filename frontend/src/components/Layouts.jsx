@@ -2,6 +2,9 @@ import { Outlet, NavLink, useNavigate } from "react-router-dom";
 import { useState } from "react";
 import { useAuth } from "../context/AuthContext";
 import "./Layouts.css";
+import HotelHeader from "./HotelHeader";
+
+
 function Layouts() {
 const { utilisateur, deconnecter } = useAuth();
 const navigate = useNavigate();
@@ -268,6 +271,8 @@ return ( <div className="app-layout">
               👨‍💼 Personnel
             </NavLink>
 
+            <NavLink to="/services-fonctions">Services & Fonctions</NavLink>
+
             <NavLink to="/utilisateurs">
               👤 Utilisateurs
             </NavLink>
@@ -310,9 +315,8 @@ return ( <div className="app-layout">
 
   <main className="main-content">
 
-    {/* TOPBAR */}
-
-    <header className="topbar">
+    {/* HEADER NGALANKA HOTEL */}
+     <header className="topbar">
 
       <div>
         <h3>NGALANKA HOTEL</h3>
@@ -333,14 +337,15 @@ return ( <div className="app-layout">
 
     </header>
 
+    <HotelHeader />
 
     {/* CONTENU DES PAGES */}
 
     <section className="page-content">
-      <Outlet />
+        <Outlet />
     </section>
 
-  </main>
+</main>
 
 </div>
 

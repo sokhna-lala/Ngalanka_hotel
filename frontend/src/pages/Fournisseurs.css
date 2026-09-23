@@ -1,0 +1,434 @@
+
+/* ==========================================
+   PAGE FOURNISSEURS
+========================================== */
+
+.fournisseurs-page {
+    padding: 30px;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+
+/* ==========================================
+   EN-TÊTE
+========================================== */
+
+.page-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 25px;
+}
+
+.page-header h1 {
+    margin: 0;
+    font-size: 28px;
+    color: #1f2937;
+}
+
+.page-header p {
+    margin-top: 6px;
+    color: #6b7280;
+    font-size: 14px;
+}
+
+
+/* ==========================================
+   BOUTON PRINCIPAL
+========================================== */
+
+.btn-primary {
+    border: none;
+    padding: 11px 18px;
+    border-radius: 7px;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 600;
+    background-color: #2563eb;
+    color: white;
+    transition: 0.2s;
+}
+
+.btn-primary:hover {
+    background-color: #1d4ed8;
+}
+
+
+/* ==========================================
+   STATISTIQUES
+========================================== */
+
+.fournisseurs-stats {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 20px;
+    margin-bottom: 25px;
+}
+
+.stat-card {
+    background: white;
+    border: 1px solid #e5e7eb;
+    border-radius: 10px;
+    padding: 20px;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+}
+
+.stat-card span {
+    display: block;
+    color: #6b7280;
+    font-size: 14px;
+    margin-bottom: 8px;
+}
+
+.stat-card strong {
+    font-size: 26px;
+    color: #111827;
+}
+
+
+/* ==========================================
+   RECHERCHE
+========================================== */
+
+.search-container {
+    background: white;
+    padding: 15px;
+    border: 1px solid #e5e7eb;
+    border-radius: 10px;
+    margin-bottom: 20px;
+}
+
+.search-container input {
+    width: 100%;
+    box-sizing: border-box;
+    padding: 12px 14px;
+    border: 1px solid #d1d5db;
+    border-radius: 7px;
+    font-size: 14px;
+    outline: none;
+}
+
+.search-container input:focus {
+    border-color: #2563eb;
+    box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.1);
+}
+
+
+/* ==========================================
+   FORMULAIRE
+========================================== */
+
+.fournisseur-form {
+    background: white;
+    border: 1px solid #e5e7eb;
+    border-radius: 10px;
+    padding: 25px;
+    margin-bottom: 25px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+}
+
+.form-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 25px;
+    padding-bottom: 15px;
+    border-bottom: 1px solid #e5e7eb;
+}
+
+.form-header h2 {
+    margin: 0;
+    font-size: 21px;
+    color: #1f2937;
+}
+
+.form-header button {
+    border: none;
+    background: transparent;
+    font-size: 22px;
+    cursor: pointer;
+    color: #6b7280;
+}
+
+.form-header button:hover {
+    color: #111827;
+}
+
+
+/* ==========================================
+   GRILLE DU FORMULAIRE
+========================================== */
+
+.form-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 20px;
+}
+
+.form-grid > div {
+    display: flex;
+    flex-direction: column;
+}
+
+.form-grid label {
+    margin-bottom: 7px;
+    font-size: 14px;
+    font-weight: 600;
+    color: #374151;
+}
+
+.form-grid input,
+.form-grid select,
+.form-grid textarea {
+    width: 100%;
+    box-sizing: border-box;
+    padding: 11px 12px;
+    border: 1px solid #d1d5db;
+    border-radius: 7px;
+    font-size: 14px;
+    font-family: inherit;
+    outline: none;
+    background-color: white;
+}
+
+.form-grid input:focus,
+.form-grid select:focus,
+.form-grid textarea:focus {
+    border-color: #2563eb;
+    box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.1);
+}
+
+.form-grid textarea {
+    resize: vertical;
+}
+
+.full-width {
+    grid-column: 1 / -1;
+}
+
+
+/* ==========================================
+   ACTIONS FORMULAIRE
+========================================== */
+
+.form-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 12px;
+    margin-top: 25px;
+    padding-top: 20px;
+    border-top: 1px solid #e5e7eb;
+}
+
+.form-actions button {
+    padding: 11px 18px;
+    border-radius: 7px;
+    border: 1px solid #d1d5db;
+    background: white;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 500;
+}
+
+.form-actions button:hover {
+    background-color: #f3f4f6;
+}
+
+.form-actions .btn-primary {
+    border: none;
+    background-color: #2563eb;
+    color: white;
+}
+
+.form-actions .btn-primary:hover {
+    background-color: #1d4ed8;
+}
+
+
+/* ==========================================
+   TABLEAU
+========================================== */
+
+.table-container {
+    width: 100%;
+    overflow-x: auto;
+    background: white;
+    border: 1px solid #e5e7eb;
+    border-radius: 10px;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+}
+
+.table-container table {
+    width: 100%;
+    border-collapse: collapse;
+    min-width: 950px;
+}
+
+.table-container thead {
+    background-color: #f9fafb;
+}
+
+.table-container th {
+    padding: 14px 12px;
+    text-align: left;
+    font-size: 13px;
+    font-weight: 600;
+    color: #374151;
+    border-bottom: 1px solid #e5e7eb;
+    white-space: nowrap;
+}
+
+.table-container td {
+    padding: 14px 12px;
+    font-size: 14px;
+    color: #4b5563;
+    border-bottom: 1px solid #f0f0f0;
+    vertical-align: middle;
+}
+
+.table-container tbody tr:hover {
+    background-color: #f9fafb;
+}
+
+.table-container td strong {
+    color: #1f2937;
+}
+
+.table-container td small {
+    color: #9ca3af;
+    font-size: 12px;
+}
+
+
+/* ==========================================
+   BADGES STATUT
+========================================== */
+
+.badge-actif,
+.badge-inactif {
+    display: inline-block;
+    padding: 5px 10px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 600;
+}
+
+.badge-actif {
+    background-color: #dcfce7;
+    color: #166534;
+}
+
+.badge-inactif {
+    background-color: #fee2e2;
+    color: #991b1b;
+}
+
+
+/* ==========================================
+   ACTIONS DU TABLEAU
+========================================== */
+
+.actions-cell {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    white-space: nowrap;
+}
+
+.actions-cell button {
+    border: none;
+    background: transparent;
+    cursor: pointer;
+    font-size: 17px;
+    padding: 5px;
+    border-radius: 5px;
+}
+
+.actions-cell button:hover {
+    background-color: #f3f4f6;
+}
+
+
+/* ==========================================
+   MESSAGE AUCUN RÉSULTAT
+========================================== */
+
+.empty {
+    text-align: center;
+    padding: 35px !important;
+    color: #9ca3af !important;
+}
+
+
+/* ==========================================
+   ERREUR
+========================================== */
+
+.error-message {
+    background-color: #fee2e2;
+    color: #991b1b;
+    border: 1px solid #fecaca;
+    padding: 12px 15px;
+    border-radius: 7px;
+    margin-bottom: 20px;
+}
+
+
+/* ==========================================
+   RESPONSIVE TABLETTE
+========================================== */
+
+@media (max-width: 900px) {
+
+    .fournisseurs-page {
+        padding: 20px;
+    }
+
+    .fournisseurs-stats {
+        grid-template-columns: 1fr;
+    }
+
+    .form-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .full-width {
+        grid-column: auto;
+    }
+}
+
+
+/* ==========================================
+   RESPONSIVE MOBILE
+========================================== */
+
+@media (max-width: 600px) {
+
+    .fournisseurs-page {
+        padding: 15px;
+    }
+
+    .page-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 15px;
+    }
+
+    .page-header .btn-primary {
+        width: 100%;
+    }
+
+    .fournisseur-form {
+        padding: 18px;
+    }
+
+    .form-actions {
+        flex-direction: column;
+    }
+
+    .form-actions button {
+        width: 100%;
+    }
+}
+

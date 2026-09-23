@@ -1,10 +1,10 @@
+```jsx
 import { Routes, Route, Navigate } from "react-router-dom";
 
 import Login from "./pages/Login";
 import Dashboard from "./pages/Dashboard";
 import Layout from "./components/Layouts";
 import ServicesFonctions from "./pages/ServicesFonctions";
-
 
 import { useAuth } from "./context/AuthContext";
 
@@ -16,20 +16,29 @@ import Factures from "./pages/Factures";
 import Paiements from "./pages/Paiements";
 import Caisse from "./pages/Caisse";
 import Comptabilite from "./pages/Comptabilite";
+
+// Administration
 import Utilisateurs from "./pages/Utilisateurs";
 import Personnel from "./pages/Personnel";
 import Parametres from "./pages/Parametres";
 import JournalAudit from "./pages/JournalAudit";
 
+// Stocks / Achats
+import Produits from "./pages/Produits.jsx";
+import Fournisseurs from "./pages/Fournisseurs";
+import Achats from "./pages/Achats";
+import Stocks from "./pages/Stocks";
+
 function ProtectedRoute({ children }) {
-const { estConnecte } = useAuth();
+    const { estConnecte } = useAuth();
 
-if (!estConnecte) {
-return <Navigate to="/" replace />;
+    if (!estConnecte) {
+        return <Navigate to="/" replace />;
+    }
+
+    return children;
 }
 
-return children;
-}
 function App() {
     return (
         <Routes>
@@ -43,7 +52,6 @@ function App() {
                 element={<Login />}
             />
 
-
             {/* ==========================
                 APPLICATION PROTÉGÉE
             ========================== */}
@@ -51,11 +59,7 @@ function App() {
             <Route
                 element={
                     <ProtectedRoute>
-                        <>
-
-
-                            <Layout />
-                        </>
+                        <Layout />
                     </ProtectedRoute>
                 }
             >
@@ -68,7 +72,6 @@ function App() {
                     path="/dashboard"
                     element={<Dashboard />}
                 />
-
 
                 {/* ==========================
                     HÉBERGEMENT
@@ -94,7 +97,6 @@ function App() {
                     element={<Sejours />}
                 />
 
-
                 {/* ==========================
                     FINANCES
                 ========================== */}
@@ -119,7 +121,6 @@ function App() {
                     element={<Caisse />}
                 />
 
-
                 {/* ==========================
                     RESTAURANT & BAR
                 ========================== */}
@@ -128,7 +129,6 @@ function App() {
                     path="/restaurant"
                     element={<h1>Restaurant / Bar</h1>}
                 />
-
 
                 {/* ==========================
                     LOISIRS & ÉVÉNEMENTS
@@ -144,60 +144,60 @@ function App() {
                     element={<h1>Salles de séminaire</h1>}
                 />
 
-
                 {/* ==========================
                     GESTION DES STOCKS
                 ========================== */}
 
                 <Route
                     path="/produits"
-                    element={<h1>Produits</h1>}
+                    element={<Produits />}
                 />
 
                 <Route
                     path="/stocks"
-                    element={<h1>Stock</h1>}
+                    element={<Stocks />}
                 />
 
                 <Route
                     path="/fournisseurs"
-                    element={<h1>Fournisseurs</h1>}
+                    element={<Fournisseurs />}
                 />
 
                 <Route
                     path="/achats"
-                    element={<h1>Achats</h1>}
+                    element={<Achats />}
                 />
-
 
                 {/* ==========================
                     ADMINISTRATION
                 ========================== */}
+
                 <Route
                     path="/personnel"
                     element={<Personnel />}
                 />
+
                 <Route
                     path="/services-fonctions"
                     element={<ServicesFonctions />}
                 />
 
-               <Route
+                <Route
                     path="/utilisateurs"
                     element={<Utilisateurs />}
                 />
 
-                 <Route
+                <Route
                     path="/parametres"
                     element={<Parametres />}
                 />
+
                 <Route
                     path="/journal-audit"
                     element={<JournalAudit />}
                 />
 
             </Route>
-
 
             {/* ==========================
                 ROUTE INCONNUE
@@ -213,3 +213,4 @@ function App() {
 }
 
 export default App;
+```

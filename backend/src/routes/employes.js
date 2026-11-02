@@ -119,6 +119,7 @@ router.post("/", async (req, res) => {
             observation
         } = req.body;
 
+
         // -----------------------------
         // Validation
         // -----------------------------
@@ -128,6 +129,7 @@ router.post("/", async (req, res) => {
                 message: "Le matricule et le nom sont obligatoires"
             });
         }
+
 
         // -----------------------------
         // Vérification matricule
@@ -148,6 +150,7 @@ router.post("/", async (req, res) => {
                 message: "Ce matricule existe déjà"
             });
         }
+
 
         // -----------------------------
         // Insertion
@@ -191,6 +194,7 @@ router.post("/", async (req, res) => {
             ]
         );
 
+
         // -----------------------------
         // AUDIT — Création
         // -----------------------------
@@ -200,7 +204,8 @@ router.post("/", async (req, res) => {
             action: "CREATION",
             table_cible: "employes",
             id_cible: result.insertId,
-            description: `Création de l'employé "${prenom ? prenom + " " : ""}${nom}"`,
+            description:
+                `Création de l'employé "${prenom ? prenom + " " : ""}${nom}"`,
             nouvelle_valeur: {
                 matricule,
                 nom,
@@ -220,6 +225,7 @@ router.post("/", async (req, res) => {
             adresse_ip: req.ip,
             user_agent: req.get("user-agent")
         });
+
 
         res.status(201).json({
             message: "Employé créé avec succès",
@@ -261,11 +267,17 @@ router.put("/:id", async (req, res) => {
             observation
         } = req.body;
 
+
+        // -----------------------------
+        // Validation
+        // -----------------------------
+
         if (!matricule || !nom) {
             return res.status(400).json({
                 message: "Le matricule et le nom sont obligatoires"
             });
         }
+
 
         // -----------------------------
         // Vérification employé
@@ -304,6 +316,7 @@ router.put("/:id", async (req, res) => {
 
         const ancienneValeur = employes[0];
 
+
         // -----------------------------
         // Vérification matricule
         // -----------------------------
@@ -325,9 +338,12 @@ router.put("/:id", async (req, res) => {
             });
         }
 
+
         // -----------------------------
-        // Modification
+        // Modification employé
         // -----------------------------
+
+        const nouveauStatut = statut || "ACTIF";
 
         await pool.execute(
             `
@@ -362,11 +378,72 @@ router.put("/:id", async (req, res) => {
                 service || null,
                 date_embauche || null,
                 Number(salaire) || 0,
-                statut || "ACTIF",
+                nouveauStatut,
                 observation || null,
                 id
             ]
         );
+
+
+        // -----------------------------
+        // Synchroniser le compte utilisateur
+        // -----------------------------
+
+        const nomComplet = [prenom, nom]
+            .filter(Boolean)
+            .join(" ")
+            .trim();
+
+
+        let statutUtilisateur = null;
+
+        if (nouveauStatut === "ACTIF") {
+            statutUtilisateur = "ACTIF";
+        } else if (nouveauStatut === "INACTIF") {
+            statutUtilisateur = "INACTIF";
+        } else if (nouveauStatut === "SUSPENDU") {
+            statutUtilisateur = "BLOQUE";
+        }
+
+
+        if (statutUtilisateur) {
+            await pool.execute(
+                `
+                UPDATE utilisateurs
+                SET
+                    nom_complet = ?,
+                    telephone = ?,
+                    email = ?,
+                    statut = ?
+                WHERE id_employe = ?
+                `,
+                [
+                    nomComplet || nom,
+                    telephone || null,
+                    email || null,
+                    statutUtilisateur,
+                    id
+                ]
+            );
+        } else {
+            await pool.execute(
+                `
+                UPDATE utilisateurs
+                SET
+                    nom_complet = ?,
+                    telephone = ?,
+                    email = ?
+                WHERE id_employe = ?
+                `,
+                [
+                    nomComplet || nom,
+                    telephone || null,
+                    email || null,
+                    id
+                ]
+            );
+        }
+
 
         // -----------------------------
         // AUDIT — Modification
@@ -377,7 +454,8 @@ router.put("/:id", async (req, res) => {
             action: "MODIFICATION",
             table_cible: "employes",
             id_cible: id,
-            description: `Modification de l'employé "${prenom ? prenom + " " : ""}${nom}"`,
+            description:
+                `Modification de l'employé "${prenom ? prenom + " " : ""}${nom}"`,
             ancienne_valeur: ancienneValeur,
             nouvelle_valeur: {
                 matricule,
@@ -392,35 +470,46 @@ router.put("/:id", async (req, res) => {
                 service: service || null,
                 date_embauche: date_embauche || null,
                 salaire: Number(salaire) || 0,
-                statut: statut || "ACTIF",
+                statut: nouveauStatut,
                 observation: observation || null
             },
             adresse_ip: req.ip,
             user_agent: req.get("user-agent")
         });
 
+
         res.json({
-            message: "Employé modifié avec succès"
+            message:
+                "Employé modifié et compte utilisateur synchronisé avec succès"
         });
 
     } catch (error) {
-        console.error("Erreur modification employé :", error);
+        console.error(
+            "Erreur modification employé et synchronisation utilisateur :",
+            error
+        );
 
         res.status(500).json({
-            message: "Erreur serveur lors de la modification"
+            message:
+                "Erreur serveur lors de la modification de l'employé"
         });
     }
 });
 
 
 // =====================================================
-// PUT — Modifier le statut
+// PUT — Modifier le statut d'un employé
 // =====================================================
 
 router.put("/:id/statut", async (req, res) => {
     try {
         const { id } = req.params;
         const { statut } = req.body;
+
+
+        // ---------------------------------------------
+        // Statuts autorisés
+        // ---------------------------------------------
 
         const statutsAutorises = [
             "ACTIF",
@@ -434,9 +523,10 @@ router.put("/:id/statut", async (req, res) => {
             });
         }
 
-        // -----------------------------
-        // Récupérer l'ancien employé
-        // -----------------------------
+
+        // ---------------------------------------------
+        // Vérifier que l'employé existe
+        // ---------------------------------------------
 
         const [employes] = await pool.execute(
             `
@@ -461,11 +551,10 @@ router.put("/:id/statut", async (req, res) => {
 
         const ancienStatut = employes[0].statut;
 
-        const nomEmploye = `${employes[0].prenom ? employes[0].prenom + " " : ""}${employes[0].nom}`;
 
-        // -----------------------------
-        // Modifier le statut
-        // -----------------------------
+        // ---------------------------------------------
+        // Modifier le statut de l'employé
+        // ---------------------------------------------
 
         await pool.execute(
             `
@@ -476,36 +565,101 @@ router.put("/:id/statut", async (req, res) => {
             [statut, id]
         );
 
-        // -----------------------------
-        // AUDIT — Changement statut
-        // -----------------------------
+
+        // ---------------------------------------------
+        // Synchroniser le compte utilisateur
+        //
+        // ACTIF     → ACTIF
+        // INACTIF   → INACTIF
+        // SUSPENDU  → BLOQUE
+        // ---------------------------------------------
+
+        let statutUtilisateur;
+
+        if (statut === "ACTIF") {
+            statutUtilisateur = "ACTIF";
+        } else if (statut === "INACTIF") {
+            statutUtilisateur = "INACTIF";
+        } else {
+            statutUtilisateur = "BLOQUE";
+        }
+
+
+        const [utilisateurs] = await pool.execute(
+            `
+            SELECT
+                id_utilisateur,
+                nom_utilisateur,
+                statut
+            FROM utilisateurs
+            WHERE id_employe = ?
+            LIMIT 1
+            `,
+            [id]
+        );
+
+
+        if (utilisateurs.length > 0) {
+            await pool.execute(
+                `
+                UPDATE utilisateurs
+                SET statut = ?
+                WHERE id_employe = ?
+                `,
+                [statutUtilisateur, id]
+            );
+        }
+
+
+        // ---------------------------------------------
+        // AUDIT — Changement de statut
+        // ---------------------------------------------
 
         await enregistrerAudit({
             id_utilisateur: req.body.id_utilisateur || null,
             action: "CHANGEMENT_STATUT",
             table_cible: "employes",
             id_cible: id,
-            description: `Changement du statut de l'employé "${nomEmploye}" : ${ancienStatut} → ${statut}`,
+            description:
+                `Changement du statut de l'employé "${employes[0].prenom ? employes[0].prenom + " " : ""}${employes[0].nom}"`,
             ancienne_valeur: {
-                statut: ancienStatut
+                statut: ancienStatut,
+                statut_utilisateur:
+                    utilisateurs.length > 0
+                        ? utilisateurs[0].statut
+                        : null
             },
             nouvelle_valeur: {
-                statut
+                statut_employe: statut,
+                statut_utilisateur:
+                    utilisateurs.length > 0
+                        ? statutUtilisateur
+                        : null
             },
             adresse_ip: req.ip,
             user_agent: req.get("user-agent")
         });
 
+
         res.json({
-            message: "Statut de l'employé modifié avec succès",
-            statut
+            message:
+                "Statut de l'employé et du compte utilisateur synchronisés avec succès",
+            statut_employe: statut,
+            statut_utilisateur:
+                utilisateurs.length > 0
+                    ? statutUtilisateur
+                    : null
         });
 
     } catch (error) {
-        console.error("Erreur changement statut :", error);
+        console.error(
+            "Erreur changement statut employé/utilisateur :",
+            error
+        );
 
         res.status(500).json({
-            message: "Erreur serveur"
+            message:
+                "Erreur serveur lors du changement de statut"
         });
     }
 });
@@ -519,9 +673,10 @@ router.delete("/:id", async (req, res) => {
     try {
         const { id } = req.params;
 
-        // -----------------------------
-        // Récupérer l'employé avant suppression
-        // -----------------------------
+
+        // ---------------------------------------------
+        // Vérifier que l'employé existe
+        // ---------------------------------------------
 
         const [employes] = await pool.execute(
             `
@@ -529,18 +684,7 @@ router.delete("/:id", async (req, res) => {
                 id_employe,
                 matricule,
                 nom,
-                prenom,
-                sexe,
-                date_naissance,
-                telephone,
-                email,
-                adresse,
-                fonction,
-                service,
-                date_embauche,
-                salaire,
-                statut,
-                observation
+                prenom
             FROM employes
             WHERE id_employe = ?
             LIMIT 1
@@ -554,11 +698,38 @@ router.delete("/:id", async (req, res) => {
             });
         }
 
-        const ancienneValeur = employes[0];
+        const employe = employes[0];
 
-        // -----------------------------
+
+        // ---------------------------------------------
+        // Vérifier si l'employé est lié à un utilisateur
+        // ---------------------------------------------
+
+        const [utilisateurs] = await pool.execute(
+            `
+            SELECT
+                id_utilisateur,
+                nom_utilisateur
+            FROM utilisateurs
+            WHERE id_employe = ?
+            LIMIT 1
+            `,
+            [id]
+        );
+
+
+        if (utilisateurs.length > 0) {
+            return res.status(409).json({
+                message:
+                    `Impossible de supprimer cet employé car il est lié au compte utilisateur "${utilisateurs[0].nom_utilisateur}". ` +
+                    `Dissociez d'abord le compte utilisateur avant de supprimer l'employé.`
+            });
+        }
+
+
+        // ---------------------------------------------
         // Suppression
-        // -----------------------------
+        // ---------------------------------------------
 
         await pool.execute(
             `
@@ -568,30 +739,35 @@ router.delete("/:id", async (req, res) => {
             [id]
         );
 
-        // -----------------------------
+
+        // ---------------------------------------------
         // AUDIT — Suppression
-        // -----------------------------
+        // ---------------------------------------------
 
         await enregistrerAudit({
             id_utilisateur: req.body?.id_utilisateur || null,
             action: "SUPPRESSION",
             table_cible: "employes",
             id_cible: id,
-            description: `Suppression de l'employé "${ancienneValeur.prenom ? ancienneValeur.prenom + " " : ""}${ancienneValeur.nom}"`,
-            ancienne_valeur: ancienneValeur,
+            description:
+                `Suppression de l'employé "${employe.prenom ? employe.prenom + " " : ""}${employe.nom}"`,
+            ancienne_valeur: employe,
             adresse_ip: req.ip,
             user_agent: req.get("user-agent")
         });
 
+
         res.json({
-            message: "Employé supprimé avec succès"
+            message:
+                `Employé ${employe.matricule} supprimé avec succès`
         });
 
     } catch (error) {
         console.error("Erreur suppression employé :", error);
 
         res.status(500).json({
-            message: "Erreur serveur lors de la suppression"
+            message:
+                "Impossible de supprimer cet employé"
         });
     }
 });

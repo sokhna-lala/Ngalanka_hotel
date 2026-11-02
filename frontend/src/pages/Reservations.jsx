@@ -788,6 +788,41 @@ function Reservations() {
 
 
     // ==========================================
+    // CONFIRMER RÉSERVATION
+    // ==========================================
+
+    const confirmerReservation = async (idReservation) => {
+
+        const confirmation = window.confirm(
+            "Voulez-vous confirmer cette réservation ?"
+        );
+
+        if (!confirmation) {
+            return;
+        }
+
+        try {
+            await axios.post(
+                `${API_URL}/reservations/${idReservation}/confirmer`
+            );
+
+            alert("Réservation confirmée avec succès.");
+
+            await chargerReservations();
+            await chargerChambres();
+
+        } catch (err) {
+            console.error("Erreur confirmation réservation :", err);
+
+            alert(
+                err.response?.data?.message ||
+                "Impossible de confirmer la réservation."
+            );
+        }
+    };
+
+
+    // ==========================================
     // MODIFIER RÉSERVATION
     // ==========================================
 
@@ -1876,6 +1911,19 @@ function Reservations() {
                                                                             item.statut !== "ANNULEE" && (
 
                                                                                 <>
+
+
+                                                                {item.statut === "EN_ATTENTE" && (
+                                                                    <button
+                                                                        type="button"
+                                                                        className="btn-confirm"
+                                                                        onClick={() =>
+                                                                            confirmerReservation(item.id_reservation)
+                                                                        }
+                                                                    >
+                                                                        ✓ Confirmer
+                                                                    </button>
+                                                                )}
 
                                                                                     <button
                                                                                         type="button"

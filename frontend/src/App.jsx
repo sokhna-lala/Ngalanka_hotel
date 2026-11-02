@@ -1,3 +1,7 @@
+<<<<<<< Updated upstream
+=======
+
+>>>>>>> Stashed changes
 import { Routes, Route, Navigate } from "react-router-dom";
 
 import Login from "./pages/Login";
@@ -16,10 +20,18 @@ import Factures from "./pages/Factures";
 import Paiements from "./pages/Paiements";
 import Caisse from "./pages/Caisse";
 import Comptabilite from "./pages/Comptabilite";
+<<<<<<< Updated upstream
+=======
+import Seminaires from "./pages/Seminaires";
+
+// Administration
+>>>>>>> Stashed changes
 import Utilisateurs from "./pages/Utilisateurs";
 import Personnel from "./pages/Personnel";
 import Parametres from "./pages/Parametres";
 import JournalAudit from "./pages/JournalAudit";
+import Prestations from "./pages/Prestations";
+import FicheClient from "./pages/FicheClient";
 
 function ProtectedRoute({ children }) {
 const { estConnecte } = useAuth();
@@ -68,8 +80,18 @@ function App() {
                     path="/dashboard"
                     element={<Dashboard />}
                 />
+                {/* ==========================
+                    Fiche client
+                ========================== */}
 
+<<<<<<< Updated upstream
 
+=======
+                    <Route
+                        path="/clients/:id"
+                        element={<FicheClient />}
+                    />
+>>>>>>> Stashed changes
                 {/* ==========================
                     HÉBERGEMENT
                 ========================== */}
@@ -134,14 +156,11 @@ function App() {
                     LOISIRS & ÉVÉNEMENTS
                 ========================== */}
 
-                <Route
-                    path="/prestations"
-                    element={<h1>Piscine & Loisirs</h1>}
-                />
+                <Route path="/prestations" element={<Prestations />} />
 
                 <Route
                     path="/seminaires"
-                    element={<h1>Salles de séminaire</h1>}
+                    element={<Seminaires />}
                 />
 
 
@@ -212,4 +231,9 @@ function App() {
     );
 }
 
+<<<<<<< Updated upstream
 export default App;
+=======
+export default App;
+
+>>>>>>> Stashed changes

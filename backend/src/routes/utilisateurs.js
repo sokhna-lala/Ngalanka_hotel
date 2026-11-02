@@ -14,6 +14,7 @@ router.get("/", async (req, res) => {
         const [utilisateurs] = await pool.execute(`
             SELECT
                 u.id_utilisateur,
+                u.id_employe,
                 u.nom_utilisateur,
                 u.nom_complet,
                 u.id_role,
@@ -24,10 +25,23 @@ router.get("/", async (req, res) => {
                 u.statut,
                 u.derniere_connexion,
                 u.date_creation,
-                u.date_modification
+                u.date_modification,
+
+                e.matricule,
+                e.nom AS nom_employe,
+                e.prenom AS prenom_employe,
+                e.fonction,
+                e.service,
+                e.statut AS statut_employe
+
             FROM utilisateurs u
+
             INNER JOIN roles r
                 ON r.id_role = u.id_role
+
+            LEFT JOIN employes e
+                ON e.id_employe = u.id_employe
+
             ORDER BY u.date_creation DESC
         `);
 
@@ -73,6 +87,75 @@ router.get("/roles", async (req, res) => {
 
 
 // =====================================================
+// GET — Personnel disponible pour un compte utilisateur
+// =====================================================
+// Retourne uniquement les employés ACTIFS qui n'ont pas
+// encore de compte utilisateur.
+//
+// Si id_utilisateur est fourni, l'employé actuellement
+// associé à ce compte est également retourné.
+// =====================================================
+
+router.get("/personnel", async (req, res) => {
+    try {
+        const { id_utilisateur } = req.query;
+
+        let query = `
+            SELECT
+                e.id_employe,
+                e.matricule,
+                e.nom,
+                e.prenom,
+                e.telephone,
+                e.email,
+                e.fonction,
+                e.service,
+                e.statut,
+                u.id_utilisateur
+            FROM employes e
+
+            LEFT JOIN utilisateurs u
+                ON u.id_employe = e.id_employe
+
+            WHERE e.statut = 'ACTIF'
+        `;
+
+        const params = [];
+
+        if (id_utilisateur) {
+            query += `
+                AND (
+                    u.id_utilisateur IS NULL
+                    OR u.id_utilisateur = ?
+                )
+            `;
+
+            params.push(id_utilisateur);
+        } else {
+            query += `
+                AND u.id_utilisateur IS NULL
+            `;
+        }
+
+        query += `
+            ORDER BY e.nom ASC, e.prenom ASC
+        `;
+
+        const [employes] = await pool.execute(query, params);
+
+        res.json(employes);
+
+    } catch (error) {
+        console.error("Erreur récupération personnel disponible :", error);
+
+        res.status(500).json({
+            message: "Erreur lors de la récupération du personnel disponible"
+        });
+    }
+});
+
+
+// =====================================================
 // GET — Utilisateur par ID
 // =====================================================
 
@@ -83,6 +166,7 @@ router.get("/:id", async (req, res) => {
         const [utilisateurs] = await pool.execute(`
             SELECT
                 u.id_utilisateur,
+                u.id_employe,
                 u.nom_utilisateur,
                 u.nom_complet,
                 u.id_role,
@@ -92,11 +176,25 @@ router.get("/:id", async (req, res) => {
                 u.statut,
                 u.derniere_connexion,
                 u.date_creation,
-                u.date_modification
+                u.date_modification,
+
+                e.matricule,
+                e.nom AS nom_employe,
+                e.prenom AS prenom_employe,
+                e.fonction,
+                e.service,
+                e.statut AS statut_employe
+
             FROM utilisateurs u
+
             INNER JOIN roles r
                 ON r.id_role = u.id_role
+
+            LEFT JOIN employes e
+                ON e.id_employe = u.id_employe
+
             WHERE u.id_utilisateur = ?
+
             LIMIT 1
         `, [id]);
 
@@ -125,12 +223,10 @@ router.get("/:id", async (req, res) => {
 router.post("/", async (req, res) => {
     try {
         const {
+            id_employe,
             nom_utilisateur,
             mot_de_passe,
-            nom_complet,
             id_role,
-            telephone,
-            email,
             statut
         } = req.body;
 
@@ -139,14 +235,14 @@ router.post("/", async (req, res) => {
         // -----------------------------
 
         if (
+            !id_employe ||
             !nom_utilisateur ||
             !mot_de_passe ||
-            !nom_complet ||
             !id_role
         ) {
             return res.status(400).json({
                 message:
-                    "Nom utilisateur, mot de passe, nom complet et rôle sont obligatoires"
+                    "Personnel, nom utilisateur, mot de passe et rôle sont obligatoires"
             });
         }
 
@@ -157,20 +253,74 @@ router.post("/", async (req, res) => {
             });
         }
 
+
+        // -----------------------------
+        // Vérifier l'employé
+        // -----------------------------
+
+        const [employes] = await pool.execute(`
+            SELECT
+                id_employe,
+                matricule,
+                nom,
+                prenom,
+                telephone,
+                email,
+                fonction,
+                service,
+                statut
+            FROM employes
+            WHERE id_employe = ?
+            LIMIT 1
+        `, [id_employe]);
+
+        if (employes.length === 0) {
+            return res.status(404).json({
+                message: "L'employé sélectionné est introuvable"
+            });
+        }
+
+        const employe = employes[0];
+
+        if (employe.statut !== "ACTIF") {
+            return res.status(400).json({
+                message:
+                    "Impossible de créer un compte pour un employé qui n'est pas actif"
+            });
+        }
+
+
+        // -----------------------------
+        // Vérifier si l'employé possède
+        // déjà un compte
+        // -----------------------------
+
+        const [compteEmploye] = await pool.execute(`
+            SELECT id_utilisateur
+            FROM utilisateurs
+            WHERE id_employe = ?
+            LIMIT 1
+        `, [id_employe]);
+
+        if (compteEmploye.length > 0) {
+            return res.status(409).json({
+                message:
+                    "Cet employé possède déjà un compte utilisateur"
+            });
+        }
+
+
         // -----------------------------
         // Vérifier le rôle
         // -----------------------------
 
-        const [roles] = await pool.execute(
-            `
+        const [roles] = await pool.execute(`
             SELECT id_role
             FROM roles
             WHERE id_role = ?
             AND statut = 'ACTIF'
             LIMIT 1
-            `,
-            [id_role]
-        );
+        `, [id_role]);
 
         if (roles.length === 0) {
             return res.status(400).json({
@@ -178,25 +328,33 @@ router.post("/", async (req, res) => {
             });
         }
 
+
         // -----------------------------
-        // Vérifier doublon
+        // Vérifier doublon nom utilisateur
         // -----------------------------
 
-        const [existants] = await pool.execute(
-            `
+        const [existants] = await pool.execute(`
             SELECT id_utilisateur
             FROM utilisateurs
             WHERE nom_utilisateur = ?
             LIMIT 1
-            `,
-            [nom_utilisateur]
-        );
+        `, [nom_utilisateur]);
 
         if (existants.length > 0) {
             return res.status(409).json({
                 message: "Ce nom d'utilisateur existe déjà"
             });
         }
+
+
+        // -----------------------------
+        // Générer le nom complet
+        // depuis le personnel
+        // -----------------------------
+
+        const nomComplet = `${employe.prenom || ""} ${employe.nom || ""}`
+            .trim();
+
 
         // -----------------------------
         // Hash du mot de passe
@@ -207,13 +365,14 @@ router.post("/", async (req, res) => {
             10
         );
 
+
         // -----------------------------
         // Création utilisateur
         // -----------------------------
 
-        const [result] = await pool.execute(
-            `
+        const [result] = await pool.execute(`
             INSERT INTO utilisateurs (
+                id_employe,
                 nom_utilisateur,
                 mot_de_passe,
                 nom_complet,
@@ -222,18 +381,18 @@ router.post("/", async (req, res) => {
                 email,
                 statut
             )
-            VALUES (?, ?, ?, ?, ?, ?, ?)
-            `,
-            [
-                nom_utilisateur,
-                motDePasseHash,
-                nom_complet,
-                id_role,
-                telephone || null,
-                email || null,
-                statut || "ACTIF"
-            ]
-        );
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+        `, [
+            id_employe,
+            nom_utilisateur,
+            motDePasseHash,
+            nomComplet,
+            id_role,
+            employe.telephone || null,
+            employe.email || null,
+            statut || "ACTIF"
+        ]);
+
 
         // -----------------------------
         // AUDIT — Création
@@ -244,18 +403,22 @@ router.post("/", async (req, res) => {
             action: "CREATION",
             table_cible: "utilisateurs",
             id_cible: result.insertId,
-            description: `Création de l'utilisateur "${nom_utilisateur}"`,
+            description:
+                `Création du compte "${nom_utilisateur}" pour ${nomComplet}`,
             nouvelle_valeur: {
+                id_employe,
+                matricule: employe.matricule,
+                nom_complet: nomComplet,
                 nom_utilisateur,
-                nom_complet,
                 id_role,
-                telephone: telephone || null,
-                email: email || null,
+                telephone: employe.telephone || null,
+                email: employe.email || null,
                 statut: statut || "ACTIF"
             },
             adresse_ip: req.ip,
             user_agent: req.get("user-agent")
         });
+
 
         res.status(201).json({
             message: "Utilisateur créé avec succès",
@@ -281,34 +444,34 @@ router.put("/:id", async (req, res) => {
         const { id } = req.params;
 
         const {
+            id_employe,
             nom_utilisateur,
-            nom_complet,
             id_role,
-            telephone,
-            email,
             statut,
             mot_de_passe
         } = req.body;
 
+
         if (
+            !id_employe ||
             !nom_utilisateur ||
-            !nom_complet ||
             !id_role
         ) {
             return res.status(400).json({
                 message:
-                    "Nom utilisateur, nom complet et rôle sont obligatoires"
+                    "Personnel, nom utilisateur et rôle sont obligatoires"
             });
         }
+
 
         // -----------------------------
         // Vérifier utilisateur
         // -----------------------------
 
-        const [utilisateurs] = await pool.execute(
-            `
+        const [utilisateurs] = await pool.execute(`
             SELECT
                 id_utilisateur,
+                id_employe,
                 nom_utilisateur,
                 nom_complet,
                 id_role,
@@ -318,9 +481,7 @@ router.put("/:id", async (req, res) => {
             FROM utilisateurs
             WHERE id_utilisateur = ?
             LIMIT 1
-            `,
-            [id]
-        );
+        `, [id]);
 
         if (utilisateurs.length === 0) {
             return res.status(404).json({
@@ -330,20 +491,18 @@ router.put("/:id", async (req, res) => {
 
         const ancienneValeur = utilisateurs[0];
 
+
         // -----------------------------
-        // Vérifier doublon de nom utilisateur
+        // Vérifier doublon nom utilisateur
         // -----------------------------
 
-        const [doublons] = await pool.execute(
-            `
+        const [doublons] = await pool.execute(`
             SELECT id_utilisateur
             FROM utilisateurs
             WHERE nom_utilisateur = ?
             AND id_utilisateur <> ?
             LIMIT 1
-            `,
-            [nom_utilisateur, id]
-        );
+        `, [nom_utilisateur, id]);
 
         if (doublons.length > 0) {
             return res.status(409).json({
@@ -351,20 +510,75 @@ router.put("/:id", async (req, res) => {
             });
         }
 
+
+        // -----------------------------
+        // Vérifier l'employé
+        // -----------------------------
+
+        const [employes] = await pool.execute(`
+            SELECT
+                id_employe,
+                matricule,
+                nom,
+                prenom,
+                telephone,
+                email,
+                fonction,
+                service,
+                statut
+            FROM employes
+            WHERE id_employe = ?
+            LIMIT 1
+        `, [id_employe]);
+
+        if (employes.length === 0) {
+            return res.status(404).json({
+                message: "L'employé sélectionné est introuvable"
+            });
+        }
+
+        const employe = employes[0];
+
+        if (employe.statut !== "ACTIF") {
+            return res.status(400).json({
+                message:
+                    "Impossible d'associer un compte à un employé qui n'est pas actif"
+            });
+        }
+
+
+        // -----------------------------
+        // Vérifier si l'employé est déjà
+        // associé à un autre utilisateur
+        // -----------------------------
+
+        const [compteEmploye] = await pool.execute(`
+            SELECT id_utilisateur
+            FROM utilisateurs
+            WHERE id_employe = ?
+            AND id_utilisateur <> ?
+            LIMIT 1
+        `, [id_employe, id]);
+
+        if (compteEmploye.length > 0) {
+            return res.status(409).json({
+                message:
+                    "Cet employé possède déjà un autre compte utilisateur"
+            });
+        }
+
+
         // -----------------------------
         // Vérifier rôle
         // -----------------------------
 
-        const [roles] = await pool.execute(
-            `
+        const [roles] = await pool.execute(`
             SELECT id_role
             FROM roles
             WHERE id_role = ?
             AND statut = 'ACTIF'
             LIMIT 1
-            `,
-            [id_role]
-        );
+        `, [id_role]);
 
         if (roles.length === 0) {
             return res.status(400).json({
@@ -372,8 +586,18 @@ router.put("/:id", async (req, res) => {
             });
         }
 
+
         // -----------------------------
-        // Si un nouveau mot de passe est fourni
+        // Nom complet depuis le personnel
+        // -----------------------------
+
+        const nomComplet = `${employe.prenom || ""} ${employe.nom || ""}`
+            .trim();
+
+
+        // -----------------------------
+        // Modification avec ou sans
+        // nouveau mot de passe
         // -----------------------------
 
         if (mot_de_passe && mot_de_passe.trim() !== "") {
@@ -390,10 +614,10 @@ router.put("/:id", async (req, res) => {
                 10
             );
 
-            await pool.execute(
-                `
+            await pool.execute(`
                 UPDATE utilisateurs
                 SET
+                    id_employe = ?,
                     nom_utilisateur = ?,
                     mot_de_passe = ?,
                     nom_complet = ?,
@@ -402,25 +626,24 @@ router.put("/:id", async (req, res) => {
                     email = ?,
                     statut = ?
                 WHERE id_utilisateur = ?
-                `,
-                [
-                    nom_utilisateur,
-                    motDePasseHash,
-                    nom_complet,
-                    id_role,
-                    telephone || null,
-                    email || null,
-                    statut || "ACTIF",
-                    id
-                ]
-            );
+            `, [
+                id_employe,
+                nom_utilisateur,
+                motDePasseHash,
+                nomComplet,
+                id_role,
+                employe.telephone || null,
+                employe.email || null,
+                statut || "ACTIF",
+                id
+            ]);
 
         } else {
 
-            await pool.execute(
-                `
+            await pool.execute(`
                 UPDATE utilisateurs
                 SET
+                    id_employe = ?,
                     nom_utilisateur = ?,
                     nom_complet = ?,
                     id_role = ?,
@@ -428,18 +651,18 @@ router.put("/:id", async (req, res) => {
                     email = ?,
                     statut = ?
                 WHERE id_utilisateur = ?
-                `,
-                [
-                    nom_utilisateur,
-                    nom_complet,
-                    id_role,
-                    telephone || null,
-                    email || null,
-                    statut || "ACTIF",
-                    id
-                ]
-            );
+            `, [
+                id_employe,
+                nom_utilisateur,
+                nomComplet,
+                id_role,
+                employe.telephone || null,
+                employe.email || null,
+                statut || "ACTIF",
+                id
+            ]);
         }
+
 
         // -----------------------------
         // AUDIT — Modification
@@ -450,20 +673,24 @@ router.put("/:id", async (req, res) => {
             action: "MODIFICATION",
             table_cible: "utilisateurs",
             id_cible: id,
-            description: `Modification de l'utilisateur "${nom_utilisateur}"`,
+            description:
+                `Modification du compte "${nom_utilisateur}"`,
             ancienne_valeur: ancienneValeur,
             nouvelle_valeur: {
+                id_employe,
+                matricule: employe.matricule,
+                nom_complet: nomComplet,
                 nom_utilisateur,
-                nom_complet,
                 id_role,
-                telephone: telephone || null,
-                email: email || null,
+                telephone: employe.telephone || null,
+                email: employe.email || null,
                 statut: statut || "ACTIF",
                 mot_de_passe_modifie: !!mot_de_passe
             },
             adresse_ip: req.ip,
             user_agent: req.get("user-agent")
         });
+
 
         res.json({
             message: "Utilisateur modifié avec succès"
@@ -500,12 +727,12 @@ router.put("/:id/statut", async (req, res) => {
             });
         }
 
+
         // -----------------------------
         // Récupérer l'ancien statut
         // -----------------------------
 
-        const [utilisateurs] = await pool.execute(
-            `
+        const [utilisateurs] = await pool.execute(`
             SELECT
                 id_utilisateur,
                 nom_utilisateur,
@@ -513,9 +740,7 @@ router.put("/:id/statut", async (req, res) => {
             FROM utilisateurs
             WHERE id_utilisateur = ?
             LIMIT 1
-            `,
-            [id]
-        );
+        `, [id]);
 
         if (utilisateurs.length === 0) {
             return res.status(404).json({
@@ -526,18 +751,17 @@ router.put("/:id/statut", async (req, res) => {
         const ancienStatut = utilisateurs[0].statut;
         const nomUtilisateur = utilisateurs[0].nom_utilisateur;
 
+
         // -----------------------------
         // Modifier le statut
         // -----------------------------
 
-        await pool.execute(
-            `
+        await pool.execute(`
             UPDATE utilisateurs
             SET statut = ?
             WHERE id_utilisateur = ?
-            `,
-            [statut, id]
-        );
+        `, [statut, id]);
+
 
         // -----------------------------
         // AUDIT — Changement statut
@@ -548,7 +772,8 @@ router.put("/:id/statut", async (req, res) => {
             action: "CHANGEMENT_STATUT",
             table_cible: "utilisateurs",
             id_cible: id,
-            description: `Changement du statut de l'utilisateur "${nomUtilisateur}" : ${ancienStatut} → ${statut}`,
+            description:
+                `Changement du statut de l'utilisateur "${nomUtilisateur}" : ${ancienStatut} → ${statut}`,
             ancienne_valeur: {
                 statut: ancienStatut
             },
@@ -558,6 +783,7 @@ router.put("/:id/statut", async (req, res) => {
             adresse_ip: req.ip,
             user_agent: req.get("user-agent")
         });
+
 
         res.json({
             message: "Statut modifié avec succès"
@@ -581,14 +807,15 @@ router.delete("/:id", async (req, res) => {
     try {
         const { id } = req.params;
 
+
         // -----------------------------
         // Récupérer l'utilisateur avant suppression
         // -----------------------------
 
-        const [utilisateurs] = await pool.execute(
-            `
+        const [utilisateurs] = await pool.execute(`
             SELECT
                 id_utilisateur,
+                id_employe,
                 nom_utilisateur,
                 nom_complet,
                 id_role,
@@ -598,9 +825,7 @@ router.delete("/:id", async (req, res) => {
             FROM utilisateurs
             WHERE id_utilisateur = ?
             LIMIT 1
-            `,
-            [id]
-        );
+        `, [id]);
 
         if (utilisateurs.length === 0) {
             return res.status(404).json({
@@ -610,17 +835,16 @@ router.delete("/:id", async (req, res) => {
 
         const ancienneValeur = utilisateurs[0];
 
+
         // -----------------------------
         // Suppression
         // -----------------------------
 
-        await pool.execute(
-            `
+        await pool.execute(`
             DELETE FROM utilisateurs
             WHERE id_utilisateur = ?
-            `,
-            [id]
-        );
+        `, [id]);
+
 
         // -----------------------------
         // AUDIT — Suppression
@@ -631,11 +855,13 @@ router.delete("/:id", async (req, res) => {
             action: "SUPPRESSION",
             table_cible: "utilisateurs",
             id_cible: id,
-            description: `Suppression de l'utilisateur "${ancienneValeur.nom_utilisateur}"`,
+            description:
+                `Suppression de l'utilisateur "${ancienneValeur.nom_utilisateur}"`,
             ancienne_valeur: ancienneValeur,
             adresse_ip: req.ip,
             user_agent: req.get("user-agent")
         });
+
 
         res.json({
             message: "Utilisateur supprimé avec succès"

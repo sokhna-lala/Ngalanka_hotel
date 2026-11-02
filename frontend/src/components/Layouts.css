@@ -1,451 +1,937 @@
-@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;600;700&family=Poppins:wght@400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Playfair+Display:wght@500;600;700&display=swap');
 
-/* ==========================================
-   VARIABLES
-========================================== */
+
+/* =========================================================
+   VARIABLES NGALANKA
+========================================================= */
 
 :root {
-    --navy-deep: #0a1f30;
-    --navy: #123049;
-    --navy-light: #16395a;
+    --navy-deep: #071824;
+    --navy: #0c263b;
+    --navy-light: #123a59;
 
     --brass: #c9a15c;
-    --brass-soft: rgba(201, 161, 92, 0.16);
-    --brass-hover: #d9b876;
+    --brass-light: #e1c486;
+    --brass-soft: rgba(201, 161, 92, 0.12);
+    --brass-medium: rgba(201, 161, 92, 0.22);
 
-    --ivory: #f8f5ef;
+    --ivory: #f7f5f0;
     --white: #ffffff;
 
     --ink: #1f2a33;
     --slate: #64748b;
-    --line: #e7e2d7;
+    --muted: #94a3b8;
 
-    --radius-sm: 6px;
-    --radius-md: 10px;
-    --shadow-soft: 0 4px 16px rgba(10, 31, 48, 0.06);
+    --line: #e8e3d9;
+
+    --sidebar-width: 270px;
+
+    --radius-sm: 8px;
+    --radius-md: 12px;
+    --radius-lg: 16px;
+
+    --shadow-soft:
+        0 4px 18px rgba(7, 24, 36, 0.06);
+
+    --shadow-medium:
+        0 8px 28px rgba(7, 24, 36, 0.10);
 }
 
 
-/* ==========================================
+/* =========================================================
    LAYOUT PRINCIPAL
-========================================== */
+========================================================= */
 
 .app-layout {
     display: flex;
+
     min-height: 100vh;
-    background: var(--ivory);
-    font-family: "Poppins", sans-serif;
+
+    background:
+        linear-gradient(
+            135deg,
+            #f8f7f3 0%,
+            #f4f2ed 100%
+        );
+
+    font-family: "Inter", sans-serif;
+
     color: var(--ink);
 }
 
 
-/* ==========================================
+/* =========================================================
    SIDEBAR
-========================================== */
+========================================================= */
 
 .sidebar {
-    width: 270px;
+    width: var(--sidebar-width);
+
     min-height: 100vh;
 
-    background: linear-gradient(180deg, var(--navy) 0%, var(--navy-deep) 100%);
-    color: white;
+    position: fixed;
+
+    left: 0;
+    top: 0;
+
+    z-index: 200;
 
     display: flex;
     flex-direction: column;
 
-    position: fixed;
-    left: 0;
-    top: 0;
+    background:
+        linear-gradient(
+            180deg,
+            #10324b 0%,
+            #081d2d 52%,
+            #061722 100%
+        );
+
+    color: #ffffff;
+
+    box-shadow:
+        5px 0 28px rgba(5, 22, 34, 0.18);
 
     overflow-y: auto;
 
-    box-shadow: 4px 0 24px rgba(10, 31, 48, 0.18);
+    overflow-x: hidden;
+
+    scrollbar-width: thin;
+
+    scrollbar-color:
+        rgba(201, 161, 92, 0.35)
+        transparent;
 }
 
 
-/* ==========================================
+/* =========================================================
+   LÉGER EFFET DÉCORATIF SIDEBAR
+========================================================= */
+
+.sidebar::before {
+    content: "";
+
+    position: absolute;
+
+    top: 0;
+    right: 0;
+
+    width: 1px;
+    height: 100%;
+
+    background:
+        linear-gradient(
+            transparent,
+            rgba(201, 161, 92, 0.28),
+            transparent
+        );
+
+    pointer-events: none;
+}
+
+
+/* =========================================================
    LOGO
-========================================== */
+========================================================= */
 
 .logo {
-    padding: 34px 25px 26px;
+    position: relative;
+
+    padding: 31px 24px 25px;
 
     text-align: center;
-    position: relative;
-}
 
-.logo::after {
-    content: "";
-    position: absolute;
-    bottom: 0;
-    left: 50%;
-    transform: translateX(-50%);
-    width: 46px;
-    height: 2px;
-    background: var(--brass);
+    background:
+        linear-gradient(
+            180deg,
+            rgba(255, 255, 255, 0.035),
+            transparent
+        );
 }
 
 .logo h2 {
     margin: 0;
 
-    font-family: "Playfair Display", serif;
-    font-weight: 600;
-    font-size: 25px;
-    letter-spacing: 1.5px;
-    color: white;
-}
+    font-family:
+        "Playfair Display",
+        Georgia,
+        serif;
 
+    font-size: 26px;
+
+    font-weight: 600;
+
+    letter-spacing: 2px;
+
+    color: #ffffff;
+}
 
 .logo span {
     display: block;
 
-    margin-top: 6px;
+    margin-top: 5px;
 
-    font-size: 11px;
-    font-weight: 500;
+    color: var(--brass-light);
+
+    font-size: 10px;
+
+    font-weight: 600;
+
     letter-spacing: 5px;
-
-    color: var(--brass);
 }
 
 
-/* ==========================================
+/* Ligne décorative */
+
+.logo::after {
+    content: "";
+
+    position: absolute;
+
+    bottom: 0;
+
+    left: 50%;
+
+    transform: translateX(-50%);
+
+    width: 54px;
+
+    height: 2px;
+
+    border-radius: 20px;
+
+    background:
+        linear-gradient(
+            90deg,
+            transparent,
+            var(--brass),
+            transparent
+        );
+}
+
+
+/* =========================================================
    NAVIGATION
-========================================== */
+========================================================= */
 
 .sidebar-nav {
     display: flex;
+
     flex-direction: column;
 
-    padding: 20px 12px;
-
-    gap: 4px;
+    gap: 5px;
 
     flex: 1;
+
+    padding: 20px 12px 18px;
 }
 
 
-/* ==========================================
+/* =========================================================
    LIENS PRINCIPAUX
-========================================== */
+========================================================= */
 
 .sidebar-nav > a {
+    position: relative;
+
     display: flex;
 
     align-items: center;
 
-    padding: 12px 15px;
+    min-height: 45px;
+
+    padding: 10px 15px;
+
+    border-radius: 11px;
+
+    border: 1px solid transparent;
+
+    color: #c4d1dc;
 
     text-decoration: none;
 
-    color: #c3d2de;
+    font-size: 13.5px;
 
-    border-radius: var(--radius-sm);
-
-    transition: background 0.2s ease, color 0.2s ease, border-color 0.2s ease;
-
-    font-size: 14.5px;
     font-weight: 500;
 
-    border-left: 2px solid transparent;
+    letter-spacing: 0.1px;
+
+    transition:
+        background 0.2s ease,
+        color 0.2s ease,
+        transform 0.2s ease,
+        border-color 0.2s ease;
 }
 
 
-/* ==========================================
-   SURVOL LIENS PRINCIPAUX
-========================================== */
+/* =========================================================
+   HOVER LIENS
+========================================================= */
 
 .sidebar-nav > a:hover {
-    background: rgba(255, 255, 255, 0.06);
+    color: #ffffff;
 
-    color: white;
+    background:
+        rgba(255, 255, 255, 0.055);
+
+    border-color:
+        rgba(255, 255, 255, 0.05);
+
+    transform: translateX(2px);
 }
 
 
-/* ==========================================
-   LIEN PRINCIPAL ACTIF
-========================================== */
+/* =========================================================
+   LIEN ACTIF
+========================================================= */
 
 .sidebar-nav > a.active {
-    background: var(--brass-soft);
-
-    color: white;
+    color: #ffffff;
 
     font-weight: 600;
 
-    border-left: 2px solid var(--brass);
+    background:
+        linear-gradient(
+            90deg,
+            rgba(201, 161, 92, 0.18),
+            rgba(201, 161, 92, 0.07)
+        );
+
+    border-color:
+        rgba(201, 161, 92, 0.16);
+
+    box-shadow:
+        inset 3px 0 0 var(--brass),
+        0 4px 14px rgba(0, 0, 0, 0.08);
 }
 
 
-/* ==========================================
-   SECTIONS MENU
-========================================== */
+/* Petit point doré */
+
+.sidebar-nav > a.active::after {
+    content: "";
+
+    position: absolute;
+
+    right: 13px;
+
+    width: 5px;
+    height: 5px;
+
+    border-radius: 50%;
+
+    background: var(--brass-light);
+
+    box-shadow:
+        0 0 8px rgba(201, 161, 92, 0.55);
+}
+
+
+/* =========================================================
+   SECTIONS DU MENU
+========================================================= */
 
 .menu-section {
     width: 100%;
 
-    margin-bottom: 4px;
+    margin-bottom: 2px;
 }
 
 
-/* ==========================================
-   BOUTON MENU PRINCIPAL
-========================================== */
+/* =========================================================
+   BOUTON PARENT
+========================================================= */
 
 .menu-parent {
     width: 100%;
 
-    display: flex;
+    min-height: 45px;
 
-    justify-content: space-between;
+    display: flex;
 
     align-items: center;
 
-    padding: 12px 15px;
+    justify-content: space-between;
 
-    border: none;
+    padding: 10px 15px;
+
+    border: 1px solid transparent;
+
+    border-radius: 11px;
 
     background: transparent;
 
-    color: #c3d2de;
+    color: #c4d1dc;
 
     cursor: pointer;
 
-    border-radius: var(--radius-sm);
+    font-family: inherit;
 
-    font-size: 14.5px;
+    font-size: 13.5px;
+
     font-weight: 500;
 
     text-align: left;
 
-    transition: background 0.2s ease, color 0.2s ease;
-
-    font-family: inherit;
+    transition:
+        background 0.2s ease,
+        color 0.2s ease,
+        border-color 0.2s ease;
 }
-
-.menu-parent span:last-child {
-    color: var(--brass);
-    font-size: 13px;
-    transition: transform 0.2s ease;
-}
-
-
-/* ==========================================
-   SURVOL MENU PRINCIPAL
-========================================== */
 
 .menu-parent:hover {
-    background: rgba(255, 255, 255, 0.06);
+    color: #ffffff;
 
-    color: white;
+    background:
+        rgba(255, 255, 255, 0.055);
+
+    border-color:
+        rgba(255, 255, 255, 0.05);
 }
 
 
-/* ==========================================
-   SOUS MENU
-========================================== */
+/* Flèche */
+
+.menu-parent span:last-child {
+    color: var(--brass-light);
+
+    font-size: 13px;
+
+    line-height: 1;
+
+    transition:
+        transform 0.2s ease,
+        color 0.2s ease;
+}
+
+
+/* =========================================================
+   SOUS-MENU
+========================================================= */
 
 .submenu {
+    position: relative;
+
     display: flex;
 
     flex-direction: column;
 
-    margin-left: 15px;
-
-    margin-top: 4px;
-    margin-bottom: 6px;
-
-    padding-left: 12px;
-
-    border-left: 1px solid rgba(201, 161, 92, 0.25);
-
     gap: 2px;
+
+    margin:
+        4px 8px 8px 14px;
+
+    padding:
+        5px 0 5px 10px;
+
+    border-left:
+        1px solid
+        rgba(201, 161, 92, 0.25);
+
+    animation:
+        submenuAppear 0.18s ease;
 }
 
 
-/* ==========================================
-   LIENS SOUS MENU
-========================================== */
+@keyframes submenuAppear {
+
+    from {
+        opacity: 0;
+
+        transform:
+            translateY(-4px);
+    }
+
+    to {
+        opacity: 1;
+
+        transform:
+            translateY(0);
+    }
+
+}
+
+
+/* =========================================================
+   LIENS SOUS-MENU
+========================================================= */
 
 .submenu a {
-    display: block;
+    position: relative;
 
-    padding: 9px 12px;
+    display: flex;
 
-    color: #9fb1c0;
+    align-items: center;
+
+    min-height: 38px;
+
+    padding: 8px 12px;
+
+    border-radius: 9px;
+
+    border: 1px solid transparent;
+
+    color: #9eb0bf;
 
     text-decoration: none;
 
-    border-radius: var(--radius-sm);
+    font-size: 12.5px;
 
-    font-size: 13.5px;
     font-weight: 400;
 
-    transition: background 0.2s ease, color 0.2s ease;
-
-    border-left: 2px solid transparent;
+    transition:
+        background 0.2s ease,
+        color 0.2s ease,
+        transform 0.2s ease,
+        border-color 0.2s ease;
 }
 
-
-/* ==========================================
-   SURVOL SOUS MENU
-========================================== */
 
 .submenu a:hover {
-    background: rgba(255, 255, 255, 0.06);
+    color: #ffffff;
 
-    color: white;
+    background:
+        rgba(255, 255, 255, 0.05);
+
+    transform: translateX(2px);
 }
 
 
-/* ==========================================
-   SOUS MENU ACTIF
-========================================== */
-
 .submenu a.active {
-    background: var(--brass-soft);
-
-    color: white;
+    color: #ffffff;
 
     font-weight: 600;
 
-    border-left: 2px solid var(--brass);
+    background:
+        rgba(201, 161, 92, 0.12);
+
+    border-color:
+        rgba(201, 161, 92, 0.13);
+
+    box-shadow:
+        inset 2px 0 0 var(--brass);
 }
 
 
-/* ==========================================
-   BAS SIDEBAR
-========================================== */
+/* =========================================================
+   BAS DE SIDEBAR
+========================================================= */
 
 .sidebar-bottom {
-    padding: 22px;
+    padding: 17px;
 
-    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    border-top:
+        1px solid
+        rgba(255, 255, 255, 0.08);
+
+    background:
+        rgba(0, 0, 0, 0.08);
 }
 
+
+/* =========================================================
+   BOUTON DÉCONNEXION
+========================================================= */
 
 .sidebar-bottom button {
     width: 100%;
 
-    padding: 12px;
+    min-height: 43px;
 
-    border: 1px solid rgba(201, 161, 92, 0.4);
+    display: flex;
 
-    border-radius: var(--radius-sm);
+    align-items: center;
+
+    justify-content: center;
+
+    gap: 8px;
+
+    padding: 10px 12px;
+
+    border:
+        1px solid
+        rgba(201, 161, 92, 0.32);
+
+    border-radius: 10px;
+
+    background:
+        rgba(201, 161, 92, 0.04);
+
+    color: var(--brass-light);
+
+    font-family: inherit;
+
+    font-size: 12.5px;
+
+    font-weight: 600;
 
     cursor: pointer;
 
-    background: transparent;
-
-    color: var(--brass);
-
-    font-family: "Poppins", sans-serif;
-    font-size: 13.5px;
-    font-weight: 600;
-
-    transition: background 0.2s ease, color 0.2s ease;
+    transition:
+        background 0.2s ease,
+        color 0.2s ease,
+        border-color 0.2s ease,
+        transform 0.2s ease;
 }
 
 
 .sidebar-bottom button:hover {
     background: var(--brass);
+
+    border-color: var(--brass);
+
     color: var(--navy-deep);
+
+    transform: translateY(-1px);
+
+    box-shadow:
+        0 5px 15px rgba(201, 161, 92, 0.18);
 }
 
 
-/* ==========================================
+/* =========================================================
    CONTENU PRINCIPAL
-========================================== */
+========================================================= */
 
 .main-content {
-    margin-left: 270px;
-
-    width: calc(100% - 270px);
-
-    height: 100vh;
-
-    overflow-y: auto;
-    overflow-x: hidden;
+    width:
+        calc(100% - var(--sidebar-width));
 
     min-height: 100vh;
+
+    margin-left:
+        var(--sidebar-width);
+
+    overflow-x: hidden;
+
+    overflow-y: auto;
+
+    background:
+        linear-gradient(
+            135deg,
+            #faf9f6 0%,
+            #f5f3ee 100%
+        );
 }
 
 
-/* ==========================================
-   CONTENU PAGE
-========================================== */
+/* =========================================================
+   HEADER SUPÉRIEUR
+========================================================= */
+
+.topbar {
+    position: sticky;
+
+    top: 0;
+
+    z-index: 100;
+
+    height: 70px;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: space-between;
+
+    padding: 0 30px;
+
+    background:
+        rgba(255, 255, 255, 0.94);
+
+    border-bottom:
+        1px solid rgba(10, 31, 48, 0.07);
+
+    box-shadow:
+        0 3px 16px rgba(10, 31, 48, 0.045);
+
+    backdrop-filter:
+        blur(12px);
+}
+
+
+/* =========================================================
+   TITRE HEADER
+========================================================= */
+
+.topbar h3 {
+    margin: 0;
+
+    font-family:
+        "Playfair Display",
+        Georgia,
+        serif;
+
+    color: var(--navy);
+
+    font-size: 19px;
+
+    font-weight: 600;
+
+    letter-spacing: 0.8px;
+}
+
+
+/* =========================================================
+   UTILISATEUR
+========================================================= */
+
+.user-info {
+    display: flex;
+
+    align-items: center;
+
+    gap: 12px;
+
+    padding:
+        7px 12px;
+
+    border:
+        1px solid
+        #ece8df;
+
+    border-radius: 11px;
+
+    background:
+        #ffffff;
+
+    box-shadow:
+        0 3px 10px rgba(10, 31, 48, 0.04);
+}
+
+
+.user-info span {
+    color: #263442;
+
+    font-size: 12.5px;
+
+    font-weight: 600;
+
+    white-space: nowrap;
+}
+
+
+.user-info small {
+    padding-left: 12px;
+
+    border-left:
+        1px solid #e4e0d8;
+
+    color: var(--brass);
+
+    font-size: 10.5px;
+
+    font-weight: 600;
+
+    white-space: nowrap;
+}
+
+
+/* =========================================================
+   CONTENU DES PAGES
+========================================================= */
 
 .page-content {
-    padding: 32px 36px;
+    width: 100%;
+
+    padding:
+        28px 34px 36px;
+
+    box-sizing: border-box;
 }
 
 
-/* ==========================================
+/* =========================================================
    SCROLLBAR SIDEBAR
-========================================== */
+========================================================= */
 
 .sidebar::-webkit-scrollbar {
-    width: 6px;
+    width: 5px;
 }
-
 
 .sidebar::-webkit-scrollbar-track {
     background: transparent;
 }
 
-
 .sidebar::-webkit-scrollbar-thumb {
-    background: rgba(201, 161, 92, 0.3);
+    background:
+        rgba(201, 161, 92, 0.28);
 
-    border-radius: 10px;
+    border-radius: 20px;
+}
+
+.sidebar::-webkit-scrollbar-thumb:hover {
+    background:
+        rgba(201, 161, 92, 0.45);
 }
 
 
-/* ==========================================
-   ACCESSIBILITÉ - FOCUS CLAVIER
-========================================== */
+/* =========================================================
+   SCROLLBAR CONTENU
+========================================================= */
+
+.main-content::-webkit-scrollbar {
+    width: 7px;
+}
+
+.main-content::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.main-content::-webkit-scrollbar-thumb {
+    background:
+        rgba(10, 31, 48, 0.14);
+
+    border-radius: 20px;
+}
+
+.main-content::-webkit-scrollbar-thumb:hover {
+    background:
+        rgba(10, 31, 48, 0.23);
+}
+
+
+/* =========================================================
+   ACCESSIBILITÉ
+========================================================= */
 
 .sidebar-nav a:focus-visible,
 .menu-parent:focus-visible,
 .sidebar-bottom button:focus-visible {
-    outline: 2px solid var(--brass);
+    outline:
+        2px solid var(--brass-light);
+
     outline-offset: 2px;
 }
 
 
-/* ==========================================
-   RESPONSIVE - TABLETTE
-========================================== */
+/* =========================================================
+   TABLETTE
+========================================================= */
 
-@media (max-width: 900px) {
+@media (max-width: 1100px) {
 
-    .sidebar {
-        width: 230px;
+    :root {
+        --sidebar-width: 245px;
     }
 
+    .sidebar {
+        width: var(--sidebar-width);
+    }
 
     .main-content {
-        margin-left: 230px;
+        width:
+            calc(100% - var(--sidebar-width));
 
-        width: calc(100% - 230px);
+        margin-left:
+            var(--sidebar-width);
+    }
+
+    .page-content {
+        padding:
+            25px 26px 32px;
+    }
+
+    .topbar {
+        padding:
+            0 24px;
     }
 
 }
 
 
-/* ==========================================
-   RESPONSIVE - MOBILE
-========================================== */
+/* =========================================================
+   PETITE TABLETTE
+========================================================= */
+
+@media (max-width: 900px) {
+
+    :root {
+        --sidebar-width: 215px;
+    }
+
+    .sidebar {
+        width: var(--sidebar-width);
+    }
+
+    .main-content {
+        width:
+            calc(100% - var(--sidebar-width));
+
+        margin-left:
+            var(--sidebar-width);
+    }
+
+    .logo {
+        padding:
+            26px 18px 22px;
+    }
+
+    .logo h2 {
+        font-size: 23px;
+    }
+
+    .sidebar-nav {
+        padding:
+            16px 9px;
+    }
+
+    .sidebar-nav > a,
+    .menu-parent {
+        font-size: 12.5px;
+    }
+
+    .submenu a {
+        font-size: 11.5px;
+    }
+
+    .topbar {
+        height: 64px;
+
+        padding:
+            0 20px;
+    }
+
+    .topbar h3 {
+        font-size: 17px;
+    }
+
+    .page-content {
+        padding:
+            22px 20px 30px;
+    }
+
+}
+
+
+/* =========================================================
+   MOBILE
+========================================================= */
 
 @media (max-width: 700px) {
 
-    .sidebar {
-        width: 70px;
+    :root {
+        --sidebar-width: 68px;
     }
 
 
+    /* Sidebar compacte */
+
+    .sidebar {
+        width: var(--sidebar-width);
+    }
+
+
+    /* Logo */
+
     .logo {
-        padding: 22px 5px;
+        padding:
+            22px 5px;
+    }
+
+    .logo h2,
+    .logo span {
+        display: none;
     }
 
     .logo::after {
@@ -453,64 +939,167 @@
     }
 
 
-    .logo h2,
-    .logo span {
-        display: none;
+    /* Navigation */
+
+    .sidebar-nav {
+        padding:
+            14px 7px;
     }
 
+    .sidebar-nav > a {
+        justify-content: center;
+
+        min-height: 45px;
+
+        padding:
+            11px 5px;
+
+        font-size: 0;
+    }
+
+    .sidebar-nav > a.active {
+        box-shadow:
+            inset 0 0 0 1px
+            rgba(201, 161, 92, 0.18);
+
+        border-left: none;
+
+        border-bottom:
+            2px solid var(--brass);
+    }
+
+
+    /* Menus parent */
+
+    .menu-parent {
+        justify-content: center;
+
+        min-height: 45px;
+
+        padding:
+            10px 5px;
+
+        font-size: 0;
+    }
 
     .menu-parent span:first-child {
         font-size: 0;
     }
 
+    .menu-parent span:last-child {
+        display: none;
+    }
+
+
+    /* Sous-menus masqués */
 
     .submenu {
         display: none;
     }
 
 
-    .sidebar-nav > a {
-        justify-content: center;
-
-        padding: 15px 5px;
-
-        font-size: 0;
-    }
-
-
-    .sidebar-nav > a.active {
-        border-left: none;
-
-        border-bottom: 2px solid var(--brass);
-    }
-
+    /* Déconnexion */
 
     .sidebar-bottom {
-        padding: 10px;
+        padding:
+            10px 7px;
     }
-
 
     .sidebar-bottom button {
-        font-size: 0;
+        min-height: 44px;
 
-        padding: 15px 5px;
+        padding:
+            10px 5px;
+
+        font-size: 0;
     }
 
+
+    /* Contenu */
 
     .main-content {
-        margin-left: 70px;
+        width:
+            calc(100% - var(--sidebar-width));
 
-        width: calc(100% - 70px);
+        margin-left:
+            var(--sidebar-width);
     }
 
+
+    /* Header */
 
     .topbar {
-        padding: 0 15px;
+        height: 62px;
+
+        padding:
+            0 12px;
+    }
+
+    .topbar h3 {
+        font-size: 15px;
+
+        letter-spacing: 0.4px;
     }
 
 
+    .user-info {
+        gap: 0;
+
+        padding:
+            6px 8px;
+    }
+
+    .user-info span {
+        font-size: 0;
+    }
+
+    .user-info span:first-letter {
+        font-size: 16px;
+    }
+
+    .user-info small {
+        display: none;
+    }
+
+
+    /* Pages */
+
     .page-content {
-        padding: 18px;
+        padding:
+            18px 14px 25px;
+    }
+
+}
+
+
+/* =========================================================
+   TRÈS PETITS ÉCRANS
+========================================================= */
+
+@media (max-width: 400px) {
+
+    :root {
+        --sidebar-width: 60px;
+    }
+
+    .sidebar {
+        width: 60px;
+    }
+
+    .main-content {
+        width:
+            calc(100% - 60px);
+
+        margin-left: 60px;
+    }
+
+    .topbar h3 {
+        font-size: 13px;
+    }
+
+    .page-content {
+        padding:
+            15px 10px 22px;
     }
 
 }

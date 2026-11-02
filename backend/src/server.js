@@ -12,13 +12,13 @@ const sejoursRoutes = require("./routes/sejours");
 const comptabiliteRoutes = require("./routes/comptabilite");
 const paiementsRoutes = require("./routes/paiements");
 const caissesRoutes = require("./routes/caisses");
-<<<<<<< Updated upstream
-=======
+
+
 const sallesSeminaireRoutes = require("./routes/sallesSeminaire");
 const reservationsSalleRoutes = require("./routes/reservationsSalle");
 
 // Routes Administration
->>>>>>> Stashed changes
+
 const utilisateursRoutes = require("./routes/utilisateurs");
 const employesRoutes = require("./routes/employes");
 const servicesRoutes = require("./routes/services");
@@ -62,15 +62,14 @@ app.use("/api/sejours", sejoursRoutes);
 app.use("/api/comptabilite", comptabiliteRoutes);
 app.use("/api/paiements", paiementsRoutes);
 app.use("/api/caisses", caissesRoutes);
-<<<<<<< Updated upstream
-=======
+
 app.use("/api/salles-seminaire", sallesSeminaireRoutes);
 app.use("/api/reservations-salle", reservationsSalleRoutes);
 app.use("/api/prestations", prestationsRoutes);
 
 
 // Administration
->>>>>>> Stashed changes
+
 app.use("/api/utilisateurs", utilisateursRoutes);
 app.use("/api/employes", employesRoutes);
 app.use("/api/services", servicesRoutes);

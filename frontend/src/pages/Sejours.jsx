@@ -145,7 +145,7 @@ function Sejours() {
         }
 
         try {
-<<<<<<< Updated upstream
+
             await axios.post(
                 `${API_URL}/sejours`,
                 {
@@ -159,7 +159,7 @@ function Sejours() {
                         formulaire.observation || null
                 }
             );
-=======
+
 
             // ==========================================
             // ENVOYER LE CHECK-IN VIA LA ROUTE SÉCURISÉE
@@ -172,7 +172,6 @@ await axios.post(
         caution: Number(formulaire.caution) || 0
     }
 );
->>>>>>> Stashed changes
 
             alert("Check-in effectué avec succès !");
 

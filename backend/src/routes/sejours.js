@@ -102,9 +102,9 @@ router.post("/", (req, res) => {
     });
 });
 
-<<<<<<< Updated upstream
+
 module.exports = router;
-=======
+
 // ==========================================
 // PUT - Check-out
 // ==========================================
@@ -215,4 +215,4 @@ router.put("/:id/checkout", async (req, res) => {
 });
 
 module.exports = router;
->>>>>>> Stashed changes
+

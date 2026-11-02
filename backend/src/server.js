@@ -27,6 +27,8 @@ const produitsRoutes = require("./routes/produits");
 const fournisseursRoutes = require("./routes/fournisseurs");
 const achatsRoutes = require("./routes/achats");
 const stocksRoutes = require("./routes/stocks");
+const commandesRoutes = require("./routes/commandes");
+
 
 const app = express();
 
@@ -67,7 +69,7 @@ app.use("/api/sejours", sejoursRoutes);
 app.use("/api/comptabilite", comptabiliteRoutes);
 app.use("/api/paiements", paiementsRoutes);
 app.use("/api/caisses", caissesRoutes);
-
+app.use("/api/commandes", commandesRoutes);
 // Administration
 app.use("/api/utilisateurs", utilisateursRoutes);
 app.use("/api/employes", employesRoutes);

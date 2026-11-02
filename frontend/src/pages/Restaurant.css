@@ -1,0 +1,244 @@
+.restaurant-page {
+    padding: 25px;
+}
+
+.restaurant-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 25px;
+}
+
+.restaurant-header h1 {
+    margin: 0;
+    font-size: 28px;
+}
+
+.restaurant-header p {
+    margin-top: 6px;
+    color: #777;
+}
+
+.btn-commandes {
+    border: none;
+    padding: 11px 18px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: 600;
+}
+
+.restaurant-stats {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 15px;
+    margin-bottom: 25px;
+}
+
+.restaurant-stat-card {
+    background: white;
+    padding: 18px;
+    border-radius: 10px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+.restaurant-stat-card span {
+    display: block;
+    color: #777;
+    font-size: 14px;
+    margin-bottom: 8px;
+}
+
+.restaurant-stat-card strong {
+    font-size: 25px;
+}
+
+.restaurant-toolbar {
+    margin-bottom: 18px;
+}
+
+.restaurant-toolbar input {
+    width: 100%;
+    box-sizing: border-box;
+    padding: 13px 15px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    font-size: 15px;
+}
+
+.restaurant-categories {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    margin-bottom: 25px;
+}
+
+.restaurant-categories button {
+    border: 1px solid #ddd;
+    background: white;
+    padding: 9px 16px;
+    border-radius: 20px;
+    cursor: pointer;
+}
+
+.restaurant-categories button:hover {
+    background: #f3f3f3;
+}
+
+.restaurant-categories .categorie-active {
+    background: #222;
+    color: white;
+    border-color: #222;
+}
+
+.restaurant-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 18px;
+}
+
+.restaurant-product-card {
+    background: white;
+    border-radius: 12px;
+    padding: 18px;
+    display: flex;
+    gap: 15px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
+}
+
+.product-icon {
+    width: 55px;
+    height: 55px;
+    min-width: 55px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 10px;
+    background: #f4f4f4;
+    font-size: 27px;
+}
+
+.product-content {
+    flex: 1;
+}
+
+.product-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 8px;
+}
+
+.product-category {
+    font-size: 12px;
+    color: #777;
+}
+
+.product-status {
+    font-size: 11px;
+    padding: 4px 7px;
+    border-radius: 10px;
+}
+
+.product-status.disponible {
+    background: #e7f7ed;
+    color: #18864b;
+}
+
+.product-status.rupture {
+    background: #fdeaea;
+    color: #c62828;
+}
+
+.product-content h3 {
+    margin: 9px 0 3px;
+    font-size: 18px;
+}
+
+.product-content small {
+    color: #888;
+}
+
+.product-bottom {
+    margin-top: 15px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.product-bottom strong {
+    font-size: 17px;
+}
+
+.product-bottom span {
+    font-size: 13px;
+    color: #777;
+}
+
+.restaurant-message,
+.restaurant-error,
+.restaurant-empty {
+    background: white;
+    border-radius: 10px;
+    padding: 40px;
+    text-align: center;
+}
+
+.restaurant-error {
+    color: #c62828;
+}
+
+.empty-icon {
+    font-size: 45px;
+    margin-bottom: 10px;
+}
+
+.restaurant-empty h2 {
+    margin-bottom: 8px;
+}
+
+.restaurant-empty p {
+    color: #777;
+}
+
+@media (max-width: 1000px) {
+    .restaurant-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .restaurant-stats {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (max-width: 650px) {
+    .restaurant-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 15px;
+    }
+
+    .restaurant-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .restaurant-stats {
+        grid-template-columns: 1fr;
+    }
+}
+
+
+
+.btn-commander-produit {
+    width: 100%;
+    margin-top: 15px;
+    padding: 10px 14px;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: 600;
+}
+
+.btn-commander-produit:disabled {
+    cursor: not-allowed;
+    opacity: 0.5;
+}

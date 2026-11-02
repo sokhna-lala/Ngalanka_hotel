@@ -369,7 +369,8 @@ function Produits() {
                                     name="unite"
                                     value={formulaire.unite}
                                     onChange={handleChange}
-                                    placeholder="Ex : Bouteille"
+                                    placeholder="Ex : 10
+                                    "
                                 />
                             </div>
 

@@ -1,4 +1,4 @@
-```jsx
+
 import { Routes, Route, Navigate } from "react-router-dom";
 
 import Login from "./pages/Login";
@@ -29,6 +29,10 @@ import Fournisseurs from "./pages/Fournisseurs";
 import Achats from "./pages/Achats";
 import Stocks from "./pages/Stocks";
 
+// Restaurant & Bar
+import Commandes from "./pages/Commandes";
+import DetailsCommande from "./pages/DetailsCommande";
+import Restaurant from "./pages/Restaurant";
 function ProtectedRoute({ children }) {
     const { estConnecte } = useAuth();
 
@@ -46,7 +50,6 @@ function App() {
             {/* ==========================
                 LOGIN
             ========================== */}
-
             <Route
                 path="/"
                 element={<Login />}
@@ -55,7 +58,6 @@ function App() {
             {/* ==========================
                 APPLICATION PROTÉGÉE
             ========================== */}
-
             <Route
                 element={
                     <ProtectedRoute>
@@ -67,7 +69,6 @@ function App() {
                 {/* ==========================
                     DASHBOARD
                 ========================== */}
-
                 <Route
                     path="/dashboard"
                     element={<Dashboard />}
@@ -76,7 +77,6 @@ function App() {
                 {/* ==========================
                     HÉBERGEMENT
                 ========================== */}
-
                 <Route
                     path="/clients"
                     element={<Clients />}
@@ -100,7 +100,6 @@ function App() {
                 {/* ==========================
                     FINANCES
                 ========================== */}
-
                 <Route
                     path="/comptabilite"
                     element={<Comptabilite />}
@@ -124,16 +123,26 @@ function App() {
                 {/* ==========================
                     RESTAURANT & BAR
                 ========================== */}
-
                 <Route
                     path="/restaurant"
-                    element={<h1>Restaurant / Bar</h1>}
+                    element={<Restaurant />}
+                />
+
+                {/* Liste des commandes */}
+                <Route
+                    path="/commandes"
+                    element={<Commandes />}
+                />
+
+                {/* Détails d'une commande */}
+                <Route
+                    path="/commandes/:id"
+                    element={<DetailsCommande />}
                 />
 
                 {/* ==========================
                     LOISIRS & ÉVÉNEMENTS
                 ========================== */}
-
                 <Route
                     path="/prestations"
                     element={<h1>Piscine & Loisirs</h1>}
@@ -147,7 +156,6 @@ function App() {
                 {/* ==========================
                     GESTION DES STOCKS
                 ========================== */}
-
                 <Route
                     path="/produits"
                     element={<Produits />}
@@ -171,7 +179,6 @@ function App() {
                 {/* ==========================
                     ADMINISTRATION
                 ========================== */}
-
                 <Route
                     path="/personnel"
                     element={<Personnel />}
@@ -202,10 +209,14 @@ function App() {
             {/* ==========================
                 ROUTE INCONNUE
             ========================== */}
-
             <Route
                 path="*"
-                element={<Navigate to="/dashboard" replace />}
+                element={
+                    <Navigate
+                        to="/dashboard"
+                        replace
+                    />
+                }
             />
 
         </Routes>
@@ -213,4 +224,4 @@ function App() {
 }
 
 export default App;
-```
+

@@ -1,3 +1,4 @@
+
 const express = require("express");
 const cors = require("cors");
 require("dotenv").config();
@@ -19,6 +20,7 @@ const reservationsSalleRoutes = require("./routes/reservationsSalle");
 
 // Routes Administration
 
+// Routes Administration
 const utilisateursRoutes = require("./routes/utilisateurs");
 const employesRoutes = require("./routes/employes");
 const servicesRoutes = require("./routes/services");
@@ -27,22 +29,33 @@ const parametresRoutes = require("./routes/parametres");
 const auditRoutes = require("./routes/audit");
 const prestationsRoutes = require("./routes/prestations");
 
+// Routes Stocks / Achats
+const produitsRoutes = require("./routes/produits");
+const fournisseursRoutes = require("./routes/fournisseurs");
+const achatsRoutes = require("./routes/achats");
+const stocksRoutes = require("./routes/stocks");
+const commandesRoutes = require("./routes/commandes");
+
+
 const app = express();
 
 // ==========================================
 // PORT
 // ==========================================
+
 const PORT = process.env.PORT || 5000;
 
 // ==========================================
 // MIDDLEWARES
 // ==========================================
+
 app.use(cors());
 app.use(express.json());
 
 // ==========================================
 // ROUTE PRINCIPALE
 // ==========================================
+
 app.get("/", (req, res) => {
     res.json({
         message: "API Ngalanka Hotel opérationnelle"
@@ -52,6 +65,7 @@ app.get("/", (req, res) => {
 // ==========================================
 // ROUTES API
 // ==========================================
+
 app.use("/api/auth", authRoutes);
 app.use("/api/dashboard", dashboardRoutes);
 app.use("/api/clients", clientsRoutes);
@@ -70,15 +84,26 @@ app.use("/api/prestations", prestationsRoutes);
 
 // Administration
 
+app.use("/api/commandes", commandesRoutes);
+// Administration
 app.use("/api/utilisateurs", utilisateursRoutes);
 app.use("/api/employes", employesRoutes);
 app.use("/api/services", servicesRoutes);
 app.use("/api/fonctions", fonctionsRoutes);
 app.use("/api/parametres", parametresRoutes);
 app.use("/api/audit", auditRoutes);
+
+// Stocks / Achats
+app.use("/api/produits", produitsRoutes);
+app.use("/api/fournisseurs", fournisseursRoutes);
+app.use("/api/achats", achatsRoutes);
+app.use("/api/stocks", stocksRoutes);
+
 // ==========================================
 // DÉMARRAGE DU SERVEUR
 // ==========================================
+
 app.listen(PORT, () => {
     console.log(`🚀 Serveur lancé sur http://localhost:${PORT}`);
 });
+

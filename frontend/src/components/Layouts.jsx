@@ -14,6 +14,7 @@ const [financesOuvert, setFinancesOuvert] = useState(false);
 const [stockOuvert, setStockOuvert] = useState(false);
 const [administrationOuvert, setAdministrationOuvert] = useState(false);
 const [loisirsOuvert, setLoisirsOuvert] = useState(false);
+const [restaurantOuvert, setRestaurantOuvert] = useState(true);
 
 
 // ==========================================
@@ -151,10 +152,43 @@ return ( <div className="app-layout">
           RESTAURANT & BAR
       ====================================== */}
 
-      <NavLink to="/restaurant">
-        🍽️ Restaurant / Bar
+       {/* ======================================
+    RESTAURANT & BAR
+====================================== */}
+
+<div className="menu-section">
+
+  <button
+    type="button"
+    className="menu-parent"
+    onClick={() =>
+      setRestaurantOuvert(!restaurantOuvert)
+    }
+  >
+    <span>🍽️ Restaurant & Bar</span>
+
+    <span>
+      {restaurantOuvert ? "⌃" : "⌄"}
+    </span>
+  </button>
+
+  {restaurantOuvert && (
+
+    <div className="submenu">
+
+      <NavLink to="/commandes">
+        🧾 Commandes
       </NavLink>
 
+      <NavLink to="/restaurant">
+        🍽️ Restaurant
+      </NavLink>
+
+    </div>
+
+  )}
+
+</div>
 
     {/* ======================================
     LOISIRS & ÉVÉNEMENTS

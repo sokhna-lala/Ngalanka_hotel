@@ -6,7 +6,6 @@ import Dashboard from "./pages/Dashboard";
 import Layout from "./components/Layouts";
 import ServicesFonctions from "./pages/ServicesFonctions";
 
-
 import { useAuth } from "./context/AuthContext";
 
 import Clients from "./pages/Clients";
@@ -22,6 +21,7 @@ import Seminaires from "./pages/Seminaires";
 
 // Administration
 
+// Administration
 import Utilisateurs from "./pages/Utilisateurs";
 import Personnel from "./pages/Personnel";
 import Parametres from "./pages/Parametres";
@@ -29,15 +29,26 @@ import JournalAudit from "./pages/JournalAudit";
 import Prestations from "./pages/Prestations";
 import FicheClient from "./pages/FicheClient";
 
+// Stocks / Achats
+import Produits from "./pages/Produits.jsx";
+import Fournisseurs from "./pages/Fournisseurs";
+import Achats from "./pages/Achats";
+import Stocks from "./pages/Stocks";
+
+// Restaurant & Bar
+import Commandes from "./pages/Commandes";
+import DetailsCommande from "./pages/DetailsCommande";
+import Restaurant from "./pages/Restaurant";
 function ProtectedRoute({ children }) {
-const { estConnecte } = useAuth();
+    const { estConnecte } = useAuth();
 
-if (!estConnecte) {
-return <Navigate to="/" replace />;
+    if (!estConnecte) {
+        return <Navigate to="/" replace />;
+    }
+
+    return children;
 }
 
-return children;
-}
 function App() {
     return (
         <Routes>
@@ -45,25 +56,18 @@ function App() {
             {/* ==========================
                 LOGIN
             ========================== */}
-
             <Route
                 path="/"
                 element={<Login />}
             />
 
-
             {/* ==========================
                 APPLICATION PROTÉGÉE
             ========================== */}
-
             <Route
                 element={
                     <ProtectedRoute>
-                        <>
-
-
-                            <Layout />
-                        </>
+                        <Layout />
                     </ProtectedRoute>
                 }
             >
@@ -71,7 +75,6 @@ function App() {
                 {/* ==========================
                     DASHBOARD
                 ========================== */}
-
                 <Route
                     path="/dashboard"
                     element={<Dashboard />}
@@ -89,7 +92,6 @@ function App() {
                 {/* ==========================
                     HÉBERGEMENT
                 ========================== */}
-
                 <Route
                     path="/clients"
                     element={<Clients />}
@@ -110,11 +112,9 @@ function App() {
                     element={<Sejours />}
                 />
 
-
                 {/* ==========================
                     FINANCES
                 ========================== */}
-
                 <Route
                     path="/comptabilite"
                     element={<Comptabilite />}
@@ -135,53 +135,63 @@ function App() {
                     element={<Caisse />}
                 />
 
-
                 {/* ==========================
                     RESTAURANT & BAR
                 ========================== */}
-
                 <Route
                     path="/restaurant"
-                    element={<h1>Restaurant / Bar</h1>}
+                    element={<Restaurant />}
                 />
 
+                {/* Liste des commandes */}
+                <Route
+                    path="/commandes"
+                    element={<Commandes />}
+                />
+
+                {/* Détails d'une commande */}
+                <Route
+                    path="/commandes/:id"
+                    element={<DetailsCommande />}
+                />
 
                 {/* ==========================
                     LOISIRS & ÉVÉNEMENTS
                 ========================== */}
 
                 <Route path="/prestations" element={<Prestations />} />
+                <Route
+                    path="/prestations"
+                    element={<h1>Piscine & Loisirs</h1>}
+                />
 
                 <Route
                     path="/seminaires"
                     element={<Seminaires />}
                 />
 
-
                 {/* ==========================
                     GESTION DES STOCKS
                 ========================== */}
-
                 <Route
                     path="/produits"
-                    element={<h1>Produits</h1>}
+                    element={<Produits />}
                 />
 
                 <Route
                     path="/stocks"
-                    element={<h1>Stock</h1>}
+                    element={<Stocks />}
                 />
 
                 <Route
                     path="/fournisseurs"
-                    element={<h1>Fournisseurs</h1>}
+                    element={<Fournisseurs />}
                 />
 
                 <Route
                     path="/achats"
-                    element={<h1>Achats</h1>}
+                    element={<Achats />}
                 />
-
 
                 {/* ==========================
                     ADMINISTRATION
@@ -190,20 +200,22 @@ function App() {
                     path="/personnel"
                     element={<Personnel />}
                 />
+
                 <Route
                     path="/services-fonctions"
                     element={<ServicesFonctions />}
                 />
 
-               <Route
+                <Route
                     path="/utilisateurs"
                     element={<Utilisateurs />}
                 />
 
-                 <Route
+                <Route
                     path="/parametres"
                     element={<Parametres />}
                 />
+
                 <Route
                     path="/journal-audit"
                     element={<JournalAudit />}
@@ -211,14 +223,17 @@ function App() {
 
             </Route>
 
-
             {/* ==========================
                 ROUTE INCONNUE
             ========================== */}
-
             <Route
                 path="*"
-                element={<Navigate to="/dashboard" replace />}
+                element={
+                    <Navigate
+                        to="/dashboard"
+                        replace
+                    />
+                }
             />
 
         </Routes>

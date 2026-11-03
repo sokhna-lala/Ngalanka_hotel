@@ -1,0 +1,139 @@
+/* ================================
+   PAGE PRODUITS
+================================ */
+
+.produits-page {
+    padding: 24px;
+}
+
+
+/* ================================
+   STATISTIQUES
+================================ */
+
+.produits-stats {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 18px;
+    margin-bottom: 20px;
+}
+
+.stat-card {
+    background: white;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.stat-card span {
+    font-size: 14px;
+    color: #6b7280;
+}
+
+.stat-card strong {
+    font-size: 28px;
+    color: #1f2937;
+}
+
+
+/* ================================
+   FORMULAIRE PRODUIT
+================================ */
+
+.produit-form {
+    background: white;
+    border-radius: 12px;
+    padding: 24px;
+    margin-bottom: 24px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.07);
+}
+
+
+/* ================================
+   BADGES STATUT
+================================ */
+
+.badge-actif,
+.badge-inactif {
+    display: inline-block;
+    padding: 5px 10px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 600;
+}
+
+.badge-actif {
+    background: #dcfce7;
+    color: #166534;
+}
+
+.badge-inactif {
+    background: #fee2e2;
+    color: #b91c1c;
+}
+
+
+/* ================================
+   STOCK FAIBLE
+================================ */
+
+.stock-faible-row {
+    background: #fff7ed;
+}
+
+.stock-faible-row:hover {
+    background: #ffedd5 !important;
+}
+
+
+/* ================================
+   CELLULE ACTIONS
+================================ */
+
+.actions-cell {
+    white-space: nowrap;
+}
+
+
+/* ================================
+   RESPONSIVE
+================================ */
+
+@media (max-width: 900px) {
+
+    .produits-stats {
+        grid-template-columns: 1fr;
+    }
+
+}
+
+
+@media (max-width: 768px) {
+
+    .produits-page {
+        padding: 16px;
+    }
+
+}
+
+.btn-delete {
+    border: none;
+    background: #fee2e2;
+    color: #dc2626;
+    padding: 8px 10px;
+    border-radius: 8px;
+    cursor: pointer;
+    margin-left: 5px;
+    transition: 0.2s;
+}
+
+.btn-delete:hover {
+    background: #fecaca;
+    transform: scale(1.05);
+}
+
+
+

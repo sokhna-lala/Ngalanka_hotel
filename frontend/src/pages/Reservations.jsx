@@ -602,15 +602,8 @@ function Reservations() {
 
             else {
 
-                if (
-                    !nouveauClient.nom ||
-                    !nouveauClient.telephone
-                ) {
-
-                    alert(
-                        "Le nom et le téléphone du nouveau client sont obligatoires."
-                    );
-
+                if (!nouveauClient.nom.trim()) {
+                    alert("Le nom du client est obligatoire.");
                     return;
                 }
 
@@ -1118,7 +1111,7 @@ function Reservations() {
                                                             e.target.value
                                                         )
                                                 }
-                                                placeholder="Numéro de téléphone"
+                                                placeholder="Téléphone (ex. : +33 6 12 34 56 78)"
                                             />
 
 
@@ -1139,6 +1132,18 @@ function Reservations() {
                                                         : "Rechercher"
                                                 }
 
+                                            </button>
+
+                                            <button
+                                                type="button"
+                                                onClick={() => {
+                                                    setTelephoneRecherche("");
+                                                    setClientTrouve(null);
+                                                    setNouveauClient(nouveauClientInitial);
+                                                    setRechercheEffectuee(true);
+                                                }}
+                                            >
+                                                Continuer sans téléphone
                                             </button>
 
                                         </div>
@@ -1261,7 +1266,7 @@ function Reservations() {
                                                 <div>
 
                                                     <label>
-                                                        Téléphone *
+                                                        Téléphone (facultatif)
                                                     </label>
 
                                                     <input
@@ -1273,7 +1278,7 @@ function Reservations() {
                                                         onChange={
                                                             handleClientChange
                                                         }
-                                                        required
+                                                        placeholder="Ex. : +33 6 12 34 56 78"
                                                     />
 
                                                 </div>
@@ -1991,7 +1996,7 @@ function Reservations() {
 
         </div>
     );
-}
+} 
 
 
 export default Reservations;

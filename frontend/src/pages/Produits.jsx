@@ -1,3 +1,4 @@
+
 import { useEffect, useState } from "react";
 import axios from "axios";
 import "./Produits.css";
@@ -369,6 +370,8 @@ function Produits() {
                                     value={formulaire.unite}
                                     onChange={handleChange}
                                     placeholder="Ex : Bouteille"
+                                    placeholder="Ex : 10
+                                    "
                                 />
                             </div>
 
@@ -661,3 +664,6 @@ function Produits() {
 }
 
 export default Produits;
+
+
+

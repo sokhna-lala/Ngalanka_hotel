@@ -7,6 +7,54 @@
     width: 100%;
 }
 
+/* ==========================================
+   BOUTON CONFIRMER RÉSERVATION
+========================================== */
+
+.btn-confirm {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+
+    background: linear-gradient(135deg, #16a34a, #15803d);
+    color: black;
+
+    border: none;
+    border-radius: 8px;
+
+    padding: 10px 16px;
+    min-width: 125px;
+
+    font-size: 13px;
+    font-weight: 700;
+    white-space: nowrap;
+
+    cursor: pointer;
+
+    box-shadow: 0 3px 8px rgba(22, 163, 74, 0.25);
+
+    transition:
+        background 0.2s ease,
+        transform 0.2s ease,
+        box-shadow 0.2s ease;
+}
+
+.btn-confirm:hover {
+    background: linear-gradient(135deg, #15803d, #166534);
+    transform: translateY(-2px);
+    box-shadow: 0 5px 12px rgba(22, 163, 74, 0.35);
+}
+
+.btn-confirm:active {
+    transform: translateY(0);
+}
+
+.btn-confirm:focus-visible {
+    outline: 3px solid #86efac;
+    outline-offset: 3px;
+}
+
 
 /* ==========================================
    HEADER

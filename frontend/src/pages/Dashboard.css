@@ -1,429 +1,1066 @@
-/* ==========================================
-   DASHBOARD
-========================================== */
-
 .dashboard-page {
-
     width: 100%;
-
+    padding: 0 0 30px;
 }
 
 
-/* ==========================================
-   BANNIÈRE HÔTEL
-========================================== */
+/* ========================================
+   RECHERCHE RAPIDE - DASHBOARD
+======================================== */
 
-.hotel-banner {
-
-    width: 100%;
-
-    height: 230px;
-
-    border-radius: 18px;
-
-    background-size: cover;
-
-    background-position: center;
-
-    overflow: hidden;
-
+.dashboard-search-section {
     position: relative;
-
-    margin-bottom: 18px;
-
+    margin: 0 0 28px;
+    padding: 26px;
+    background: #ffffff;
+    border: 1px solid #e5eaf1;
+    border-radius: 18px;
+    box-shadow: 0 5px 20px rgba(15, 23, 42, 0.05);
 }
 
-
-/* ==========================================
-   OVERLAY
-========================================== */
-
-.hotel-overlay {
-
-    position: absolute;
-
-    inset: 0;
-
-    display: flex;
-
-    align-items: center;
-
-    padding: 40px;
-
-    background:
-        linear-gradient(
-            90deg,
-            rgba(10, 35, 60, 0.85),
-            rgba(10, 35, 60, 0.35),
-            transparent
-        );
-
-}
-
-
-/* ==========================================
-   TEXTE BIENVENUE
-========================================== */
-
-.hotel-welcome {
-
-    color: white;
-
-}
-
-
-.welcome-text {
-
-    font-size: 13px;
-
-    font-weight: 600;
-
-    letter-spacing: 1px;
-
-}
-
-
-.hotel-welcome h1 {
-
-    margin-top: 10px;
-
-    margin-bottom: 8px;
-
-    font-size: 42px;
-
+.dashboard-search-section h2 {
+    margin: 0 0 8px;
+    color: #172b4d;
+    font-size: 22px;
     font-weight: 700;
+}
 
-    letter-spacing: 1px;
+.dashboard-search-section p {
+    margin: 0 0 18px;
+    color: #64748b;
+    font-size: 14px;
+    line-height: 1.6;
+}
 
+.dashboard-search-input {
+    display: block;
+    width: 100%;
+    box-sizing: border-box;
+    padding: 15px 18px;
+    border: 1px solid #dbe3ee;
+    border-radius: 12px;
+    outline: none;
+    background: #f8fafc;
+    color: #172b4d;
+    font-size: 15px;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease,
+        background 0.2s ease;
+}
+
+.dashboard-search-input::placeholder {
+    color: #94a3b8;
+}
+
+.dashboard-search-input:focus {
+    border-color: #1597a5;
+    background: #ffffff;
+    box-shadow: 0 0 0 4px rgba(21, 151, 165, 0.12);
+}
+
+.dashboard-search-results {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: 14px;
+    margin-top: 22px;
+}
+
+.dashboard-search-results h3 {
+    grid-column: 1 / -1;
+    margin: 10px 0 0;
+    padding-bottom: 9px;
+    border-bottom: 1px solid #e8edf4;
+    color: #1597a5;
+    font-size: 16px;
+    font-weight: 700;
+}
+
+.dashboard-search-result {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    min-width: 0;
+    padding: 15px;
+    border: 1px solid #e5eaf1;
+    border-radius: 12px;
+    background: #f8fafc;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.dashboard-search-result:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 14px rgba(15, 23, 42, 0.07);
+}
+
+.dashboard-search-result strong {
+    color: #172b4d;
+    font-size: 15px;
+    overflow-wrap: anywhere;
+}
+
+.dashboard-search-result span {
+    color: #475569;
+    font-size: 14px;
+    overflow-wrap: anywhere;
+}
+
+.dashboard-search-result small {
+    color: #64748b;
+    font-size: 12px;
+}
+
+.dashboard-search-error {
+    margin-top: 12px !important;
+    color: #dc2626 !important;
+}
+
+@media (max-width: 600px) {
+    .dashboard-search-section {
+        padding: 18px;
+        border-radius: 14px;
+    }
+
+    .dashboard-search-section h2 {
+        font-size: 19px;
+    }
+
+    .dashboard-search-results {
+        grid-template-columns: 1fr;
+    }
 }
 
 
-.hotel-welcome p {
+/* =========================================================
+   EN-TÊTES DES SECTIONS
+========================================================= */
 
+.dashboard-main-stats {
+    margin-bottom: 28px;
+}
+
+.section-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    margin-bottom: 16px;
+}
+
+.section-header h2 {
+    margin: 0 0 5px;
+
+    color: #172033;
+
+    font-size: 21px;
+    font-weight: 700;
+}
+
+.section-header p {
     margin: 0;
 
-    font-size: 20px;
+    color: #7a8494;
 
-    font-style: italic;
-
+    font-size: 13px;
 }
 
 
-/* ==========================================
-   STATISTIQUES
-========================================== */
+/* =========================================================
+   STATISTIQUES PRINCIPALES
+========================================================= */
 
 .stats-grid {
-
     display: grid;
 
     grid-template-columns:
-        repeat(auto-fit, minmax(210px, 1fr));
+        repeat(
+            auto-fit,
+            minmax(220px, 1fr)
+        );
 
     gap: 16px;
-
 }
 
 
-/* ==========================================
-   CARTE
-========================================== */
+/* =========================================================
+   CARTES STATISTIQUES
+========================================================= */
 
 .stat-card {
-
-    min-height: 130px;
-
-    background: white;
-
-    border-radius: 15px;
-
-    padding: 18px;
+    min-height: 125px;
 
     display: flex;
-
     align-items: flex-start;
 
     gap: 14px;
 
-    border: 1px solid #e5e7eb;
+    padding: 18px;
+
+    background: #ffffff;
+
+    border: 1px solid #e8edf3;
+
+    border-radius: 16px;
 
     box-shadow:
-        0 4px 15px
-        rgba(0, 0, 0, 0.05);
+        0 4px 15px rgba(15, 23, 42, 0.05);
 
-    transition: 0.25s;
+    transition:
+        transform 0.2s ease,
+        box-shadow 0.2s ease,
+        border-color 0.2s ease;
+}
 
+.stat-card:hover {
+    transform: translateY(-3px);
+
+    border-color: #dce3ec;
+
+    box-shadow:
+        0 9px 25px rgba(15, 23, 42, 0.09);
 }
 
 
-.stat-card:hover {
+/* =========================================================
+   ICÔNES DES STATISTIQUES
+========================================================= */
 
+.stat-icon {
+    width: 46px;
+    height: 46px;
+
+    flex-shrink: 0;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    border-radius: 13px;
+
+    font-size: 21px;
+}
+
+
+/* Couleurs */
+
+.stat-icon.blue {
+    background: #e8f1ff;
+}
+
+.stat-icon.red {
+    background: #feecec;
+}
+
+.stat-icon.green {
+    background: #e9f8ef;
+}
+
+.stat-icon.orange {
+    background: #fff3df;
+}
+
+.stat-icon.purple {
+    background: #f1eaff;
+}
+
+.stat-icon.cyan {
+    background: #e6f8fb;
+}
+
+.stat-icon.teal {
+    background: #e5f8f5;
+}
+
+.stat-icon.gray {
+    background: #eef1f4;
+}
+
+.stat-icon.gold {
+    background: #fff6d9;
+}
+
+
+/* =========================================================
+   CONTENU DES STATISTIQUES
+========================================================= */
+
+.stat-content {
+    min-width: 0;
+
+    display: flex;
+    flex-direction: column;
+
+    gap: 4px;
+}
+
+.stat-label {
+    color: #64748b;
+
+    font-size: 13px;
+    font-weight: 500;
+}
+
+.stat-content strong {
+    color: #172033;
+
+    font-size: 25px;
+
+    line-height: 1.15;
+
+    font-weight: 700;
+}
+
+.stat-content strong.amount {
+    font-size: 18px;
+
+    white-space: nowrap;
+}
+
+.stat-content small {
+    color: #8a94a6;
+
+    font-size: 12px;
+}
+
+
+/* =========================================================
+   SECTION ÉTAT DES CHAMBRES
+========================================================= */
+
+.dashboard-section {
+    margin-top: 30px;
+    margin-bottom: 30px;
+}
+
+
+/* =========================================================
+   CARTES PAR TYPE DE CHAMBRE
+========================================================= */
+
+.room-types-grid {
+    display: grid;
+
+    grid-template-columns:
+        repeat(
+            3,
+            minmax(0, 1fr)
+        );
+
+    gap: 18px;
+}
+
+
+/* Carte */
+
+.room-type-card {
+    position: relative;
+
+    padding: 20px;
+
+    background: #ffffff;
+
+    border: 1px solid #e7ecf2;
+
+    border-radius: 17px;
+
+    box-shadow:
+        0 5px 18px rgba(15, 23, 42, 0.055);
+
+    transition:
+        transform 0.2s ease,
+        box-shadow 0.2s ease;
+}
+
+.room-type-card:hover {
     transform: translateY(-3px);
 
     box-shadow:
-        0 8px 20px
-        rgba(0, 0, 0, 0.08);
-
+        0 10px 28px rgba(15, 23, 42, 0.09);
 }
 
 
-/* ==========================================
-   ICÔNE
-========================================== */
+/* =========================================================
+   EN-TÊTE DU TYPE
+========================================================= */
 
-.stat-icon {
-
-    width: 52px;
-
-    height: 52px;
-
-    min-width: 52px;
-
-    border-radius: 50%;
-
+.room-type-header {
     display: flex;
-
     align-items: center;
 
+    gap: 12px;
+
+    padding-bottom: 15px;
+
+    border-bottom: 1px solid #edf0f4;
+}
+
+.room-type-icon {
+    width: 45px;
+    height: 45px;
+
+    flex-shrink: 0;
+
+    display: flex;
+    align-items: center;
     justify-content: center;
 
-    font-size: 24px;
+    border-radius: 12px;
 
+    background: #eef4fb;
+
+    font-size: 20px;
+}
+
+.room-type-header h3 {
+    margin: 0 0 3px;
+
+    color: #172033;
+
+    font-size: 16px;
+
+    font-weight: 700;
+}
+
+.room-type-header span {
+    color: #8993a3;
+
+    font-size: 12px;
 }
 
 
-/* ==========================================
-   CONTENU
-========================================== */
+/* =========================================================
+   TOTAL DU TYPE
+========================================================= */
 
-.stat-content {
+.room-type-total {
+    display: flex;
+    align-items: baseline;
 
-    flex: 1;
+    gap: 7px;
 
+    margin: 17px 0;
 }
 
-
-.stat-content span {
-
-    display: block;
-
-    font-size: 14px;
-
-    color: #475569;
-
-    margin-bottom: 6px;
-
-}
-
-
-.stat-content h2 {
-
-    margin: 0;
+.room-type-total strong {
+    color: #172033;
 
     font-size: 30px;
 
-    color: #1e293b;
+    line-height: 1;
 
+    font-weight: 700;
 }
 
-
-.stat-content p {
-
-    margin-top: 6px;
-
-    margin-bottom: 0;
+.room-type-total span {
+    color: #8993a3;
 
     font-size: 12px;
-
-    color: #64748b;
-
 }
 
 
-/* ==========================================
-   COULEURS CARTES
-========================================== */
+/* =========================================================
+   STATUTS DES CHAMBRES
+========================================================= */
 
-.stat-blue {
+.room-status-list {
+    display: flex;
+    flex-direction: column;
 
-    border-color: #bfdbfe;
-
+    gap: 9px;
 }
 
-.stat-blue .stat-icon {
+.room-status-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
 
-    background: #dbeafe;
+    min-height: 28px;
 
+    color: #596579;
+
+    font-size: 13px;
 }
 
+.room-status-item span {
+    display: flex;
+    align-items: center;
 
-.stat-green {
-
-    border-color: #bbf7d0;
-
+    gap: 8px;
 }
 
-.stat-green .stat-icon {
+.room-status-item strong {
+    color: #172033;
 
-    background: #dcfce7;
-
-}
-
-
-.stat-red {
-
-    border-color: #fecaca;
-
-}
-
-.stat-red .stat-icon {
-
-    background: #fee2e2;
-
+    font-size: 14px;
 }
 
 
-.stat-orange {
+/* =========================================================
+   POINTS DE STATUT
+========================================================= */
 
-    border-color: #fed7aa;
+.status-dot {
+    width: 9px;
+    height: 9px;
 
-}
+    display: inline-block;
 
-.stat-orange .stat-icon {
-
-    background: #ffedd5;
-
-}
-
-
-.stat-purple {
-
-    border-color: #ddd6fe;
-
-}
-
-.stat-purple .stat-icon {
-
-    background: #ede9fe;
-
+    border-radius: 50%;
 }
 
 
-.stat-cyan {
+/* Disponible */
 
-    border-color: #bae6fd;
+.status-dot.available {
+    background: #22c55e;
 
-}
-
-.stat-cyan .stat-icon {
-
-    background: #e0f2fe;
-
+    box-shadow:
+        0 0 0 3px rgba(34, 197, 94, 0.10);
 }
 
 
-.stat-gold {
+/* Occupée */
 
-    border-color: #fde68a;
-
-}
-
-.stat-gold .stat-icon {
-
-    background: #fef3c7;
-
-}
-
-
-/* ==========================================
-   BARRE DE PROGRESSION
-========================================== */
-
-.progress {
-
-    width: 100%;
-
-    height: 7px;
-
-    background: #e5e7eb;
-
-    border-radius: 20px;
-
-    overflow: hidden;
-
-    margin-top: 14px;
-
-}
-
-
-.progress-bar {
-
-    height: 100%;
-
-    border-radius: 20px;
-
-}
-
-
-.progress-bar.green {
-
-    background: #16a34a;
-
-}
-
-
-.progress-bar.red {
-
+.status-dot.occupied {
     background: #ef4444;
 
+    box-shadow:
+        0 0 0 3px rgba(239, 68, 68, 0.10);
 }
 
 
-/* ==========================================
-   RESPONSIVE
-========================================== */
+/* Réservée */
+
+.status-dot.reserved {
+    background: #f59e0b;
+
+    box-shadow:
+        0 0 0 3px rgba(245, 158, 11, 0.10);
+}
+
+
+/* Nettoyage */
+
+.status-dot.cleaning {
+    background: #3b82f6;
+
+    box-shadow:
+        0 0 0 3px rgba(59, 130, 246, 0.10);
+}
+
+
+/* Hors service */
+
+.status-dot.out {
+    background: #64748b;
+
+    box-shadow:
+        0 0 0 3px rgba(100, 116, 139, 0.10);
+}
+
+
+/* =========================================================
+   RÉSUMÉ DE L'HÉBERGEMENT
+========================================================= */
+
+.room-summary-grid {
+    display: grid;
+
+    grid-template-columns:
+        repeat(
+            6,
+            minmax(0, 1fr)
+        );
+
+    gap: 12px;
+}
+
+.room-summary-card {
+    display: flex;
+    align-items: center;
+
+    gap: 11px;
+
+    min-height: 82px;
+
+    padding: 13px;
+
+    background: #ffffff;
+
+    border: 1px solid #e8edf3;
+
+    border-radius: 14px;
+
+    box-shadow:
+        0 4px 14px rgba(15, 23, 42, 0.04);
+
+    transition:
+        transform 0.2s ease,
+        box-shadow 0.2s ease;
+}
+
+.room-summary-card:hover {
+    transform: translateY(-2px);
+
+    box-shadow:
+        0 8px 20px rgba(15, 23, 42, 0.07);
+}
+
+
+/* Icône résumé */
+
+.summary-icon {
+    width: 39px;
+    height: 39px;
+
+    flex-shrink: 0;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    border-radius: 10px;
+
+    font-size: 17px;
+}
+
+
+/* Couleurs */
+
+.summary-icon.blue {
+    background: #e8f1ff;
+}
+
+.summary-icon.green {
+    background: #e9f8ef;
+}
+
+.summary-icon.red {
+    background: #feecec;
+}
+
+.summary-icon.orange {
+    background: #fff3df;
+}
+
+.summary-icon.cyan {
+    background: #e6f8fb;
+}
+
+.summary-icon.gray {
+    background: #eef1f4;
+}
+
+
+/* Texte */
+
+.room-summary-card > div:last-child {
+    min-width: 0;
+
+    display: flex;
+    flex-direction: column;
+
+    gap: 3px;
+}
+
+.room-summary-card span {
+    color: #7b8798;
+
+    font-size: 11px;
+
+    white-space: nowrap;
+}
+
+.room-summary-card strong {
+    color: #172033;
+
+    font-size: 20px;
+
+    line-height: 1;
+}
+
+
+/* =========================================================
+   ALERTES
+========================================================= */
+
+.dashboard-alerts {
+    margin-top: 30px;
+}
+
+.alerts-grid {
+    display: grid;
+
+    grid-template-columns:
+        repeat(
+            3,
+            minmax(0, 1fr)
+        );
+
+    gap: 16px;
+}
+
+.alert-card {
+    display: flex;
+    align-items: center;
+
+    gap: 14px;
+
+    min-height: 88px;
+
+    padding: 17px;
+
+    background: #ffffff;
+
+    border: 1px solid #e8edf3;
+
+    border-radius: 15px;
+
+    box-shadow:
+        0 4px 15px rgba(15, 23, 42, 0.04);
+}
+
+.alert-icon {
+    width: 45px;
+    height: 45px;
+
+    flex-shrink: 0;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    border-radius: 12px;
+
+    background: #fff3df;
+
+    font-size: 20px;
+}
+
+.alert-card > div:last-child {
+    min-width: 0;
+
+    display: flex;
+    flex-direction: column;
+
+    gap: 2px;
+}
+
+.alert-card strong {
+    color: #172033;
+
+    font-size: 21px;
+
+    line-height: 1.1;
+}
+
+.alert-card span {
+    color: #596579;
+
+    font-size: 13px;
+}
+
+.alert-card small {
+    color: #939baa;
+
+    font-size: 11px;
+}
+
+
+/* =========================================================
+   BOUTON ACTUALISER
+========================================================= */
+
+.dashboard-footer {
+    display: flex;
+    justify-content: flex-end;
+
+    margin-top: 10px;
+}
+
+.dashboard-refresh {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    gap: 7px;
+
+    padding: 10px 16px;
+
+    border: 1px solid #dce3eb;
+
+    border-radius: 10px;
+
+    background: #ffffff;
+
+    color: #4b5563;
+
+    font-size: 13px;
+    font-weight: 600;
+
+    cursor: pointer;
+
+    transition:
+        background 0.2s ease,
+        border-color 0.2s ease,
+        transform 0.2s ease;
+}
+
+.dashboard-refresh:hover {
+    background: #f7f9fb;
+
+    border-color: #cbd5e1;
+
+    transform: translateY(-1px);
+}
+
+
+/* =========================================================
+   CHARGEMENT
+========================================================= */
+
+.dashboard-loading {
+    min-height: 400px;
+
+    display: flex;
+    flex-direction: column;
+
+    align-items: center;
+    justify-content: center;
+
+    gap: 14px;
+
+    color: #64748b;
+}
+
+.dashboard-loading p {
+    margin: 0;
+
+    font-size: 14px;
+}
+
+.dashboard-spinner {
+    width: 42px;
+    height: 42px;
+
+    border: 4px solid #e8edf3;
+
+    border-top-color: #3b82f6;
+
+    border-radius: 50%;
+
+    animation:
+        dashboard-spin 0.8s linear infinite;
+}
+
+@keyframes dashboard-spin {
+
+    from {
+        transform: rotate(0deg);
+    }
+
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+
+/* =========================================================
+   ERREUR
+========================================================= */
+
+.dashboard-error {
+    min-height: 400px;
+
+    display: flex;
+    flex-direction: column;
+
+    align-items: center;
+    justify-content: center;
+
+    text-align: center;
+
+    padding: 30px;
+
+    background: #ffffff;
+
+    border: 1px solid #e8edf3;
+
+    border-radius: 17px;
+}
+
+.dashboard-error-icon {
+    margin-bottom: 12px;
+
+    font-size: 42px;
+}
+
+.dashboard-error h2 {
+    margin: 0 0 7px;
+
+    color: #172033;
+
+    font-size: 20px;
+}
+
+.dashboard-error p {
+    max-width: 420px;
+
+    margin: 0 0 18px;
+
+    color: #7a8494;
+
+    font-size: 13px;
+}
+
+.dashboard-retry {
+    padding: 10px 18px;
+
+    border: none;
+
+    border-radius: 10px;
+
+    background: #172033;
+
+    color: #ffffff;
+
+    font-size: 13px;
+    font-weight: 600;
+
+    cursor: pointer;
+
+    transition:
+        background 0.2s ease,
+        transform 0.2s ease;
+}
+
+.dashboard-retry:hover {
+    background: #263248;
+
+    transform: translateY(-1px);
+}
+
+
+/* =========================================================
+   TABLETTE
+========================================================= */
+
+@media (max-width: 1200px) {
+
+    .room-summary-grid {
+        grid-template-columns:
+            repeat(
+                3,
+                minmax(0, 1fr)
+            );
+    }
+
+    .room-types-grid {
+        grid-template-columns:
+            repeat(
+                2,
+                minmax(0, 1fr)
+            );
+    }
+
+}
+
+
+/* =========================================================
+   PETITE TABLETTE
+========================================================= */
 
 @media (max-width: 900px) {
 
-    .hotel-banner {
-
-        height: 200px;
-
+    .stats-grid {
+        grid-template-columns:
+            repeat(
+                2,
+                minmax(0, 1fr)
+            );
     }
 
-    .hotel-welcome h1 {
+    .alerts-grid {
+        grid-template-columns:
+            repeat(
+                2,
+                minmax(0, 1fr)
+            );
+    }
 
-        font-size: 32px;
-
+    .room-summary-grid {
+        grid-template-columns:
+            repeat(
+                2,
+                minmax(0, 1fr)
+            );
     }
 
 }
 
 
+/* =========================================================
+   MOBILE
+========================================================= */
+
 @media (max-width: 600px) {
 
-    .hotel-banner {
-
-        height: 180px;
-
+    .dashboard-page {
+        padding-bottom: 20px;
     }
 
-    .hotel-overlay {
 
-        padding: 25px;
-
+    .section-header h2 {
+        font-size: 18px;
     }
 
-    .hotel-welcome h1 {
-
-        font-size: 26px;
-
+    .section-header p {
+        font-size: 12px;
     }
 
-    .hotel-welcome p {
 
-        font-size: 16px;
+    .stats-grid {
+        grid-template-columns: 1fr;
 
+        gap: 12px;
+    }
+
+
+    .stat-card {
+        min-height: 110px;
+
+        padding: 15px;
+    }
+
+
+    .room-types-grid {
+        grid-template-columns: 1fr;
+
+        gap: 13px;
+    }
+
+
+    .room-type-card {
+        padding: 17px;
+    }
+
+
+    .room-summary-grid {
+        grid-template-columns: 1fr;
+    }
+
+
+    .alerts-grid {
+        grid-template-columns: 1fr;
+
+        gap: 12px;
+    }
+
+
+    .dashboard-footer {
+        justify-content: stretch;
+    }
+
+    .dashboard-refresh {
+        width: 100%;
     }
 
 }

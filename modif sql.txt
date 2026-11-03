@@ -1,0 +1,22 @@
+
+
+ALTER TABLE reservations_salle
+ADD COLUMN nom_client VARCHAR(150) NULL AFTER id_client;
+
+
+ALTER TABLE reservations_salle
+MODIFY COLUMN id_client INT(10) UNSIGNED NULL;
+
+
+ALTER TABLE utilisateurs
+ADD COLUMN id_employe INT UNSIGNED NULL AFTER id_utilisateur;
+
+ALTER TABLE utilisateurs
+ADD INDEX idx_utilisateur_employe (id_employe);
+
+ALTER TABLE utilisateurs
+ADD CONSTRAINT fk_utilisateur_employe
+FOREIGN KEY (id_employe)
+REFERENCES employes(id_employe)
+ON UPDATE CASCADE
+ON DELETE SET NULL;

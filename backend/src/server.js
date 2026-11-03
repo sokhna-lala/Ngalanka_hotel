@@ -14,6 +14,12 @@ const comptabiliteRoutes = require("./routes/comptabilite");
 const paiementsRoutes = require("./routes/paiements");
 const caissesRoutes = require("./routes/caisses");
 
+
+const sallesSeminaireRoutes = require("./routes/sallesSeminaire");
+const reservationsSalleRoutes = require("./routes/reservationsSalle");
+
+// Routes Administration
+
 // Routes Administration
 const utilisateursRoutes = require("./routes/utilisateurs");
 const employesRoutes = require("./routes/employes");
@@ -21,6 +27,7 @@ const servicesRoutes = require("./routes/services");
 const fonctionsRoutes = require("./routes/fonctions");
 const parametresRoutes = require("./routes/parametres");
 const auditRoutes = require("./routes/audit");
+const prestationsRoutes = require("./routes/prestations");
 
 // Routes Stocks / Achats
 const produitsRoutes = require("./routes/produits");
@@ -69,6 +76,14 @@ app.use("/api/sejours", sejoursRoutes);
 app.use("/api/comptabilite", comptabiliteRoutes);
 app.use("/api/paiements", paiementsRoutes);
 app.use("/api/caisses", caissesRoutes);
+
+app.use("/api/salles-seminaire", sallesSeminaireRoutes);
+app.use("/api/reservations-salle", reservationsSalleRoutes);
+app.use("/api/prestations", prestationsRoutes);
+
+
+// Administration
+
 app.use("/api/commandes", commandesRoutes);
 // Administration
 app.use("/api/utilisateurs", utilisateursRoutes);

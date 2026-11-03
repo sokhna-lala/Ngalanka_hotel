@@ -17,11 +17,17 @@ import Paiements from "./pages/Paiements";
 import Caisse from "./pages/Caisse";
 import Comptabilite from "./pages/Comptabilite";
 
+import Seminaires from "./pages/Seminaires";
+
+// Administration
+
 // Administration
 import Utilisateurs from "./pages/Utilisateurs";
 import Personnel from "./pages/Personnel";
 import Parametres from "./pages/Parametres";
 import JournalAudit from "./pages/JournalAudit";
+import Prestations from "./pages/Prestations";
+import FicheClient from "./pages/FicheClient";
 
 // Stocks / Achats
 import Produits from "./pages/Produits.jsx";
@@ -73,6 +79,15 @@ function App() {
                     path="/dashboard"
                     element={<Dashboard />}
                 />
+                {/* ==========================
+                    Fiche client
+                ========================== */}
+
+
+                    <Route
+                        path="/clients/:id"
+                        element={<FicheClient />}
+                    />
 
                 {/* ==========================
                     HÉBERGEMENT
@@ -143,6 +158,8 @@ function App() {
                 {/* ==========================
                     LOISIRS & ÉVÉNEMENTS
                 ========================== */}
+
+                <Route path="/prestations" element={<Prestations />} />
                 <Route
                     path="/prestations"
                     element={<h1>Piscine & Loisirs</h1>}
@@ -150,7 +167,7 @@ function App() {
 
                 <Route
                     path="/seminaires"
-                    element={<h1>Salles de séminaire</h1>}
+                    element={<Seminaires />}
                 />
 
                 {/* ==========================
@@ -222,6 +239,7 @@ function App() {
         </Routes>
     );
 }
+
 
 export default App;
 

@@ -76,7 +76,7 @@ function Sejours() {
             const reservationsConfirmees =
                 response.data.filter(
                     (reservation) =>
-                        reservation.statut === "EN_ATTENTE"
+                        reservation.statut === "CONFIRMEE"
                 );
 
             setReservations(reservationsConfirmees);
@@ -296,6 +296,19 @@ function Sejours() {
             );
 
 
+            // ==========================================
+            // ENVOYER LE CHECK-IN VIA LA ROUTE SÉCURISÉE
+            // ==========================================
+
+
+await axios.post(
+    `${API_URL}/reservations/${reservationSelectionnee.id_reservation}/checkin`,
+    {
+        caution: Number(formulaire.caution) || 0
+    }
+);
+
+            alert("Check-in effectué avec succès !");
             // Fermer formulaire
 
             fermerFormulaire();

@@ -5,12 +5,10 @@ import "./Utilisateurs.css";
 const API_URL = "http://localhost:5000/api/utilisateurs";
 
 const initialForm = {
+    id_employe: "",
     nom_utilisateur: "",
     mot_de_passe: "",
-    nom_complet: "",
     id_role: "",
-    telephone: "",
-    email: "",
 };
 
 function Utilisateurs() {
@@ -18,6 +16,7 @@ function Utilisateurs() {
 
     const [utilisateurs, setUtilisateurs] = useState([]);
     const [roles, setRoles] = useState([]);
+    const [personnel, setPersonnel] = useState([]);
 
     const [form, setForm] = useState(initialForm);
     const [utilisateurSelectionne, setUtilisateurSelectionne] = useState(null);
@@ -26,10 +25,16 @@ function Utilisateurs() {
     const [statutFiltre, setStatutFiltre] = useState("TOUS");
 
     const [chargement, setChargement] = useState(false);
+    const [chargementPersonnel, setChargementPersonnel] = useState(false);
+
     const [message, setMessage] = useState("");
     const [erreur, setErreur] = useState("");
 
     const [modalOuvert, setModalOuvert] = useState(false);
+
+    // =====================================================
+    // CHARGEMENT INITIAL
+    // =====================================================
 
     useEffect(() => {
         chargerUtilisateurs();
@@ -88,36 +93,75 @@ function Utilisateurs() {
     };
 
     // =====================================================
+    // CHARGER LE PERSONNEL DISPONIBLE
+    // =====================================================
+
+    const chargerPersonnel = async (idUtilisateur = null) => {
+        try {
+            setChargementPersonnel(true);
+
+            let url = `${API_URL}/personnel`;
+
+            if (idUtilisateur) {
+                url += `?id_utilisateur=${idUtilisateur}`;
+            }
+
+            const response = await fetch(url);
+            const data = await response.json();
+
+            if (!response.ok) {
+                throw new Error(
+                    data.message ||
+                    "Erreur lors du chargement du personnel"
+                );
+            }
+
+            setPersonnel(data);
+
+        } catch (error) {
+            console.error(error);
+            setErreur(error.message);
+        } finally {
+            setChargementPersonnel(false);
+        }
+    };
+
+    // =====================================================
     // OUVRIR AJOUT
     // =====================================================
 
-    const ouvrirAjout = () => {
+    const ouvrirAjout = async () => {
         setUtilisateurSelectionne(null);
         setForm(initialForm);
         setMessage("");
         setErreur("");
         setModalOuvert(true);
+
+        await chargerPersonnel();
     };
 
     // =====================================================
     // OUVRIR MODIFICATION
     // =====================================================
 
-    const ouvrirModification = (utilisateur) => {
-        setUtilisateurSelectionne(utilisateur);
+    const ouvrirModification = async (utilisateurCible) => {
+        setUtilisateurSelectionne(utilisateurCible);
 
         setForm({
-            nom_utilisateur: utilisateur.nom_utilisateur || "",
+            id_employe: utilisateurCible.id_employe || "",
+            nom_utilisateur:
+                utilisateurCible.nom_utilisateur || "",
             mot_de_passe: "",
-            nom_complet: utilisateur.nom_complet || "",
-            id_role: utilisateur.id_role || "",
-            telephone: utilisateur.telephone || "",
-            email: utilisateur.email || "",
+            id_role: utilisateurCible.id_role || "",
         });
 
         setMessage("");
         setErreur("");
         setModalOuvert(true);
+
+        await chargerPersonnel(
+            utilisateurCible.id_utilisateur
+        );
     };
 
     // =====================================================
@@ -128,6 +172,7 @@ function Utilisateurs() {
         setModalOuvert(false);
         setUtilisateurSelectionne(null);
         setForm(initialForm);
+        setPersonnel([]);
     };
 
     // =====================================================
@@ -144,6 +189,16 @@ function Utilisateurs() {
     };
 
     // =====================================================
+    // EMPLOYÉ SÉLECTIONNÉ
+    // =====================================================
+
+    const employeSelectionne = personnel.find(
+        (employe) =>
+            String(employe.id_employe) ===
+            String(form.id_employe)
+    );
+
+    // =====================================================
     // CRÉER / MODIFIER UN UTILISATEUR
     // =====================================================
 
@@ -153,23 +208,58 @@ function Utilisateurs() {
         setMessage("");
         setErreur("");
 
-        if (!form.nom_utilisateur.trim()) {
-            setErreur("Le nom d'utilisateur est obligatoire.");
+        // -----------------------------
+        // Vérification personnel
+        // -----------------------------
+
+        if (!form.id_employe) {
+            setErreur(
+                "Veuillez sélectionner une personne du personnel."
+            );
             return;
         }
 
-        if (!form.nom_complet.trim()) {
-            setErreur("Le nom complet est obligatoire.");
+        // -----------------------------
+        // Vérification nom utilisateur
+        // -----------------------------
+
+        if (!form.nom_utilisateur.trim()) {
+            setErreur(
+                "Le nom d'utilisateur est obligatoire."
+            );
             return;
         }
+
+        // -----------------------------
+        // Vérification rôle
+        // -----------------------------
 
         if (!form.id_role) {
             setErreur("Veuillez sélectionner un rôle.");
             return;
         }
 
-        if (!utilisateurSelectionne && !form.mot_de_passe) {
-            setErreur("Le mot de passe est obligatoire.");
+        // -----------------------------
+        // Vérification mot de passe
+        // -----------------------------
+
+        if (
+            !utilisateurSelectionne &&
+            !form.mot_de_passe.trim()
+        ) {
+            setErreur(
+                "Le mot de passe est obligatoire."
+            );
+            return;
+        }
+
+        if (
+            form.mot_de_passe.trim() &&
+            form.mot_de_passe.length < 6
+        ) {
+            setErreur(
+                "Le mot de passe doit contenir au moins 6 caractères."
+            );
             return;
         }
 
@@ -185,18 +275,19 @@ function Utilisateurs() {
                 : "POST";
 
             const body = {
-                nom_utilisateur: form.nom_utilisateur,
-                nom_complet: form.nom_complet,
+                id_employe: Number(form.id_employe),
+                nom_utilisateur:
+                    form.nom_utilisateur.trim(),
                 id_role: Number(form.id_role),
-                telephone: form.telephone,
-                email: form.email,
 
                 // Utilisateur actuellement connecté
-                id_utilisateur: utilisateur?.id_utilisateur || null,
+                id_utilisateur:
+                    utilisateur?.id_utilisateur || null,
             };
 
             if (form.mot_de_passe.trim()) {
-                body.mot_de_passe = form.mot_de_passe;
+                body.mot_de_passe =
+                    form.mot_de_passe;
             }
 
             const response = await fetch(url, {
@@ -269,7 +360,8 @@ function Utilisateurs() {
 
                         // Utilisateur actuellement connecté
                         id_utilisateur:
-                            utilisateur?.id_utilisateur || null,
+                            utilisateur?.id_utilisateur ||
+                            null,
                     }),
                 }
             );
@@ -283,7 +375,9 @@ function Utilisateurs() {
                 );
             }
 
-            setMessage("Statut modifié avec succès.");
+            setMessage(
+                "Statut modifié avec succès."
+            );
 
             await chargerUtilisateurs();
 
@@ -322,7 +416,8 @@ function Utilisateurs() {
                     body: JSON.stringify({
                         // Utilisateur actuellement connecté
                         id_utilisateur:
-                            utilisateur?.id_utilisateur || null,
+                            utilisateur?.id_utilisateur ||
+                            null,
                     }),
                 }
             );
@@ -336,7 +431,9 @@ function Utilisateurs() {
                 );
             }
 
-            setMessage("Utilisateur supprimé avec succès.");
+            setMessage(
+                "Utilisateur supprimé avec succès."
+            );
 
             await chargerUtilisateurs();
 
@@ -350,52 +447,72 @@ function Utilisateurs() {
     // FILTRES
     // =====================================================
 
-    const utilisateursFiltres = utilisateurs.filter(
-        (utilisateur) => {
-            const texte = recherche.toLowerCase();
+    const utilisateursFiltres =
+        utilisateurs.filter((utilisateurLigne) => {
+            const texte =
+                recherche.toLowerCase();
 
             const correspondRecherche =
-                utilisateur.nom_utilisateur
+                utilisateurLigne.nom_utilisateur
                     ?.toLowerCase()
                     .includes(texte) ||
-                utilisateur.nom_complet
+
+                utilisateurLigne.nom_complet
                     ?.toLowerCase()
                     .includes(texte) ||
-                utilisateur.nom_role
+
+                utilisateurLigne.nom_role
                     ?.toLowerCase()
                     .includes(texte) ||
-                utilisateur.email
+
+                utilisateurLigne.email
+                    ?.toLowerCase()
+                    .includes(texte) ||
+
+                utilisateurLigne.matricule
+                    ?.toLowerCase()
+                    .includes(texte) ||
+
+                utilisateurLigne.fonction
+                    ?.toLowerCase()
+                    .includes(texte) ||
+
+                utilisateurLigne.service
                     ?.toLowerCase()
                     .includes(texte);
 
             const correspondStatut =
                 statutFiltre === "TOUS" ||
-                utilisateur.statut === statutFiltre;
+                utilisateurLigne.statut ===
+                    statutFiltre;
 
             return (
                 correspondRecherche &&
                 correspondStatut
             );
-        }
-    );
+        });
 
     // =====================================================
     // STATISTIQUES
     // =====================================================
 
-    const totalUtilisateurs = utilisateurs.length;
+    const totalUtilisateurs =
+        utilisateurs.length;
 
-    const utilisateursActifs = utilisateurs.filter(
-        (u) => u.statut === "ACTIF"
-    ).length;
+    const utilisateursActifs =
+        utilisateurs.filter(
+            (u) => u.statut === "ACTIF"
+        ).length;
 
-    const utilisateursInactifs = utilisateurs.filter(
-        (u) => u.statut === "INACTIF"
-    ).length;
+    const utilisateursInactifs =
+        utilisateurs.filter(
+            (u) => u.statut === "INACTIF"
+        ).length;
 
-    const utilisateursBloques = utilisateurs.filter(
-        (u) => u.statut === "BLOQUE"
-    ).length;
+    const utilisateursBloques =
+        utilisateurs.filter(
+            (u) => u.statut === "BLOQUE"
+        ).length;
 
     // =====================================================
     // AFFICHAGE
@@ -404,13 +521,18 @@ function Utilisateurs() {
     return (
         <div className="utilisateurs-page">
 
+            {/* ================= HEADER ================= */}
+
             <div className="utilisateurs-header">
+
                 <div>
-                    <h1>Gestion des utilisateurs</h1>
+                    <h1>
+                        Gestion des utilisateurs
+                    </h1>
 
                     <p>
-                        Administration des comptes, rôles
-                        et accès au système.
+                        Administration des comptes,
+                        rôles et accès au système.
                     </p>
                 </div>
 
@@ -420,7 +542,11 @@ function Utilisateurs() {
                 >
                     + Nouvel utilisateur
                 </button>
+
             </div>
+
+
+            {/* ================= MESSAGES ================= */}
 
             {message && (
                 <div className="message-succes">
@@ -434,46 +560,72 @@ function Utilisateurs() {
                 </div>
             )}
 
+
+            {/* ================= STATISTIQUES ================= */}
+
             <div className="stats-utilisateurs">
 
                 <div className="stat-card">
-                    <div className="stat-icon">👥</div>
+                    <div className="stat-icon">
+                        👥
+                    </div>
 
                     <div>
-                        <span>Total utilisateurs</span>
+                        <span>
+                            Total utilisateurs
+                        </span>
+
                         <strong>
                             {totalUtilisateurs}
                         </strong>
                     </div>
                 </div>
 
+
                 <div className="stat-card">
-                    <div className="stat-icon">🟢</div>
+                    <div className="stat-icon">
+                        🟢
+                    </div>
 
                     <div>
-                        <span>Actifs</span>
+                        <span>
+                            Actifs
+                        </span>
+
                         <strong>
                             {utilisateursActifs}
                         </strong>
                     </div>
                 </div>
 
+
                 <div className="stat-card">
-                    <div className="stat-icon">🟠</div>
+                    <div className="stat-icon">
+                        🟠
+                    </div>
 
                     <div>
-                        <span>Inactifs</span>
+                        <span>
+                            Inactifs
+                        </span>
+
                         <strong>
                             {utilisateursInactifs}
                         </strong>
                     </div>
                 </div>
 
+
                 <div className="stat-card">
-                    <div className="stat-icon">🔴</div>
+                    <div className="stat-icon">
+                        🔴
+                    </div>
 
                     <div>
-                        <span>Bloqués</span>
+                        <span>
+                            Bloqués
+                        </span>
+
                         <strong>
                             {utilisateursBloques}
                         </strong>
@@ -482,27 +634,38 @@ function Utilisateurs() {
 
             </div>
 
+
+            {/* ================= FILTRES ================= */}
+
             <div className="utilisateurs-filtres">
 
                 <div className="recherche-utilisateur">
+
                     <span>🔎</span>
 
                     <input
                         type="text"
-                        placeholder="Rechercher un utilisateur..."
+                        placeholder="Rechercher un utilisateur, personnel, rôle..."
                         value={recherche}
                         onChange={(e) =>
-                            setRecherche(e.target.value)
+                            setRecherche(
+                                e.target.value
+                            )
                         }
                     />
+
                 </div>
+
 
                 <select
                     value={statutFiltre}
                     onChange={(e) =>
-                        setStatutFiltre(e.target.value)
+                        setStatutFiltre(
+                            e.target.value
+                        )
                     }
                 >
+
                     <option value="TOUS">
                         Tous les statuts
                     </option>
@@ -518,27 +681,37 @@ function Utilisateurs() {
                     <option value="BLOQUE">
                         Bloqués
                     </option>
+
                 </select>
 
             </div>
+
+
+            {/* ================= TABLEAU ================= */}
 
             <div className="tableau-utilisateurs">
 
                 <div className="tableau-titre">
 
                     <div>
-                        <h2>Utilisateurs</h2>
+
+                        <h2>
+                            Utilisateurs
+                        </h2>
 
                         <span>
                             {utilisateursFiltres.length}
                             {" "}utilisateur(s)
                         </span>
+
                     </div>
 
                 </div>
 
+
                 {chargement &&
                 utilisateurs.length === 0 ? (
+
                     <div className="chargement">
                         Chargement des utilisateurs...
                     </div>
@@ -558,17 +731,47 @@ function Utilisateurs() {
                             <thead>
 
                                 <tr>
-                                    <th>Utilisateur</th>
-                                    <th>Nom complet</th>
-                                    <th>Rôle</th>
-                                    <th>Téléphone</th>
-                                    <th>Email</th>
-                                    <th>Statut</th>
-                                    <th>Dernière connexion</th>
-                                    <th>Actions</th>
+
+                                    <th>
+                                        Utilisateur
+                                    </th>
+
+                                    <th>
+                                        Personnel
+                                    </th>
+
+                                    <th>
+                                        Fonction / Service
+                                    </th>
+
+                                    <th>
+                                        Rôle
+                                    </th>
+
+                                    <th>
+                                        Téléphone
+                                    </th>
+
+                                    <th>
+                                        Email
+                                    </th>
+
+                                    <th>
+                                        Statut
+                                    </th>
+
+                                    <th>
+                                        Dernière connexion
+                                    </th>
+
+                                    <th>
+                                        Actions
+                                    </th>
+
                                 </tr>
 
                             </thead>
+
 
                             <tbody>
 
@@ -581,14 +784,18 @@ function Utilisateurs() {
                                             }
                                         >
 
+                                            {/* UTILISATEUR */}
+
                                             <td>
 
                                                 <div className="cell-utilisateur">
 
                                                     <div className="avatar-utilisateur">
+
                                                         {utilisateurLigne.nom_complet
                                                             ?.charAt(0)
                                                             ?.toUpperCase()}
+
                                                     </div>
 
                                                     <div>
@@ -612,33 +819,128 @@ function Utilisateurs() {
 
                                             </td>
 
-                                            <td>
-                                                {
-                                                    utilisateurLigne.nom_complet
-                                                }
-                                            </td>
+
+                                            {/* PERSONNEL */}
 
                                             <td>
+
+                                                {utilisateurLigne.id_employe ? (
+
+                                                    <div>
+
+                                                        <strong>
+                                                            {
+                                                                utilisateurLigne.nom_employe
+                                                            }{" "}
+                                                            {
+                                                                utilisateurLigne.prenom_employe
+                                                            }
+                                                        </strong>
+
+                                                        <small
+                                                            style={{
+                                                                display: "block",
+                                                                marginTop: "4px",
+                                                                opacity: 0.7,
+                                                            }}
+                                                        >
+                                                            {
+                                                                utilisateurLigne.matricule
+                                                            }
+                                                        </small>
+
+                                                    </div>
+
+                                                ) : (
+
+                                                    <span>
+                                                        Non associé
+                                                    </span>
+
+                                                )}
+
+                                            </td>
+
+
+                                            {/* FONCTION / SERVICE */}
+
+                                            <td>
+
+                                                {utilisateurLigne.id_employe ? (
+
+                                                    <div>
+
+                                                        <strong>
+                                                            {
+                                                                utilisateurLigne.fonction ||
+                                                                "—"
+                                                            }
+                                                        </strong>
+
+                                                        <small
+                                                            style={{
+                                                                display: "block",
+                                                                marginTop: "4px",
+                                                                opacity: 0.7,
+                                                            }}
+                                                        >
+                                                            {
+                                                                utilisateurLigne.service ||
+                                                                "—"
+                                                            }
+                                                        </small>
+
+                                                    </div>
+
+                                                ) : (
+
+                                                    "—"
+
+                                                )}
+
+                                            </td>
+
+
+                                            {/* RÔLE */}
+
+                                            <td>
+
                                                 <span className="badge-role">
+
                                                     {
                                                         utilisateurLigne.nom_role
                                                     }
+
                                                 </span>
+
                                             </td>
 
+
+                                            {/* TÉLÉPHONE */}
+
                                             <td>
+
                                                 {
                                                     utilisateurLigne.telephone ||
                                                     "—"
                                                 }
+
                                             </td>
 
+
+                                            {/* EMAIL */}
+
                                             <td>
+
                                                 {
                                                     utilisateurLigne.email ||
                                                     "—"
                                                 }
+
                                             </td>
+
+
+                                            {/* STATUT */}
 
                                             <td>
 
@@ -652,7 +954,11 @@ function Utilisateurs() {
 
                                             </td>
 
+
+                                            {/* DERNIÈRE CONNEXION */}
+
                                             <td>
+
                                                 {
                                                     utilisateurLigne.derniere_connexion
                                                         ? new Date(
@@ -662,7 +968,11 @@ function Utilisateurs() {
                                                         )
                                                         : "Jamais"
                                                 }
+
                                             </td>
+
+
+                                            {/* ACTIONS */}
 
                                             <td>
 
@@ -680,8 +990,10 @@ function Utilisateurs() {
                                                         ✏️
                                                     </button>
 
+
                                                     {utilisateurLigne.statut !==
                                                         "ACTIF" && (
+
                                                         <button
                                                             className="btn-action activer"
                                                             title="Activer"
@@ -694,10 +1006,13 @@ function Utilisateurs() {
                                                         >
                                                             ✓
                                                         </button>
+
                                                     )}
+
 
                                                     {utilisateurLigne.statut ===
                                                         "ACTIF" && (
+
                                                         <button
                                                             className="btn-action desactiver"
                                                             title="Désactiver"
@@ -710,10 +1025,13 @@ function Utilisateurs() {
                                                         >
                                                             ⏸
                                                         </button>
+
                                                     )}
+
 
                                                     {utilisateurLigne.statut !==
                                                         "BLOQUE" && (
+
                                                         <button
                                                             className="btn-action bloquer"
                                                             title="Bloquer"
@@ -726,7 +1044,9 @@ function Utilisateurs() {
                                                         >
                                                             🔒
                                                         </button>
+
                                                     )}
+
 
                                                     <button
                                                         className="btn-action supprimer"
@@ -759,6 +1079,9 @@ function Utilisateurs() {
 
             </div>
 
+
+            {/* ================= MODAL ================= */}
+
             {modalOuvert && (
 
                 <div
@@ -773,23 +1096,30 @@ function Utilisateurs() {
                         }
                     >
 
+                        {/* HEADER MODAL */}
+
                         <div className="modal-header">
 
                             <div>
 
                                 <h2>
+
                                     {utilisateurSelectionne
                                         ? "Modifier l'utilisateur"
                                         : "Nouvel utilisateur"}
+
                                 </h2>
 
                                 <p>
+
                                     {utilisateurSelectionne
                                         ? "Modifiez les informations du compte."
-                                        : "Créez un nouveau compte utilisateur."}
+                                        : "Associez un compte à une personne du personnel."}
+
                                 </p>
 
                             </div>
+
 
                             <button
                                 className="btn-fermer-modal"
@@ -800,11 +1130,186 @@ function Utilisateurs() {
 
                         </div>
 
+
+                        {/* FORMULAIRE */}
+
                         <form
-                            onSubmit={enregistrerUtilisateur}
+                            onSubmit={
+                                enregistrerUtilisateur
+                            }
                         >
 
                             <div className="form-grid">
+
+                                {/* PERSONNEL */}
+
+                                <div className="form-group">
+
+                                    <label>
+                                        Personnel *
+                                    </label>
+
+                                    <select
+                                        name="id_employe"
+                                        value={
+                                            form.id_employe
+                                        }
+                                        onChange={
+                                            handleChange
+                                        }
+                                        required
+                                        disabled={
+                                            chargementPersonnel
+                                        }
+                                    >
+
+                                        <option value="">
+
+                                            {chargementPersonnel
+                                                ? "Chargement du personnel..."
+                                                : "Sélectionner une personne"}
+
+                                        </option>
+
+                                        {personnel.map(
+                                            (employe) => (
+
+                                                <option
+                                                    key={
+                                                        employe.id_employe
+                                                    }
+                                                    value={
+                                                        employe.id_employe
+                                                    }
+                                                >
+
+                                                    {
+                                                        employe.prenom
+                                                    }{" "}
+                                                    {
+                                                        employe.nom
+                                                    }
+                                                    {" — "}
+                                                    {
+                                                        employe.matricule
+                                                    }
+
+                                                </option>
+
+                                            )
+                                        )}
+
+                                    </select>
+
+                                </div>
+
+
+                                {/* INFORMATIONS EMPLOYÉ */}
+
+                                {employeSelectionne && (
+
+                                    <div
+                                        className="form-group"
+                                        style={{
+                                            gridColumn:
+                                                "1 / -1",
+                                            padding:
+                                                "14px 16px",
+                                            borderRadius:
+                                                "10px",
+                                            background:
+                                                "#f5f7fa",
+                                            border:
+                                                "1px solid #e1e5eb",
+                                        }}
+                                    >
+
+                                        <strong
+                                            style={{
+                                                display:
+                                                    "block",
+                                                marginBottom:
+                                                    "8px",
+                                            }}
+                                        >
+                                            👤{" "}
+                                            {
+                                                employeSelectionne.prenom
+                                            }{" "}
+                                            {
+                                                employeSelectionne.nom
+                                            }
+                                        </strong>
+
+                                        <div
+                                            style={{
+                                                display:
+                                                    "grid",
+                                                gridTemplateColumns:
+                                                    "repeat(2, minmax(0, 1fr))",
+                                                gap: "6px 20px",
+                                                fontSize:
+                                                    "13px",
+                                            }}
+                                        >
+
+                                            <span>
+                                                <strong>
+                                                    Matricule :
+                                                </strong>{" "}
+                                                {
+                                                    employeSelectionne.matricule
+                                                }
+                                            </span>
+
+                                            <span>
+                                                <strong>
+                                                    Fonction :
+                                                </strong>{" "}
+                                                {
+                                                    employeSelectionne.fonction ||
+                                                    "—"
+                                                }
+                                            </span>
+
+                                            <span>
+                                                <strong>
+                                                    Service :
+                                                </strong>{" "}
+                                                {
+                                                    employeSelectionne.service ||
+                                                    "—"
+                                                }
+                                            </span>
+
+                                            <span>
+                                                <strong>
+                                                    Téléphone :
+                                                </strong>{" "}
+                                                {
+                                                    employeSelectionne.telephone ||
+                                                    "—"
+                                                }
+                                            </span>
+
+                                            <span>
+                                                <strong>
+                                                    Email :
+                                                </strong>{" "}
+                                                {
+                                                    employeSelectionne.email ||
+                                                    "—"
+                                                }
+                                            </span>
+
+                                        </div>
+
+                                    </div>
+
+                                )}
+
+
+                                {/* NOM UTILISATEUR */}
 
                                 <div className="form-group">
 
@@ -818,31 +1323,17 @@ function Utilisateurs() {
                                         value={
                                             form.nom_utilisateur
                                         }
-                                        onChange={handleChange}
-                                        placeholder="Ex : reception2"
-                                        required
-                                    />
-
-                                </div>
-
-                                <div className="form-group">
-
-                                    <label>
-                                        Nom complet *
-                                    </label>
-
-                                    <input
-                                        type="text"
-                                        name="nom_complet"
-                                        value={
-                                            form.nom_complet
+                                        onChange={
+                                            handleChange
                                         }
-                                        onChange={handleChange}
-                                        placeholder="Ex : Abdoulaye Ba"
+                                        placeholder="Ex : mamadou.diop"
                                         required
                                     />
 
                                 </div>
+
+
+                                {/* RÔLE */}
 
                                 <div className="form-group">
 
@@ -852,8 +1343,12 @@ function Utilisateurs() {
 
                                     <select
                                         name="id_role"
-                                        value={form.id_role}
-                                        onChange={handleChange}
+                                        value={
+                                            form.id_role
+                                        }
+                                        onChange={
+                                            handleChange
+                                        }
                                         required
                                     >
 
@@ -861,27 +1356,40 @@ function Utilisateurs() {
                                             Sélectionner un rôle
                                         </option>
 
-                                        {roles.map((role) => (
+                                        {roles.map(
+                                            (role) => (
 
-                                            <option
-                                                key={role.id_role}
-                                                value={role.id_role}
-                                            >
-                                                {role.nom_role}
-                                            </option>
+                                                <option
+                                                    key={
+                                                        role.id_role
+                                                    }
+                                                    value={
+                                                        role.id_role
+                                                    }
+                                                >
+                                                    {
+                                                        role.nom_role
+                                                    }
+                                                </option>
 
-                                        ))}
+                                            )
+                                        )}
 
                                     </select>
 
                                 </div>
 
+
+                                {/* MOT DE PASSE */}
+
                                 <div className="form-group">
 
                                     <label>
+
                                         Mot de passe{" "}
                                         {!utilisateurSelectionne &&
                                             "*"}
+
                                     </label>
 
                                     <input
@@ -890,7 +1398,9 @@ function Utilisateurs() {
                                         value={
                                             form.mot_de_passe
                                         }
-                                        onChange={handleChange}
+                                        onChange={
+                                            handleChange
+                                        }
                                         placeholder={
                                             utilisateurSelectionne
                                                 ? "Laisser vide pour conserver"
@@ -903,50 +1413,42 @@ function Utilisateurs() {
 
                                 </div>
 
-                                <div className="form-group">
+                            </div>
 
-                                    <label>
-                                        Téléphone
-                                    </label>
 
-                                    <input
-                                        type="text"
-                                        name="telephone"
-                                        value={
-                                            form.telephone
-                                        }
-                                        onChange={handleChange}
-                                        placeholder="Ex : 77 000 00 00"
-                                    />
+                            {/* NOTE */}
 
-                                </div>
+                            <div
+                                style={{
+                                    marginTop: "10px",
+                                    padding: "10px 12px",
+                                    borderRadius: "8px",
+                                    background:
+                                        "#fff8e6",
+                                    border:
+                                        "1px solid #f0dfaa",
+                                    fontSize: "13px",
+                                }}
+                            >
 
-                                <div className="form-group">
-
-                                    <label>
-                                        Email
-                                    </label>
-
-                                    <input
-                                        type="email"
-                                        name="email"
-                                        value={
-                                            form.email
-                                        }
-                                        onChange={handleChange}
-                                        placeholder="Ex : utilisateur@ngalanka.sn"
-                                    />
-
-                                </div>
+                                ℹ️ Le nom complet, le téléphone
+                                et l'e-mail sont automatiquement
+                                récupérés depuis la fiche du
+                                personnel sélectionné.
 
                             </div>
+
+
+                            {/* ACTIONS */}
 
                             <div className="modal-actions">
 
                                 <button
                                     type="button"
                                     className="btn-annuler"
-                                    onClick={fermerModal}
+                                    onClick={
+                                        fermerModal
+                                    }
                                 >
                                     Annuler
                                 </button>
@@ -956,11 +1458,13 @@ function Utilisateurs() {
                                     className="btn-enregistrer"
                                     disabled={chargement}
                                 >
+
                                     {chargement
                                         ? "Enregistrement..."
                                         : utilisateurSelectionne
                                         ? "Enregistrer les modifications"
                                         : "Créer l'utilisateur"}
+
                                 </button>
 
                             </div>
